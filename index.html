@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1219"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<title>SECM · Maniobras de Seccionamiento ante Falla</title>
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1219"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>GridCtrl · Maniobras de falla</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet.gridlayer.googlemutant@0.16.0/dist/Leaflet.GoogleMutant.js"></script>
@@ -56,7 +56,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 </style></head><body>
 <button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button>
 <aside id="side">
-<h1>SECM<small>Maniobras de Seccionamiento ante Falla</small></h1>
+<h1>GridCtrl<small>Maniobras de seccionamiento ante falla</small></h1>
 <section><h2>Circuitos KMZ <b id="cc">0/100</b></h2>
 <label class="btn">Cargar archivos KMZ / KML<input id="fi" type="file" accept=".kmz,.kml" multiple hidden></label>
 <div id="cl"></div><small class="h">Solo los circuitos marcados participan en el análisis. Los archivos se guardan en el dispositivo y se cargan solos al reabrir.</small>
@@ -66,7 +66,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <small class="h">Rojo = cerrado, verde = abierto. Elija un tipo y haga clic en el mapa (Esc cancela). Anclaje Doble: se recomienda como segunda maniobra, después de la primera (restauradores y seccionamiento); márquelo con 2 clics (un lado y el otro, en la dirección en que están los puentes de su circuito). Elija arriba el circuito del equipo o déjelo en Automático. Restaurador: se abre solo si la falla queda delante de él. Cruces: con "Trazar flujo en cruce" dibuje por dónde pasa la corriente en cada línea (clic en cada vértice; Enter o "Terminar trazo" para cerrar cada trazo). Haga un trazo por cada línea; la app conecta solo lo que usted trace. Acerque el mapa y haga clic sobre la línea, un poco antes y después del cruce. Para borrar un trazo, haga clic sobre él con la herramienta desactivada. Arrastre un punto para moverlo. Para renombrar, edite el nombre en la lista.</small>
 <div class="g"><button id="be">Terminar trazo (Enter)</button><button id="bu">Deshacer vértice</button></div><div id="ptl"></div><small class="h">Casilla: mostrar u ocultar cada equipo en el mapa (un equipo oculto no participa en el análisis, igual que los circuitos).<br>Tolerancia de unión de líneas (m): <input id="tol" type="number" value="4" min="0.5" max="5" step="0.5" style="width:60px"></small>
 <div class="g"><button id="ex">Exportar puntos</button><label class="btn">Importar puntos<input id="im" type="file" accept=".json" hidden></label></div>
-<div class="g"><button id="bk">💾 Respaldo completo</button><label class="btn">Restaurar respaldo<input id="br" type="file" accept=".json" hidden></label></div><small class="h">El respaldo guarda equipos, cruces y KMZ en un solo archivo: sirve para pasar su información a otro celular.</small></section>
+<div class="g"><button id="bk">💾 Respaldo completo</button><label class="btn">Restaurar respaldo<input id="br" type="file" accept=".json" hidden></label></div><small class="h">El respaldo guarda equipos, cruces y KMZ en un solo archivo: sirve para pasar su información a otro celular.</small><small class="h">🔒 Sus KMZ, tablas y equipos se guardan solo en este dispositivo: la app no sube archivos a ningún servidor.</small></section>
 <section><h2>Usuarios y demandas <b id="dm"></b></h2>
 <small class="h">Cada interruptor toma sus usuarios y su demanda (MW) de la tabla cuando su nombre coincide con el del circuito (sin importar mayúsculas, espacios ni guiones). Se reparten por igual a lo largo de la línea de cada circuito, porque la tabla solo trae totales por circuito.</small>
 <label class="btn">Cargar tabla (.xlsx o .csv)<input id="dx" type="file" accept=".xlsx,.csv" hidden></label><div id="dl"></div></section>
@@ -529,4 +529,6 @@ function insEnd(){clearInterval(ins.tm);ins.ln&&ins.ln.remove();const n=ins.list
  insb.innerHTML=`<div class="ih"><b>🧭 Inspección terminada</b><span>${ins.ok.size}/${n}</span><button onclick="insStop()">✕</button></div><div class="ib"><div class="in">Revisados: <b>${ins.ok.size}</b> · omitidos: <b>${ins.sk.size}</b></div><div class="ia"><button class="ok" onclick="insShare()">Compartir reporte</button></div></div>`}
 function insShare(){const t=ins.rep;navigator.share?navigator.share({title:'Inspección '+ins.cn,text:t}).catch(()=>{}):navigator.clipboard.writeText(t).then(()=>toast('Reporte copiado'))}
 function insStop(){if(!ins)return;clearInterval(ins.tm);ins.ln&&ins.ln.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+if('serviceWorker' in navigator&&location.protocol=='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>
