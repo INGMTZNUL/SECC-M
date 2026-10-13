@@ -1,0 +1,532 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1219"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<title>SECM · Maniobras de Seccionamiento ante Falla</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet.gridlayer.googlemutant@0.16.0/dist/Leaflet.GoogleMutant.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{--bg:#0a1219;--p:#101b25;--l:#233546;--t:#d4e4f2;--m:#7b94aa;--a:#3cc8f0;--r:#ff4d5e;--g:#3ddc84;--y:#ffc233}
+*{box-sizing:border-box}body{margin:0;height:100vh;display:grid;grid-template-columns:372px 1fr;background:var(--bg);color:var(--t);font:13px/1.45 system-ui,sans-serif}
+#side{overflow:auto;padding:12px;border-right:1px solid var(--l);background:var(--p)}#map{height:100vh;background:#0a1219}
+h1{font:700 17px ui-monospace,Consolas,monospace;margin:0 0 12px;color:var(--a)}h1 small{display:block;color:var(--m);font-size:11px;font-weight:400}
+h2{font:600 12px ui-monospace,Consolas,monospace;color:var(--m);margin:0 0 6px;display:flex;justify-content:space-between}
+section{border:1px solid var(--l);border-radius:6px;padding:10px;margin-bottom:10px;background:#0c1620}
+button,.btn{background:#15222f;color:var(--t);border:1px solid var(--l);border-radius:5px;padding:6px 8px;cursor:pointer;font:inherit;text-align:center;display:block}
+button:hover,.btn:hover{border-color:var(--a)}button.on{background:var(--a);color:#04121c}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.g button,.g .btn{width:100%}
+#tb button,#sv button{border-left:5px solid var(--c);text-align:left}
+.r{display:flex;gap:6px;align-items:center;padding:2px 0}.r span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r input[type=color]{width:22px;height:22px;padding:0;border:0;background:none}.r button{padding:0 7px}
+#cl,#sl,#ptl{max-height:210px;overflow:auto;margin-top:6px}small.h{display:block;color:var(--m);margin:6px 0 0}
+#log{max-height:150px;overflow:auto;font:11px ui-monospace,Consolas,monospace;color:var(--m)}
+#bf{border-color:var(--r);color:var(--r);width:100%}#bf.on{background:var(--r);color:#fff}
+ol{padding-left:20px;margin:8px 0}li{margin:5px 0}em{font:700 11px ui-monospace,Consolas,monospace;font-style:normal}
+.ABRIR{color:var(--g)}.CERRAR{color:var(--r)}.ALERTA{color:var(--y)}.VERIF{color:var(--a)}.sum{color:var(--m);font-size:12px;margin-top:8px}.pct{font-weight:700;color:var(--g)}.rec{border:1px solid var(--y);border-radius:8px;padding:8px;margin-top:8px;font-size:12px}
+.pt{--c:#e5384a;position:absolute;transform:translate(-50%,-50%);display:flex;gap:4px;align-items:center;padding:2px 6px;min-height:22px;white-space:nowrap;font:700 11px ui-monospace,Consolas,monospace;color:#fff;background:var(--c);border:2px solid #fff;box-shadow:0 0 6px #000a}
+.pt.op{--c:#2fd47a;color:#04121c}.pt.pend{border-style:dashed;opacity:.85}.sv{position:absolute;transform:translate(-50%,-50%);filter:drop-shadow(0 0 3px #000)}
+.pt.ab{box-shadow:0 0 0 4px var(--g),0 0 16px var(--g)}.pt.ce{box-shadow:0 0 0 4px var(--r),0 0 16px var(--r)}
+.co{background:#101b25e8;color:#d4e4f2;font:12px ui-monospace,Consolas,monospace;padding:3px 8px;border-radius:4px;border:1px solid #233546}
+.gt{display:flex;background:#101b25}.gt input{width:210px;border:0;padding:5px 7px;font:12px system-ui;background:#fff}.gt button{border:0;border-radius:0;padding:0 9px}
+.loc{display:block;margin-top:6px;background:#101b25;color:#d4e4f2;border:1px solid #233546;padding:6px 10px;cursor:pointer;font:12px system-ui}.loc.on{background:#2f80ff;color:#fff}
+.fl{font-size:26px;filter:drop-shadow(0 0 6px #f33)}
+#mvbar{display:none;position:absolute;left:8px;right:8px;bottom:8px;z-index:1000;background:var(--p);color:var(--t);border:2px solid var(--y);border-radius:8px;padding:8px 10px;font:12px system-ui;box-shadow:0 2px 12px #000a;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#mvbar.on{display:flex}#mvbar small{display:block;color:var(--m);width:100%;order:3;margin:0}#mvbar span{display:flex;gap:6px}#mvbar button{padding:7px 14px}
+#mvbar button.ok{background:var(--g);color:#04121c;border-color:var(--g);font-weight:700}
+.mving .pt,.mving .sv{outline:3px dashed var(--y);outline-offset:4px}.leaflet-popup-content input{width:130px;margin:4px 0}
+@media(max-width:800px){body{grid-template-columns:1fr;grid-template-rows:48vh 1fr;height:auto}#map{height:52vh}}
+
+:root{color-scheme:dark}#side{scrollbar-width:thin;scrollbar-color:var(--l) transparent}
+section{background:linear-gradient(180deg,#0e1b27,#0b1520);border-radius:10px;box-shadow:0 1px 0 #ffffff0a inset,0 6px 18px #0006}
+button,.btn{border-radius:8px;min-height:34px;transition:border-color .15s,background .15s,transform .06s}button:active,.btn:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--a);outline-offset:1px}
+.leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 8px 28px #000a}.leaflet-popup-content button{margin-top:6px;width:100%}
+.sq input{width:210px;border:0;padding:8px 10px;font:13px system-ui;background:#fff}#sqr{background:var(--p);max-height:240px;overflow:auto}#sqr small{display:block;padding:8px;color:var(--m)}
+#sqr button{width:100%;text-align:left;border:0;border-top:1px solid var(--l);border-radius:0}#sqr small b{color:var(--t)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:3000;display:flex;gap:12px;align-items:center;background:#17283a;color:var(--t);border:1px solid var(--a);border-radius:12px;padding:10px 14px;box-shadow:0 8px 28px #000c;font:13px system-ui;transition:.25s;max-width:92vw}
+#toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}#toast button{background:var(--a);color:#04121c;border:0;font-weight:700;padding:6px 12px}
+#ins{position:absolute;left:8px;right:8px;bottom:8px;z-index:1000;background:var(--p);border:2px solid var(--a);border-radius:12px;box-shadow:0 4px 18px #000b;font:13px system-ui;overflow:hidden}#ins:empty{display:none}
+#ins .ih{display:flex;gap:6px;align-items:center;padding:8px 10px;background:#0c1620}#ins .ih b{flex:1;color:var(--a)}#ins .ib{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 10px;flex-wrap:wrap}
+#ins .in small{display:block;color:var(--m)}#ins .ia{display:flex;gap:6px}#ins button{padding:8px 14px}#ins .ok{background:var(--g);color:#04121c;border-color:var(--g);font-weight:700}
+.pulse{animation:pl 1s infinite}@keyframes pl{50%{box-shadow:0 0 0 6px #3ddc8466}}#ins .bar{height:4px;background:var(--l)}#ins .bar i{display:block;height:100%;background:var(--g);transition:width .3s}
+#shb{display:none}
+@media(max-width:800px){body{display:block;height:100dvh;overflow:hidden}#map{position:fixed;inset:0;height:100dvh}
+#side{position:fixed;left:0;right:0;bottom:0;z-index:1200;max-height:72dvh;border:1px solid var(--l);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px #000c;transform:translateY(105%);transition:transform .28s;padding-bottom:80px}body.sheet #side{transform:none}
+#shb{display:block;position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:1300;background:var(--a);color:#04121c;border:0;font-weight:700;padding:10px 16px;box-shadow:0 4px 16px #000a}
+#mvbar,#ins{bottom:calc(64px + env(safe-area-inset-bottom))}#co{display:none}input,select{font-size:16px}button,.btn{min-height:42px}.sq input{width:min(210px,52vw)}}
+</style></head><body>
+<button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button>
+<aside id="side">
+<h1>SECM<small>Maniobras de Seccionamiento ante Falla</small></h1>
+<section><h2>Circuitos KMZ <b id="cc">0/100</b></h2>
+<label class="btn">Cargar archivos KMZ / KML<input id="fi" type="file" accept=".kmz,.kml" multiple hidden></label>
+<div id="cl"></div><small class="h">Solo los circuitos marcados participan en el análisis. Los archivos se guardan en el dispositivo y se cargan solos al reabrir.</small>
+<label class="btn" style="margin-top:8px">Cargar KMZ de subestaciones (imágenes / figuras)<input id="fs" type="file" accept=".kmz,.kml" multiple hidden></label><div id="sl"></div></section>
+<section><h2>Puntos del sistema <b id="pc"></b></h2>
+<small class="h"><b>Circuito del equipo</b>: aplica a todo lo que marque (interruptor, restaurador, seccionamiento, cuchilla, enlace, Anclaje Doble y cruces)<select id="dc" style="width:100%;margin-top:3px"></select></small><div class="g" id="tb"></div><h2 style="margin-top:10px">Servicios importantes</h2><div class="g" id="sv"></div>
+<small class="h">Rojo = cerrado, verde = abierto. Elija un tipo y haga clic en el mapa (Esc cancela). Anclaje Doble: se recomienda como segunda maniobra, después de la primera (restauradores y seccionamiento); márquelo con 2 clics (un lado y el otro, en la dirección en que están los puentes de su circuito). Elija arriba el circuito del equipo o déjelo en Automático. Restaurador: se abre solo si la falla queda delante de él. Cruces: con "Trazar flujo en cruce" dibuje por dónde pasa la corriente en cada línea (clic en cada vértice; Enter o "Terminar trazo" para cerrar cada trazo). Haga un trazo por cada línea; la app conecta solo lo que usted trace. Acerque el mapa y haga clic sobre la línea, un poco antes y después del cruce. Para borrar un trazo, haga clic sobre él con la herramienta desactivada. Arrastre un punto para moverlo. Para renombrar, edite el nombre en la lista.</small>
+<div class="g"><button id="be">Terminar trazo (Enter)</button><button id="bu">Deshacer vértice</button></div><div id="ptl"></div><small class="h">Casilla: mostrar u ocultar cada equipo en el mapa (un equipo oculto no participa en el análisis, igual que los circuitos).<br>Tolerancia de unión de líneas (m): <input id="tol" type="number" value="4" min="0.5" max="5" step="0.5" style="width:60px"></small>
+<div class="g"><button id="ex">Exportar puntos</button><label class="btn">Importar puntos<input id="im" type="file" accept=".json" hidden></label></div>
+<div class="g"><button id="bk">💾 Respaldo completo</button><label class="btn">Restaurar respaldo<input id="br" type="file" accept=".json" hidden></label></div><small class="h">El respaldo guarda equipos, cruces y KMZ en un solo archivo: sirve para pasar su información a otro celular.</small></section>
+<section><h2>Usuarios y demandas <b id="dm"></b></h2>
+<small class="h">Cada interruptor toma sus usuarios y su demanda (MW) de la tabla cuando su nombre coincide con el del circuito (sin importar mayúsculas, espacios ni guiones). Se reparten por igual a lo largo de la línea de cada circuito, porque la tabla solo trae totales por circuito.</small>
+<label class="btn">Cargar tabla (.xlsx o .csv)<input id="dx" type="file" accept=".xlsx,.csv" hidden></label><div id="dl"></div></section>
+<section><h2>Falla y maniobra</h2>
+<button id="bf" data-m="FALLA">Marcar punto de falla</button><div id="pl"></div>
+<div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn">Normalizar</button></div></section>
+<section><h2>Bitácora</h2><div id="log"></div></section>
+</aside><div id="map"></div>
+<script>
+const $=s=>document.querySelector(s),MAX=100,R=6371000,rad=Math.PI/180;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NC='#ff4d5e',NA='#3ddc84',SVG={
+COM:'<svg width="26" height="30" viewBox="0 0 26 30"><path d="M13 2C13 2 3 14 3 20a10 10 0 0020 0C23 14 13 2 13 2z" fill="#1e90ff" stroke="#fff" stroke-width="2"/><path d="M8 20a5 5 0 004 4" stroke="#fff" stroke-width="2" fill="none"/></svg>',
+HOS:'<svg width="26" height="26" viewBox="0 0 26 26"><rect x="1" y="1" width="24" height="24" fill="#e11" stroke="#fff" stroke-width="2"/><path d="M10 5h6v5h5v6h-5v5h-6v-5H5v-6h5z" fill="#fff"/></svg>',
+GOB:'<svg width="28" height="26" viewBox="0 0 28 26"><path d="M14 2L2 9h24z" fill="#ffc233" stroke="#04121c" stroke-width="1.5"/><path d="M4 11h3v9H4zM10 11h3v9h-3zM15 11h3v9h-3zM21 11h3v9h-3z" fill="#ffc233" stroke="#04121c"/><path d="M2 21h24v3H2z" fill="#ffc233" stroke="#04121c" stroke-width="1.5"/></svg>'};
+const T={INT:{n:'Interruptor',k:'INT',c:NC,r:3},ENL:{n:'Enlace (normal abierto)',k:'ENL',c:NA,r:13},RES:{n:'Restaurador',k:'RES',c:NC,r:8},SS:{n:'Seccionamiento',k:'SECC',c:NC,r:8},CCF:{n:'Corto circuito fusible / cuchilla sólida',k:'CCF',c:NC,r:5},DR:{n:'Anclaje Doble (último recurso)',k:'AD',c:NC,r:3},
+COM:{n:'Servicio COMAPA',k:'COMAPA',c:'#1e90ff',r:0,sv:1,svg:SVG.COM},HOS:{n:'Hospital',k:'HOSP',c:'#e11',r:0,sv:1,svg:SVG.HOS},GOB:{n:'Edificio de gobierno',k:'GOB',c:'#ffc233',r:0,sv:1,svg:SVG.GOB}};
+const COL=['#ff7b72','#79c0ff','#7ee787','#d2a8ff','#ffa657','#56d4dd','#f2cc60','#ff9bce'];
+const map=L.map('map',{preferCanvas:true,keyboard:false}).setView([23.6,-102.5],5);
+const calles=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri, HERE, Garmin, OpenStreetMap contributors'}).addTo(map);
+const carto=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© OpenStreetMap, © CARTO'});
+const sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri, Maxar, Earthstar Geographics'});
+const GMAPS_KEY='AIzaSyDbp2v17TmNaBK0R9n3ONJfUzpUOdRsaKU';
+const lyr=L.control.layers({'Calles (Esri)':calles,'Calles (CARTO)':carto,'Satélite (Esri)':sat}).addTo(map);
+let gR,gH,gS;
+function gOff(m){[gR,gH,gS].forEach(t=>{if(t){map.removeLayer(t);lyr.removeLayer(t)}});gR=gH=gS=null;if(![calles,carto,sat].some(t=>map.hasLayer(t)))calles.addTo(map);log('⚠ '+m+'; se usa el mapa Esri')}
+window.gm_authFailure=()=>gOff('Google Maps rechazó la API Key (revise restricciones, facturación y que Maps JavaScript API esté habilitada)');
+window.initGM=()=>{try{gR=L.gridLayer.googleMutant({type:'roadmap',maxZoom:21});gH=L.gridLayer.googleMutant({type:'hybrid',maxZoom:21});gS=L.gridLayer.googleMutant({type:'satellite',maxZoom:21});
+ lyr.addBaseLayer(gR,'Google Calles');lyr.addBaseLayer(gH,'Google Híbrido');lyr.addBaseLayer(gS,'Google Satélite');
+ if(map.hasLayer(calles)){map.removeLayer(calles);gR.addTo(map)}}catch(e){gOff('No se pudo iniciar Google Maps')}};
+if(L.gridLayer.googleMutant){const g=document.createElement('script');g.src='https://maps.googleapis.com/maps/api/js?key='+GMAPS_KEY+'&callback=initGM';g.async=true;g.onerror=()=>gOff('No cargó Google Maps (¿sin conexión?)');document.head.appendChild(g)}else setTimeout(()=>gOff('No cargó el complemento de Google Maps'),0);
+let tileWarn=0;[calles,carto,sat].forEach(t=>t.on('tileerror',()=>{if(!tileWarn++)log('⚠ No cargan los mosaicos del mapa: revise su conexión o cambie de capa (control arriba a la derecha)')}));
+let circ=[],pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0;
+const ov=L.layerGroup().addTo(map),st=p=>ovr&&ovr.has(p)?ovr.get(p):p.st,km=m=>(m/1000).toFixed(2);
+/* ---------- Usuarios y demandas por circuito (ligados por nombre al interruptor) ---------- */
+const DEM0=[]; /* versión web: la tabla de usuarios y demandas NO va incluida; se carga en cada dispositivo con «Cargar tabla» */
+let DEM=new Map();
+const dkey=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,''),
+ fu=x=>Math.round(x).toLocaleString('es-MX'),
+ pn=x=>{if(typeof x=='number')return x;let t=String(x??'').trim().replace(/[^0-9.,\-]/g,'');if(t.includes('.')&&t.includes(','))t=t.replace(/,/g,'');else if(/^\d{1,3}(,\d{3})+$/.test(t))t=t.replace(/,/g,'');else t=t.replace(',','.');return parseFloat(t)};
+function setDem(rows,persist){DEM=new Map(rows.map(r=>[dkey(r[0]),{n:r[0],u:r[1],mw:r[2]}]));
+ if(persist){try{localStorage.setItem('gc_dem',JSON.stringify(rows))}catch(e){}}dlist();if(persist)clearPlan()}
+function dlist(){const ints=pts.filter(p=>p.t=='INT'),ok=ints.filter(p=>DEM.get(dkey(p.name)));
+ $('#dm').textContent=DEM.size+' circuitos';if(!DEM.size){$('#dl').innerHTML='<small class="h" style="color:#ffc233">Aún no hay tabla de usuarios y demandas en este dispositivo: pulse «Cargar tabla (.xlsx o .csv)». Se guarda aquí y no hay que repetirlo.</small>';return}
+ $('#dl').innerHTML=`<small class="h">${ok.length} de ${ints.length} interruptores con datos · ${new Set(ok.map(p=>dkey(p.name))).size} de ${DEM.size} circuitos de la tabla ya tienen interruptor</small>`+
+  ints.map(p=>{const d=DEM.get(dkey(p.name));return`<div class="r"><span title="${esc(p.name)}">${esc(p.name)}</span><small style="flex:none;color:${d?'var(--m)':'#ffc233'}">${d?fu(d.u)+' usuarios · '+d.mw.toFixed(2)+' MW':'sin coincidencia'}</small></div>`}).join('')}
+async function xlsxRows(buf){const z=await JSZip.loadAsync(buf),X=t=>new DOMParser().parseFromString(t,'text/xml'),T2=n=>Array.from(n.getElementsByTagName('t')).map(t=>t.textContent).join('');
+ const ss=z.file('xl/sharedStrings.xml')?Array.from(X(await z.file('xl/sharedStrings.xml').async('string')).getElementsByTagName('si')).map(T2):[];
+ const sh=Object.keys(z.files).filter(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}))[0];
+ if(!sh)throw new Error('el archivo no tiene hojas');
+ return Array.from(X(await z.file(sh).async('string')).getElementsByTagName('row')).map(r=>{const row=[];
+  for(const c of Array.from(r.getElementsByTagName('c'))){const col=[...(c.getAttribute('r')||'A').replace(/[0-9]/g,'')].reduce((a,ch)=>a*26+ch.charCodeAt(0)-64,0)-1,t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0],is=c.getElementsByTagName('is')[0];
+   row[col]=t=='s'&&v?ss[+v.textContent]:t=='inlineStr'&&is?T2(is):v?v.textContent:''}return row})}
+const demRows=rows=>rows.map(r=>[String(r[0]??'').replace(/\s+/g,' ').trim(),pn(r[1]),pn(r[2])]).filter(r=>r[0]&&!isNaN(r[1])&&!isNaN(r[2])).map(r=>[r[0],Math.round(r[1]),r[2]]);
+async function loadDem(f){try{let rows;
+  if(/\.csv$/i.test(f.name)){rows=(await f.text()).split(/\r?\n/).map(l=>l.split(l.includes(';')?';':l.includes('\t')?'\t':','))}else rows=await xlsxRows(await f.arrayBuffer());
+  const t=demRows(rows);if(!t.length)return log('⚠ No se encontraron filas con circuito, usuarios y demanda (3 columnas)');
+  const dup=t.length-new Set(t.map(r=>dkey(r[0]))).size;setDem(t,true);
+  log('Tabla de usuarios y demandas cargada: '+t.length+' circuitos'+(dup?' (⚠ '+dup+' nombres repetidos; se usó el último)':''))}catch(x){log('⚠ No se pudo leer el archivo: '+x.message)}}
+const log=m=>{const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString()+'  '+m;$('#log').prepend(d)};
+const dist=(a,b)=>Math.hypot((b[1]-a[1])*Math.cos((a[0]+b[0])*rad/2),b[0]-a[0])*rad*R;
+/* ---------- Coordenadas (WGS84, mismo formato que Google Maps: lat, lng) ---------- */
+const fmt=l=>l.lat.toFixed(6)+', '+l.lng.toFixed(6);
+const cc=L.control({position:'bottomleft'});cc.onAdd=()=>{const d=L.DomUtil.create('div','co');d.id='co';d.textContent='Mueva el cursor · clic derecho copia las coordenadas';return d};cc.addTo(map);
+map.on('mousemove',e=>$('#co').textContent=fmt(e.latlng));
+map.on('contextmenu',e=>{const s=fmt(e.latlng);try{navigator.clipboard.writeText(s).catch(()=>{})}catch(x){}log('Coordenadas: '+s+' (copiadas)')});
+const gc=L.control({position:'topleft'});gc.onAdd=()=>{const d=L.DomUtil.create('div','leaflet-bar gt');d.innerHTML='<input id="gi" placeholder="Pegue lat, lng de Google Maps"><button id="gb">Ir</button>';L.DomEvent.disableClickPropagation(d);return d};gc.addTo(map);
+let gm;function goTo(){const m=$('#gi').value.match(/-?\d+(?:\.\d+)?/g);if(!m||m.length<2)return log('⚠ Formato esperado: 27.486100, -99.506900');
+ const la=+m[0],lo=+m[1];if(Math.abs(la)>90||Math.abs(lo)>180)return log('⚠ Fuera de rango: use latitud, longitud');
+ gm&&gm.remove();gm=L.circleMarker([la,lo],{radius:10,color:'#ff4d5e',weight:3,fillOpacity:.25}).addTo(map).bindTooltip(la+', '+lo);map.setView([la,lo],17)}
+$('#gb').onclick=goTo;$('#gi').addEventListener('keydown',e=>{if(e.key=='Enter')goTo()});
+/* ---------- Mi ubicación (GPS del celular o red de la PC), en tiempo real ---------- */
+map.createPane('gps').style.zIndex=450;map.createPane('ad').style.zIndex=445;
+let me,meAcc,follow=false;
+const lc=L.control({position:'topleft'});lc.onAdd=()=>{const b=L.DomUtil.create('button','loc');b.id='lb';b.textContent='◎ Mi ubicación';L.DomEvent.disableClickPropagation(b);return b};lc.addTo(map);
+$('#lb').onclick=()=>{if(!me)return log('⚠ Aún no hay posición disponible; permita el acceso a la ubicación');follow=true;$('#lb').classList.add('on');map.setView(me.getLatLng(),Math.max(map.getZoom(),17))};
+map.on('dragstart',()=>{follow=false;$('#lb').classList.remove('on')});
+if(navigator.geolocation)navigator.geolocation.watchPosition(pos=>{const ll=[pos.coords.latitude,pos.coords.longitude],a=pos.coords.accuracy;
+ if(!me){me=L.circleMarker(ll,{pane:'gps',radius:8,color:'#fff',weight:3,fillColor:'#2f80ff',fillOpacity:1}).addTo(map).bindTooltip(()=>'Mi posición: '+fmt(me.getLatLng()));
+  meAcc=L.circle(ll,{pane:'gps',radius:a,color:'#2f80ff',weight:1,fillOpacity:.12,interactive:false}).addTo(map);log('Ubicación obtenida (±'+Math.round(a)+' m)');if(!circ.length)map.setView(ll,16)}
+ else{me.setLatLng(ll);meAcc.setLatLng(ll).setRadius(a)}
+ if(follow)map.panTo(ll)},
+ e=>{log('⚠ Ubicación no disponible: '+e.message);warnGps()},{enableHighAccuracy:true,maximumAge:2000,timeout:30000});
+else log('⚠ Este navegador no admite geolocalización');
+/* ---------- KMZ ---------- */
+const DB=new Promise(r=>{try{const q=indexedDB.open('gridctrl',1);q.onupgradeneeded=()=>q.result.createObjectStore('f',{keyPath:'id'});q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
+DB.then(d=>{if(!d)log("⚠ El navegador no permite guardar los KMZ (IndexedDB); abra la app desde https")});try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+const dbDo=async(m,v)=>{const d=await DB;if(!d)return;return new Promise(r=>{try{const o=d.transaction('f',m=='getAll'?'readonly':'readwrite').objectStore('f'),q=m=='getAll'?o.getAll():m=='put'?o.put(v):o.delete(v);q.onsuccess=()=>r(q.result);q.onerror=()=>r()}catch(e){r()}})};
+const rec=c=>({id:c.id,k:c.k,kmz:c.kmz,t:c.t,name:c.name,color:c.color,on:c.on,blob:c.blob});
+async function openKml(f,kmz){let z,x;if(kmz){z=await JSZip.loadAsync(f);const e=Object.values(z.files).find(n=>!n.dir&&/\.kml$/i.test(n.name));if(!e)throw'sin KML interno';x=await e.async('string')}else x=await f.text();return{z,d:new DOMParser().parseFromString(x,'text/xml')}}
+const lines=d=>{const r=[];for(const e of d.getElementsByTagName('LineString')){const c=e.getElementsByTagName('coordinates')[0].textContent.trim().split(/\s+/).map(s=>s.split(',').map(Number)).filter(a=>a.length>1&&!isNaN(a[0])&&!isNaN(a[1])).map(a=>[a[1],a[0]]);if(c.length>1)r.push(c)}return r};
+const kid=(e,t)=>e.getElementsByTagName(t)[0],txt=(e,t)=>{const n=e&&kid(e,t);return n?n.textContent.trim():''};
+async function subLayer({z,d}){const g=L.featureGroup(),bl={},sty={};
+ const url=async h=>{if(!h)return'';if(/^(https?|data):/.test(h)||!z)return h;const k=Object.keys(z.files).find(n=>n==h||n.split('/').pop()==h.split('/').pop());return k?(bl[k]||(bl[k]=URL.createObjectURL(await z.files[k].async('blob')))):''};
+ for(const e of d.getElementsByTagName('Style'))sty[e.getAttribute('id')]=txt(e,'href');
+ for(const m of d.getElementsByTagName('StyleMap')){const q=[...m.getElementsByTagName('Pair')].find(x=>txt(x,'key')=='normal');if(q)sty[m.getAttribute('id')]=sty[txt(q,'styleUrl').replace('#','')]||''}
+ for(const pm of d.getElementsByTagName('Placemark')){const name=txt(pm,'name'),inl=kid(pm,'Style'),h=inl?txt(inl,'href'):sty[txt(pm,'styleUrl').replace('#','')]||'',pt=kid(pm,'Point');
+  if(pt){const c=txt(pt,'coordinates').split(',').map(Number),u=await url(h);
+   const ic=u?L.icon({iconUrl:u,iconSize:[36,36],iconAnchor:[18,18]}):L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],html:'<div class="pt" style="--c:#ffd166;color:#04121c;border-radius:4px">▲</div>'});
+   L.marker([c[1],c[0]],{icon:ic}).bindTooltip(name||'Subestación').addTo(g)}
+  for(const pg of pm.getElementsByTagName('Polygon')){const cs=txt(kid(pg,'outerBoundaryIs')||pg,'coordinates').split(/\s+/).map(s=>s.split(',').map(Number)).filter(a=>a.length>1&&!isNaN(a[0])).map(a=>[a[1],a[0]]);if(cs.length>2)L.polygon(cs,{color:'#ffd166',weight:2,fillOpacity:.25}).bindTooltip(name||'Figura').addTo(g)}}
+ for(const o of d.getElementsByTagName('GroundOverlay')){const b=kid(o,'LatLonBox'),u=await url(txt(o,'href'));if(b&&u){const[n,s,e,w]=['north','south','east','west'].map(k=>+txt(b,k));L.imageOverlay(u,[[s,w],[n,e]]).addTo(g)}}
+ return g}
+let subs=[];
+async function ingest(f,k,sv){const nm=sv?sv.name:f.name.replace(/\.(kmz|kml)$/i,''),kmz=sv?sv.kmz:/\.kmz$/i.test(f.name);
+ try{const o=await openKml(f,kmz),sg=lines(o.d),c=sv||{id:k+Date.now()+Math.random(),k,kmz,t:Date.now(),name:nm,on:1,blob:f};
+  if(k=='c'&&!sg.length)k=c.k='s';
+  if(k=='c'){c.color=c.color||COL[circ.length%COL.length];c.segs=sg;c.layer=L.polyline(sg,{color:c.color,weight:3,opacity:.9}).bindTooltip(nm,{sticky:true});circ.push(c);log('Circuito '+nm+': '+sg.length+' tramos')}
+  else{c.layer=await subLayer(o);subs.push(c);log('Capa de subestaciones: '+nm)}
+  if(c.on)c.layer.addTo(map);if(!sv)dbDo('put',rec(c))}
+ catch(x){log('⚠ '+nm+': '+x)}}
+for(const[i,k]of[['fi','c'],['fs','s']])$('#'+i).onchange=async e=>{const fs=[...e.target.files];e.target.value='';for(const f of fs){if(k=='c'&&circ.length>=MAX){log('⚠ Límite de '+MAX+' circuitos');break}await ingest(f,k)}list();if(k=='c')resolveLinks(1);clearPlan();fitAll()};
+function fitAll(){const b=L.featureGroup([...circ,...subs].map(c=>c.layer)).getBounds();if(b.isValid())map.fitBounds(b)}
+(async()=>{const a=(await dbDo('getAll'))||[];a.sort((x,y)=>x.t-y.t);for(const r of a)await ingest(r.blob,r.k,r);list();resolveLinks();fitAll();if(a.length)log('Cargados automáticamente '+a.length+' archivo(s) guardado(s)')})();
+function list(){const row=(c,i,a)=>`<div class="r"><input type="checkbox" ${c.on?'checked':''} onchange="vis('${a}',${i},this.checked)">${a=='c'?`<input type="color" value="${c.color}" onchange="col(${i},this.value)">`:'<span style="flex:none;width:22px;text-align:center">▲</span>'}<span title="${esc(c.name)}">${esc(c.name)}</span><button onclick="zoom('${a}',${i})">⌖</button><button onclick="rm('${a}',${i})">✕</button></div>`;
+ $('#cl').innerHTML=circ.map((c,i)=>row(c,i,'c')).join('');$('#sl').innerHTML=subs.map((c,i)=>row(c,i,'s')).join('');$('#cc').textContent=circ.length+'/'+MAX;fillDc()}
+const arr=a=>a=='c'?circ:subs;
+function vis(a,i,v){const c=arr(a)[i];c.on=v?1:0;v?c.layer.addTo(map):c.layer.remove();dbDo('put',rec(c));if(a=='c')clearPlan()}
+function col(i,v){circ[i].color=v;circ[i].layer.setStyle({color:v});dbDo('put',rec(circ[i]))}
+function zoom(a,i){const b=arr(a)[i].layer.getBounds();if(b.isValid())map.fitBounds(b)}
+function rm(a,i){const c=arr(a).splice(i,1)[0];c.layer.remove();dbDo('delete',c.id);list();clearPlan()}
+function warnGps(){if(location.protocol=='file:'&&!$('#gw'))$('#side').insertAdjacentHTML('afterbegin','<section id="gw" style="border-color:#ffc233;color:#ffc233">⚠ El navegador bloquea el GPS en archivos locales (sobre todo en celular). Publique este archivo como página https (por ejemplo Netlify Drop o GitHub Pages) y ábralo desde ese enlace.</section>')}
+if(!window.isSecureContext)warnGps();
+/* ---------- Puntos ---------- */
+const bt=(k,v)=>`<button data-m="${k}" style="--c:${v.c}">${v.n}</button>`,E=Object.entries(T);
+$('#tb').innerHTML=E.filter(([k,v])=>!v.sv).map(([k,v])=>bt(k,v)).join('')+'<button data-m="TRAZO" style="--c:#00e5ff">Trazar flujo en cruce</button>';
+$('#sv').innerHTML=E.filter(([k,v])=>v.sv).map(([k,v])=>bt(k,v)).join('');
+function setMode(m){if(mode=='TRAZO'&&m!='TRAZO')endTrace(0);if(mode=='DR'&&m!='DR')drReset();mode=m;map.doubleClickZoom[m=='TRAZO'?'disable':'enable']();document.querySelectorAll('#tb button,#sv button,#bf').forEach(b=>b.classList.toggle('on',b.dataset.m==m));map.getContainer().style.cursor=m?'crosshair':''}
+document.querySelectorAll('#tb button,#sv button,#bf').forEach(b=>b.onclick=()=>setMode(mode==b.dataset.m?null:b.dataset.m));
+addEventListener('keydown',e=>{if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.key=='Escape')setMode(null);if(e.key=='Enter'&&mode=='TRAZO')endTrace(1)});
+addEventListener('error',e=>log('⚠ Error en la aplicación: '+(e.message||'desconocido')));addEventListener('unhandledrejection',e=>log('⚠ Error: '+((e.reason&&e.reason.message)||e.reason)));
+const demPop=p=>p.t!='INT'?'':(d=>d?`Usuarios: <b>${fu(d.u)}</b> · Demanda: <b>${d.mw.toFixed(2)} MW</b><br>`:(DEM.size?`<b style="color:#b8860b">Sin datos</b>: su nombre no coincide con ningún circuito de la tabla<br>`:`<b style="color:#b8860b">Sin tabla</b> de usuarios y demandas cargada en este dispositivo<br>`))(DEM.get(dkey(p.name)));
+const pop=p=>`<b>${esc(p.name)}</b><br>${T[p.t].n}${T[p.t].sv?'':` · <b style="color:${p.st?'#d12':'#1a9c57'}">${p.st?'CERRADO':'ABIERTO'}</b>`}<br>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><input value="${esc(p.name)}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)"><br>${demPop(p)}${cPop(p)}${T[p.t].sv?'':`<button onclick="tog(${p.id})">${p.st?'Abrir':'Cerrar'}</button> `}${p.t=='INT'&&p.cn?`<button onclick="insStart(${p.id})">🧭 Inspeccionar circuito</button> `:''}<button onclick="mvArm(${p.id})">📍 Mover ubicación</button> <button onclick="del(${p.id})">Eliminar</button>`;
+function mk(p){const t=T[p.t],dr=p.t=='DR',h=L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],html:t.sv?`<div class="sv">${t.svg}</div>`:`<div class="pt ${p.st?'':'op'} ${hl.get(p)||''}${p.t=='ENL'&&p.cn&&!p.cn2?' pend':''}" style="border-radius:${t.r}px${dr?';transform:translate(-50%,calc(-100% - 12px))':''}">${t.svg||''}${esc(p.name)}</div>`});
+ if(dr)drMark(p);
+ if(p.m){p.m.setIcon(h);if(mv&&mv.p===p){const e=p.m.getElement();e&&e.classList.add('mving')}return pvis(p)}
+ p.m=L.marker([p.lat,p.lng],{icon:h,draggable:false}).addTo(map).bindTooltip(()=>p.name+(p.cn?' · '+p.cn+(p.cn2?' ↔ '+p.cn2:''):'')).bindPopup(()=>pop(p));
+ p.m.on('dragend',()=>mvDrag(p));pvis(p)}
+/* casilla del equipo: oculto = no se ve y no participa en el análisis (igual que un circuito desmarcado) */
+function pvis(p){if(p.vis!==0){if(!map.hasLayer(p.m))p.m.addTo(map);if(p.g&&!map.hasLayer(p.g))p.g.addTo(map)}else{p.m.remove();if(p.g)p.g.remove()}}
+function pshow(id,v){const p=byId(id);p.vis=v?1:0;pvis(p);save();plist();clearPlan()}
+const byId=id=>pts.find(p=>p.id==id),cnt=()=>{$('#pc').textContent=pts.length;plist()};
+function plist(){dlist();$('#ptl').innerHTML=pts.map(p=>`<div class="r" style="${p.vis===0?'opacity:.5':''}"><input type="checkbox" ${p.vis===0?'':'checked'} onchange="pshow(${p.id},this.checked)" title="Mostrar / ocultar en el mapa"><i style="flex:none;width:11px;height:11px;border-radius:${T[p.t].r}px;background:${T[p.t].c}"></i><input value="${esc(p.name)}" title="${T[p.t].n}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)" style="flex:1;min-width:0;background:#0a1219;color:var(--t);border:1px solid var(--l);border-radius:4px;padding:3px 5px">${T[p.t].sv?'':`<small style="flex:none;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m)" title="Circuito">${esc(p.t=='ENL'?(p.cn||'?')+' ↔ '+(p.cn2||'⏳ pendiente'):p.cn||'sin circuito')}</small>`}<button onclick="goP(${p.id})">⌖</button></div>`).join('')}
+function goP(id){const p=byId(id);if(p.vis===0){p.vis=1;pvis(p);save();plist();clearPlan()}map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}
+const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,...(p.vis===0?{vis:0}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{})});
+const save=()=>{try{localStorage.setItem('gc_pts',JSON.stringify(pts.map(ser)))}catch(e){}};
+function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1};if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}pts.push(p);mk(p);return p}
+function tog(id){const p=byId(id);p.st^=1;log((p.st?'CERRAR ':'ABRIR ')+p.name+' (manual)');p.m.closePopup();save();clearPlan()}
+function del(id){const p=byId(id);if(mv&&mv.p===p)mvCancel(1);const o=ser(p);p.m.remove();p.g&&p.g.remove();pts=pts.filter(x=>x!=p);cnt();save();clearPlan();toast('Eliminado: '+p.name,'Deshacer',()=>{const q=addPt(o);cnt();save();clearPlan();log('↩ '+q.name+' restaurado')})}
+function ren(id,el){const p=byId(id);p.name=el.value.trim()||'s/n';el.value=p.name;save();mk(p);dlist();if(!el.closest('#ptl'))plist()}
+function loadPts(a){mvCancel(1);pts.forEach(p=>{p.m&&p.m.remove();p.g&&p.g.remove()});pts=[];a.map(o=>({...o,t:o.t=='SP'?'RES':o.t})).filter(o=>T[o.t]).forEach(addPt);cnt()}
+try{loadPts(JSON.parse(localStorage.getItem('gc_pts')||'[]'))}catch(e){}
+$('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({puntos:pts.map(ser),flujos:flows},null,1)],{type:'application/json'}));a.download='puntos_gridctrl.json';a.click()};
+$('#im').onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());loadPts(Array.isArray(j)?j:j.puntos||[]);if(j.flujos){flows=j.flujos;fseq=Math.max(0,...flows.map(f=>f.id));saveF();redrawF()}save();clearPlan();log('Importados '+pts.length+' puntos')}catch(x){log('⚠ JSON inválido')}e.target.value=''};
+map.on('click',e=>{const q=[e.latlng.lat,e.latlng.lng];
+ if(mode=='FALLA'){setMode(null);runFault(q)}else if(mode=='TRAZO')addV(q);else if(mode=='DR')drClick(q);else if(T[mode]){if(T[mode].sv){addPt({t:mode,lat:q[0],lng:q[1]});cnt();save();clearPlan()}else addEq(mode,q)}});
+/* ---------- Anclaje Doble: marca de un lado a otro, ligada a UN circuito ---------- */
+let drA=null,drRe=null,drRub=null;const drTmp=L.layerGroup().addTo(map);
+function fillDc(){const d=$('#dc'),v=d.value;d.innerHTML='<option value="">Automático (el circuito más cercano)</option>'+circ.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');d.value=circ.some(c=>c.name==v)?v:''}
+function nearC(c,q){let d=1e18,eb=0,bp=null;const k=Math.cos(q[0]*rad);
+ for(const s of c.segs)for(let i=1;i<s.length;i++){const A=s[i-1],B=s[i],ax=(A[1]-q[1])*k,ay=A[0]-q[0],dx=(B[1]-A[1])*k,dy=B[0]-A[0],t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/(dx*dx+dy*dy||1))),dd=Math.hypot(ax+t*dx,ay+t*dy)*rad*R;if(dd<d){d=dd;eb=bear(A,B);bp=[A[0]+t*(B[0]-A[0]),A[1]+t*(B[1]-A[1])]}}
+ return{d,eb,p:bp}}
+/* circuito activo que mejor coincide con la marca (posición y dirección); amb = otros circuitos con casi la misma coincidencia */
+function pickCirc(a,b){const m=[(a[0]+b[0])/2,(a[1]+b[1])/2],br=bear(a,b),r=[];
+ circ.forEach((c,ci)=>{if(!c.on)return;const M=nearC(c,m);if(M.d>80)return;const d=(M.d+nearC(c,a).d+nearC(c,b).d)/3;let da=Math.abs((br-M.eb)%180);da=Math.min(da,180-da);r.push({ci,sc:d+25*Math.sin(da*rad)})});
+ r.sort((x,y)=>x.sc-y.sc);return{ci:r.length?r[0].ci:-1,amb:r.filter((x,i)=>i&&x.sc-r[0].sc<3).map(x=>circ[x.ci].name)}}
+/* Todo equipo, enlace, cruce y anclaje queda ligado a UN circuito (p.cn); un enlace une exactamente dos (p.cn y p.cn2) */
+function pCirc(p){let ci=p.cn?circ.findIndex(c=>c.name==p.cn&&c.on):-1;
+ if(ci<0&&!p.cn){const r=p.t=='DR'?pickCirc(p.a,p.b):pickPt([p.lat,p.lng]);ci=r.ci;if(ci>=0){p.cn=circ[ci].name;p.au=1;save();if(r.amb.length)log('⚠ '+p.name+': por ese punto pasan varios circuitos ('+[p.cn,...r.amb].join(', ')+'); se ligó a '+p.cn+'. Verifique el circuito en su ventana.')}}
+ return ci}
+function pickPt(q){const r=[];circ.forEach((c,ci)=>{if(!c.on)return;const M=nearC(c,q);if(M.d<=80)r.push({ci,d:M.d,p:M.p})});r.sort((x,y)=>x.d-y.d);
+ return{ci:r.length?r[0].ci:-1,list:r,amb:r.filter((x,i)=>i&&x.d-r[0].d<5).map(x=>circ[x.ci].name)}}
+/* Enlace pendiente: tiene cn y cn2 vacío. Se completa con el circuito activo más cercano (≤80 m) distinto de cn */
+function linkFill(p){const q=[p.lat,p.lng],r=[];
+ circ.forEach((c,ci)=>{if(!c.on||c.name==p.cn)return;const d=nearC(c,q).d;if(d<=80)r.push({ci,d})});
+ r.sort((x,y)=>x.d-y.d);if(!r.length)return false;
+ p.cn2=circ[r[0].ci].name;p.au=1;
+ log('🔗 '+p.name+' detectado: '+p.cn+' ↔ '+p.cn2+(r.length>1&&r[1].d-r[0].d<5?' ⚠ también hay cerca '+r.slice(1).map(x=>circ[x.ci].name).join(', ')+'; si no es el correcto, cámbielo en la ventana del enlace':''));
+ return true}
+function resolveLinks(hint){let n=0;
+ pts.forEach(p=>{if(p.t!='ENL')return;if(!p.cn&&p.cn2){p.cn=p.cn2;p.cn2=''}if(!p.cn||p.cn2)return;
+  if(linkFill(p)){n++;mk(p)}
+  else if(hint){let m=1e18,mc='';circ.forEach(c=>{if(!c.on||c.name==p.cn)return;const d=nearC(c,[p.lat,p.lng]).d;if(d<m){m=d;mc=c.name}});
+   if(m<=400)log('⚠ '+p.name+' sigue pendiente: '+mc+' pasa a '+Math.round(m)+' m (el límite es 80 m). Acerque el enlace a esa línea y se enlazará solo')}});
+ if(n){save();plist();clearPlan()}return n}
+function relink(p){const r=pickCirc(p.a,p.b);if(r.ci>=0)p.cn=circ[r.ci].name}
+function drMark(p){if(!p.a){const k=8/(R*Math.cos(p.lat*rad)*rad);p.a=[p.lat,p.lng-k];p.b=[p.lat,p.lng+k]}
+ const g=p.g||(p.g=L.layerGroup().addTo(map)),c=p.st?NC:NA,w=hl.get(p)?8:5,o={pane:'ad',interactive:false};g.clearLayers();
+ L.polyline([p.a,p.b],{...o,color:'#fff',weight:w+4,opacity:.95,lineCap:'butt'}).addTo(g);
+ L.polyline([p.a,p.b],{...o,color:c,weight:w,lineCap:'butt'}).addTo(g);
+ [p.a,p.b].forEach(q=>L.circleMarker(q,{...o,radius:5,color:'#fff',weight:2,fillColor:c,fillOpacity:1}).addTo(g))}
+const cSel=(id,cur,sec,fn)=>{const ok=circ.some(c=>c.name==cur);return`<select onchange="${fn||'setCirc'}(${id},this.value${sec?',1':''})">${ok?'':`<option selected disabled>${esc(cur||(sec?'⏳ pendiente de cargar':'(sin circuito)'))}</option>`}${circ.map(c=>`<option ${c.name==cur?'selected':''}>${esc(c.name)}</option>`).join('')}</select>`};
+const drPop=p=>`Circuito: ${cSel(p.id,p.cn)}<br><button onclick="reDR(${p.id})">Redibujar marca</button><br>`;
+const cPop=p=>T[p.t].sv?'':p.t=='DR'?drPop(p):p.t=='ENL'?`Circuitos: ${cSel(p.id,p.cn)} ↔ ${cSel(p.id,p.cn2,1)}<br>${p.cn2?'':'<small>⏳ Pendiente: se enlaza solo al cargar el KMZ del otro circuito (a menos de 80 m)</small><br>'}`:`Circuito: ${cSel(p.id,p.cn)}<br>`;
+function setCirc(id,v,sec){const p=byId(id);p.m.closePopup();if(sec)p.cn2=v;else p.cn=v;p.au=0;
+ if(!sec&&p.t!='DR'&&p.t!='ENL'){const c=circ.find(c=>c.name==v&&c.on);if(c){const s=nearC(c,[p.lat,p.lng]);if(s.d<=80){p.lat=s.p[0];p.lng=s.p[1];p.m.setLatLng(s.p)}else log('⚠ '+p.name+' está a más de 80 m de la línea de '+v+'; muévalo sobre ella')}}
+ if(p.t=='ENL')mk(p);save();clearPlan();log(p.name+' ligado al circuito '+v)}
+function addEq(t,q){const sel=$('#dc').value,r=pickPt(q);let p;
+ if(t=='ENL'){let A,B=-1;const o=ci=>circ[ci].name;
+  if(sel){A=circ.findIndex(c=>c.name==sel&&c.on);if(A<0||nearC(circ[A],q).d>80)return log('⚠ El enlace debe quedar a menos de 80 m de '+sel);const rest=r.list.filter(x=>x.ci!=A);if(rest.length){B=rest[0].ci;if(rest.length>1&&rest[1].d-rest[0].d<5)log('⚠ Para el segundo circuito del enlace hay varias opciones ('+rest.map(x=>o(x.ci)).join(', ')+'); se tomó '+o(B)+'. Verifíquelo en la ventana del enlace.')}}
+  else{if(!r.list.length)return log('⚠ Un enlace necesita al menos un circuito a menos de 80 m: haga clic cerca de la línea de uno de los circuitos');if(r.list.length>2&&r.list[2].d-r.list[1].d<15)return log('⚠ Por ahí pasan más de dos circuitos ('+r.list.map(x=>o(x.ci)).join(', ')+'). Elija uno en el menú «Circuito del equipo» y vuelva a marcar.');A=r.list[0].ci;B=r.list.length>1?r.list[1].ci:-1}
+  p=addPt({t,lat:q[0],lng:q[1],cn:o(A),cn2:B>=0?o(B):'',au:sel?0:1});
+  if(B>=0)log(p.name+' enlaza los circuitos '+o(A)+' ↔ '+o(B)+' (cámbielos en su ventana si no son los correctos)');
+  else log('⏳ '+p.name+' ligado a '+o(A)+' y PENDIENTE de enlazar: al cargar el KMZ del otro circuito (a menos de 80 m del enlace) se enlazará solo')}
+ else{let ci;
+  if(sel){ci=circ.findIndex(c=>c.name==sel&&c.on);if(ci<0)return log('⚠ El circuito '+sel+' no está cargado o activo');if(nearC(circ[ci],q).d>80)return log('⚠ El punto está a más de 80 m de la línea de '+sel)}
+  else{if(r.ci<0)return log('⚠ No hay un circuito activo a menos de 80 m del clic');if(r.amb.length)return log('⚠ Por ese punto pasan varios circuitos ('+[circ[r.ci].name,...r.amb].join(', ')+'). Elija el circuito del equipo en el menú «Circuito del equipo» y vuelva a marcar.');ci=r.ci}
+  const s=nearC(circ[ci],q);p=addPt({t,lat:s.p[0],lng:s.p[1],cn:circ[ci].name,au:sel?0:1});log(p.name+' ligado al circuito '+p.cn)}
+ cnt();save();clearPlan()}
+/* Mover ubicación: los equipos están BLOQUEADOS por defecto (no se mueven al tocar o arrastrar el mapa).
+   Se desbloquea uno desde su ventana («Mover ubicación»), se arrastra y la nueva posición solo se guarda al CONFIRMAR. */
+let mv=null;
+const mvb=(()=>{const d=document.createElement('div');d.id='mvbar';map.getContainer().appendChild(d);L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);return d})();
+function mvShow(h){mvb.innerHTML=h;mvb.classList.add('on')}
+function mvArm(id){const p=byId(id);if(!p)return;mvCancel(1);map.closePopup();mv={p};p.m.dragging.enable();const e=p.m.getElement();e&&e.classList.add('mving');
+ mvShow(`<span>✋ <b>${esc(p.name)}</b> desbloqueado: arrástrelo a su nueva ubicación</span><span><button onclick="mvCancel()">Cancelar</button></span>`)}
+function mvDrag(p){if(!mv||mv.p!==p){p.m.setLatLng([p.lat,p.lng]);return}
+ const l=p.m.getLatLng();mvShow(`<span>¿Mover <b>${esc(p.name)}</b> a esta ubicación?</span><span><button class="ok" onclick="mvOk()">Confirmar</button><button onclick="mvCancel()">Cancelar</button></span><small>${l.lat.toFixed(6)}, ${l.lng.toFixed(6)} · puede arrastrarlo otra vez para ajustar</small>`)}
+function mvEnd(){const p=mv.p;mv=null;p.m.dragging.disable();const e=p.m.getElement();e&&e.classList.remove('mving');mvb.classList.remove('on');mvb.innerHTML=''}
+function mvOk(){if(!mv)return;const p=mv.p,a=p.lat,b=p.lng;mvEnd();dragEnd(p);if(p.lat!=a||p.lng!=b)log('📍 '+p.name+' movido a '+p.lat.toFixed(6)+', '+p.lng.toFixed(6))}
+function mvCancel(silent){if(!mv)return;const p=mv.p;p.m.setLatLng([p.lat,p.lng]);mvEnd();if(!silent)log(p.name+': movimiento cancelado, conserva su ubicación')}
+document.addEventListener('keydown',e=>{if(e.key=='Escape')mvCancel()});
+function dragEnd(p){const l=p.m.getLatLng();let la=l.lat,lo=l.lng;
+ if(p.t=='DR'){const dy=la-p.lat,dx=lo-p.lng;p.a=[p.a[0]+dy,p.a[1]+dx];p.b=[p.b[0]+dy,p.b[1]+dx];if(p.au)relink(p)}
+ else if(!T[p.t].sv&&p.t!='ENL'){const c=p.au||!p.cn?(()=>{const r=pickPt([la,lo]);return r.ci>=0?circ[r.ci]:null})():circ.find(c=>c.name==p.cn&&c.on);
+  if(c){const s=nearC(c,[la,lo]);if(s.d<=80){p.cn=c.name;la=s.p[0];lo=s.p[1]}else{log('⚠ '+p.name+' quedó a más de 80 m de la línea de '+c.name+'; regresó a su lugar');la=p.lat;lo=p.lng}p.m.setLatLng([la,lo])}}
+ p.lat=la;p.lng=lo;save();clearPlan();if(p.t=='ENL'){if(p.cn&&!p.cn2)resolveLinks(1)}}
+function pickFlow(P){const r=[];circ.forEach((c,ci)=>{if(!c.on)return;const ds=P.map(q=>nearC(c,q).d);if(ds[0]>30||ds[ds.length-1]>30)return;r.push({ci,sc:ds.reduce((a,b)=>a+b,0)/ds.length})});r.sort((x,y)=>x.sc-y.sc);
+ return{ci:r.length?r[0].ci:-1,amb:r.filter((x,i)=>i&&x.sc-r[0].sc<3).map(x=>circ[x.ci].name)}}
+function setFC(id,v){const f=flows.find(f=>f.id==id);f.cn=v;f.au=0;saveF();map.closePopup();clearPlan();log('Cruce ligado al circuito '+v)}
+function reDR(id){const p=byId(id);p.m.closePopup();setMode('DR');drRe=id;log('Marque los dos extremos de la nueva marca de '+p.name)}
+function drReset(){drA=null;drRe=null;drRub=null;drTmp.clearLayers()}
+function drClick(q){
+ if(!drA){drA=q;drTmp.clearLayers();L.circleMarker(q,{pane:'ad',radius:6,color:'#fff',weight:2,fillColor:'#ffc233',fillOpacity:1,interactive:false}).addTo(drTmp);
+  drRub=L.polyline([q,q],{pane:'ad',color:'#ffc233',weight:4,dashArray:'4 6',interactive:false}).addTo(drTmp);log('Anclaje Doble: marque el otro extremo, en la dirección de los puentes');return}
+ const a=drA,b=q,m=[(a[0]+b[0])/2,(a[1]+b[1])/2],re=drRe?byId(drRe):null,sel=re?(re.au?'':re.cn):$('#dc').value;
+ drA=null;drRe=null;drRub=null;drTmp.clearLayers();
+ if(dist(a,b)<2)return log('⚠ Marque dos puntos distintos (un lado y el otro del anclaje)');
+ let ci,amb=[];if(sel){ci=circ.findIndex(c=>c.name==sel&&c.on);if(ci>=0&&nearC(circ[ci],m).d>80){log('⚠ La marca está a más de 80 m de la línea de '+sel);return}}else{const r=pickCirc(a,b);ci=r.ci;amb=r.amb}
+ if(ci<0)return log('⚠ No hay un circuito activo a menos de 80 m de la marca'+(sel?' ('+sel+')':''));
+ let p=re;if(re){re.a=a;re.b=b;re.lat=m[0];re.lng=m[1];re.cn=circ[ci].name;re.m.setLatLng(m)}else p=addPt({t:'DR',lat:m[0],lng:m[1],a,b,cn:circ[ci].name,au:sel?0:1});
+ log(p.name+' ligado al circuito '+p.cn+(amb.length?' ⚠ por ese punto también pasa: '+amb.join(', ')+'. Si no es el correcto, cámbielo en la ventana del Anclaje Doble o elija el circuito en el menú antes de marcar.':''));
+ cnt();save();clearPlan()}
+map.on('mousemove',e=>{if(drRub)drRub.setLatLngs([drA,[e.latlng.lat,e.latlng.lng]])});
+/* ---------- Trazos de flujo en cruces: definen la conectividad real ---------- */
+map.createPane('flow').style.zIndex=440;
+let flows=[],draft=[],fseq=0;const dl=L.polyline([],{pane:'flow',color:'#00e5ff',weight:4,dashArray:'6 6',interactive:false}).addTo(map),dv=L.layerGroup().addTo(map),fg=L.layerGroup().addTo(map);
+const bear=(a,b)=>Math.atan2((b[1]-a[1])*Math.cos(a[0]*rad),b[0]-a[0])/rad,saveF=()=>{try{localStorage.setItem('gc_flows',JSON.stringify(flows))}catch(e){}};
+try{flows=JSON.parse(localStorage.getItem('gc_flows')||'[]');fseq=Math.max(0,...flows.map(f=>f.id))}catch(e){}
+const dvr=()=>{dl.setLatLngs(draft);dv.clearLayers();draft.forEach(q=>L.circleMarker(q,{pane:'flow',radius:4,color:'#00e5ff',fillOpacity:1,interactive:false}).addTo(dv))};
+function addV(q){draft.push(q);dvr()}
+function endTrace(ok){if(ok&&draft.length>1){const sel=$('#dc').value,e0=draft[0],e1=draft[draft.length-1];let ci;
+  if(sel){ci=circ.findIndex(c=>c.name==sel&&c.on);if(ci<0||Math.max(nearC(circ[ci],e0).d,nearC(circ[ci],e1).d)>30)return log('⚠ Los extremos del trazo deben quedar a menos de 30 m de la línea de '+sel)}
+  else{const r=pickFlow(draft);ci=r.ci;if(ci<0)return log('⚠ Los extremos del trazo deben quedar a menos de 30 m de la línea de un circuito activo');if(r.amb.length)return log('⚠ Por ahí pasan varios circuitos ('+[circ[ci].name,...r.amb].join(', ')+'). Elija el circuito en el menú «Circuito del equipo» y pulse otra vez Terminar trazo (Enter).')}
+  flows.push({id:++fseq,pts:draft,cn:circ[ci].name,au:sel?0:1});saveF();log('Cruce '+flows.length+' guardado ('+draft.length+' vértices) · circuito '+circ[ci].name);redrawF();clearPlan()}
+ else if(ok)log('⚠ Un trazo necesita al menos 2 puntos');draft=[];dvr()}
+function redrawF(){fg.clearLayers();flows.forEach(f=>{const P=f.pts,g=L.layerGroup();L.polyline(P,{pane:'flow',color:'#00e5ff',weight:5,opacity:.95}).on('click',e=>{if(!mode)L.popup().setLatLng(e.latlng).setContent(`<b>Cruce de líneas</b><br>Circuito: ${cSel(f.id,f.cn,0,'setFC')}<br><button onclick="delF(${f.id})">Eliminar trazo</button>`).openOn(map)}).addTo(g);
+ for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i];L.marker([(a[0]+b[0])/2,(a[1]+b[1])/2],{interactive:false,icon:L.divIcon({className:'',iconSize:[16,16],iconAnchor:[8,8],html:`<div style="color:#00e5ff;font-size:16px;line-height:16px;text-shadow:0 0 3px #000;transform:rotate(${bear(a,b)-90}deg)">▶</div>`})}).addTo(g)}g.addTo(fg)})}
+function delF(id){flows=flows.filter(f=>f.id!=id);saveF();redrawF();clearPlan()}
+$('#be').onclick=()=>endTrace(1);$('#bu').onclick=()=>{draft.pop();dvr()};
+function applyFlows(w){for(const fl of flows){const P=fl.pts,e0=P[0],e1=P[P.length-1];
+ let ci=fl.cn?circ.findIndex(c=>c.name==fl.cn&&c.on):-1;
+ if(!fl.cn){const r=pickFlow(P);ci=r.ci;if(ci>=0){fl.cn=circ[ci].name;fl.au=1;saveF()}}
+ if(ci<0){const ex=circ.find(c=>c.name==fl.cn);if(!ex||ex.on)w.push('Un cruce (trazo de flujo) ligado a "'+(fl.cn||'?')+'" no tiene su circuito cargado o está lejos de su línea');continue}
+ const f0=locate(e0,30,ci);if(!f0){w.push('Un trazo no tiene línea a menos de 30 m en su inicio');continue}const a=split(f0);
+ const f1=locate(e1,30,ci);if(!f1){w.push('Un trazo no tiene línea a menos de 30 m en su final');continue}const b=split(f1);
+ const lim=dist(e0,e1)*2.5+60,D=new Map([[a,0]]),pv=new Map(),dn=new Set();
+ for(;;){let u=-1,d=1e18;D.forEach((v,k)=>{if(!dn.has(k)&&v<d){d=v;u=k}});if(u<0||u==b||d>lim)break;dn.add(u);
+  for(const e of G.N[u].adj){if(e.d||e.tie||e.v)continue;const m=nb(u,e),nd=d+e.l;if(nd<(D.has(m)?D.get(m):1e18)){D.set(m,nd);pv.set(m,[u,e])}}}
+ if(D.has(b)&&D.get(b)<=lim)for(let n=b;n!==a;n=pv.get(n)[0])pv.get(n)[1].d=1;
+ let l=0;for(let i=1;i<P.length;i++)l+=dist(P[i-1],P[i]);const v={a,b,l,v:1};G.N[a].adj.push(v);G.N[b].adj.push(v)}}
+redrawF();
+/* ---------- Topología ---------- */
+function build(){const N=[],E=[],grid=new Map(),K=5e-5,TL=Math.min(5,Math.max(.5,+$('#tol').value||4)),xs=[];
+ const node=(c,p,sid)=>{const x=xs.some(q=>dist(q,p)<15)?sid:-1,i=Math.floor(p[0]/K),j=Math.floor(p[1]/K);
+  for(let a=i-1;a<=i+1;a++)for(let b=j-1;b<=j+1;b++){const l=grid.get(c+'|'+a+'|'+b);if(l)for(const n of l)if(N[n].x===x&&dist(N[n].p,p)<TL)return n}
+  const n=N.length,k=c+'|'+i+'|'+j;N.push({p,c,x,adj:[],sw:null});(grid.get(k)||grid.set(k,[]).get(k)).push(n);return n};
+ circ.forEach((c,ci)=>{if(!c.on)return;for(const[si,s]of c.segs.entries())for(let i=1;i<s.length;i++){const a=node(ci,s[i-1],si),b=node(ci,s[i],si);if(a==b)continue;
+  const e={a,b,l:dist(N[a].p,N[b].p)};E.push(e);N[a].adj.push(e);N[b].adj.push(e)}});
+ return{N,E}}
+function locate(q,max,only){let best=null,d=max;const k=Math.cos(q[0]*rad);
+ G.E.forEach(e=>{if(e.d||only>=0&&G.N[e.a].c!==only)return;const A=G.N[e.a].p,B=G.N[e.b].p,ax=(A[1]-q[1])*k,ay=A[0]-q[0],dx=(B[1]-A[1])*k,dy=B[0]-A[0];
+  const t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/(dx*dx+dy*dy||1))),dd=Math.hypot(ax+t*dx,ay+t*dy)*rad*R;
+  if(dd<d){d=dd;best={e,t,p:[A[0]+t*dy,A[1]+t*(B[1]-A[1])]}}});
+ if(best)best.p[0]=G.N[best.e.a].p[0]+best.t*(G.N[best.e.b].p[0]-G.N[best.e.a].p[0]);return best}
+function split(f){const{e}=f,N=G.N,n=N.length;N.push({p:f.p,c:N[e.a].c,adj:[],sw:null});
+ const a={a:e.a,b:n,l:e.l*f.t},b={a:n,b:e.b,l:e.l*(1-f.t)};e.d=1;N[e.a].adj.push(a);N[n].adj.push(a,b);N[e.b].adj.push(b);G.E.push(a,b);return n}
+const nearIn=(q,x)=>{let b=-1,d=80;G.N.forEach((n,i)=>{if(n.c!==x)return;const k=dist(n.p,q);if(k<d){d=k;b=i}});return b};
+const near=(q,x)=>{let b=-1,d=80;G.N.forEach((n,i)=>{if(n.c===x)return;const k=dist(n.p,q);if(k<d){d=k;b=i}});return b};
+function attach(){G=build();const w=[];applyFlows(w);pts.forEach(p=>{p.n=-1});
+ [...pts.filter(p=>p.vis!==0&&!T[p.t].sv&&p.t!='ENL'),...pts.filter(p=>p.vis!==0&&p.t=='ENL')].forEach(p=>{p.n=-1;const q=[p.lat,p.lng];
+  if(p.t!='ENL'){const ci=pCirc(p);
+   if(ci<0){if(!(p.cn&&circ.some(c=>c.name==p.cn&&!c.on)))w.push(p.name+' ('+T[p.t].n+'): su circuito'+(p.cn?' "'+p.cn+'"':'')+' no está cargado o no hay línea cerca');return}
+   const f=locate(q,80,ci);if(!f)return w.push(p.name+' fuera de su circuito ('+p.cn+', a más de 80 m)');p.n=split(f);G.N[p.n].sw=p;return}
+  /* enlace: une exactamente los dos circuitos indicados */
+  let a,b;
+  if(!p.cn&&p.cn2){p.cn=p.cn2;p.cn2=''}
+  if(p.cn&&!p.cn2&&linkFill(p)){save();mk(p)}
+  if(p.cn&&!p.cn2)return w.push(p.name+' (enlace): pendiente, aún no hay otro circuito a menos de 80 m; cargue el KMZ del circuito con el que se enlaza');
+  if(p.cn&&p.cn2){const ca=circ.findIndex(c=>c.name==p.cn&&c.on),cb=circ.findIndex(c=>c.name==p.cn2&&c.on);
+   if(ca<0||cb<0){if(!circ.some(c=>(c.name==p.cn||c.name==p.cn2)&&!c.on))w.push(p.name+' (enlace): falta cargar el circuito "'+(ca<0?p.cn:p.cn2)+'"');return}
+   a=nearIn(q,ca);b=nearIn(q,cb);if(a<0||b<0)return w.push(p.name+' (enlace): no hay línea de '+(a<0?p.cn:p.cn2)+' a menos de 80 m')}
+  else{a=near(q,-1);if(a<0)return w.push(p.name+' sin circuito cercano');b=near(q,G.N[a].c);if(b<0)return w.push(p.name+' sin segundo circuito cercano');p.cn=circ[G.N[a].c].name;p.cn2=circ[G.N[b].c].name;p.au=1;save()}
+  p.n=a;p.n2=b;const e={a,b,l:0,tie:p};G.N[a].adj.push(e);G.N[b].adj.push(e)});
+ w.forEach(x=>log('⚠ '+x))}
+const nb=(n,e)=>e.a==n?e.b:e.a,cn=n=>circ[G.N[n].c].name;
+function walk(s,S,p,par){const q=[s];S.set(s,p);while(q.length){const n=q.pop();for(const e of G.N[n].adj){if(e.d||(e.tie&&!st(e.tie)))continue;const m=nb(n,e);if(S.has(m))continue;S.set(m,p);par&&par.set(m,n);const w=G.N[m].sw;if(w&&!st(w))continue;q.push(m)}}}
+/* longitud sin servicio incluyendo los tramos que tocan los anclajes dobles/seccionadores (comparación justa al decidir usar Anclaje Doble) */
+const ex=S=>{const E=new Set();S.forEach(n=>{for(const e of G.N[n].adj)if(!e.d&&!e.tie)E.add(e)});let t=0;E.forEach(e=>t+=e.l);return t};
+const energized=()=>{const S=new Map();pts.forEach(p=>{if(p.t=='INT'&&p.n>=0&&st(p)&&!S.has(p.n))walk(p.n,S,p)});return S};
+const len=S=>{let s=0;S.forEach(n=>{for(const e of G.N[n].adj)if(!e.d&&!e.tie&&e.a==n&&S.has(e.b))s+=e.l});return s};
+const segs=S=>{const r=[],N=G.N;S.forEach(n=>{for(const e of N[n].adj){if(e.d||e.tie)continue;const o=nb(n,e);if(S.has(o)?e.a==n:N[o].sw)r.push([N[n].p,N[o].p])}});return r};
+/* ---------- Lógica SCADA de falla ---------- */
+const RK={INT:0,RES:1,SS:2,CCF:3,ENL:3.5,DR:4};let DRU=new Set();
+function analyze(q,u){DRU=u;clearPlan();
+ if(!circ.some(c=>c.on))return log('⚠ Cargue y active al menos un circuito');
+ attach();ovr=null;const f=locate(q,200);if(!f)return log('⚠ La falla debe marcarse sobre una línea (máx. 200 m)');
+ const F=split(f),N=G.N;f.F=F;const pre=energized(),src=pre.get(F);
+ if(!src){plan={f,Z:new Set([F]),B:new Set(),isl:[],steps:[['ALERTA','El tramo con falla no está energizado por ningún interruptor cerrado. Verifique que el circuito tenga un interruptor (I) cerrado a menos de 80 m de su línea.']]};return show()}
+ const flood=U=>{const Z=new Set([F]),B=new Set(),qq=[F];
+ while(qq.length){const n=qq.pop();for(const x of N[n].adj){if(x.d)continue;if(x.tie){if(st(x.tie))B.add(x.tie);continue}
+  const m=nb(n,x);if(Z.has(m))continue;const w=N[m].sw;if(w&&!(w.t=='DR'&&st(w)&&!U.has(w))){if(st(w))B.add(w);continue}Z.add(m);qq.push(m)}}return[Z,B]};
+ /* Z = zona en falla (entre los anclajes dobles abiertos); Z0 = tramo de línea completo afectado (anclajes dobles sin abrir) */
+ const[Z,B]=flood(DRU),Z0=DRU.size?flood(new Set())[0]:Z;
+ const comp=new Map(),par=new Map();walk(src.n,comp,src,par);
+ let trip=null;for(let n=F;n!==undefined;n=par.get(n)){const w=N[n].sw;if(w&&(w.t=='INT'||w.t=='RES')&&st(w)){trip=w;break}}
+ trip=trip||src;const kids=new Map();par.forEach((a,c)=>(kids.get(a)||kids.set(a,[]).get(a)).push(c));
+ const dn=new Set([trip.n]),qd=[trip.n];while(qd.length)for(const c of kids.get(qd.pop())||[]){dn.add(c);qd.push(c)}
+ ovr=new Map([...B].map(p=>[p,0]));
+ const post=energized(),lost=new Set(),up=new Set();
+ comp.forEach((_,n)=>{const w=N[n].sw;if(!dn.has(n)||Z.has(n)||(w&&!st(w)))return;(post.has(n)?up:lost).add(n)});
+ const isl=[],seen=new Set();
+ lost.forEach(s=>{if(seen.has(s))return;const S=new Set([s]),a=[s];seen.add(s);
+  while(a.length){const n=a.pop();for(const x of N[n].adj){if(x.d||x.tie)continue;const m=nb(n,x);if(!lost.has(m)||seen.has(m))continue;seen.add(m);S.add(m);a.push(m)}}
+  const l=len(S);if(l>0){const cand=[];pts.forEach(p=>{if(p.t!='ENL'||st(p)||p.n<0)return;const a1=S.has(p.n),b1=S.has(p.n2);if(a1==b1)return;const o=a1?p.n2:p.n;
+    if(post.has(o)&&!Z.has(o))cand.push({p,o,d:dist([p.lat,p.lng],f.p)})});cand.sort((x,y)=>x.d-y.d);isl.push({S,l,cand,t:cand[0]})}});
+ const Bl=[...B].sort((a,b)=>(RK[a.t]-RK[b.t])||dist([a.lat,a.lng],f.p)-dist([b.lat,b.lng],f.p)),reclose=!B.has(trip),steps=[];
+ steps.push(['VERIF',`Disparó automáticamente ${trip.name} (${cn(trip.n)}). Falla en ${cn(F)}; zona a aislar: ${km(len(Z))} km.`]);
+ if(Z0.size>Z.size)steps.push(['VERIF',`Tramo de línea afectado por completo: ${km(len(Z0))} km (antes, en y después de la falla). Se marca como normal hasta que los anclajes dobles estén abiertos y el restaurador/alimentador y el enlace estén cerrados para recuperar las cargas de antes y después del punto de falla.`]);
+ Bl.filter(p=>p!=trip).forEach(p=>steps.push(['ABRIR',`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}${p.t=='DR'?' · abrir la línea (ÚLTIMO RECURSO): queda sin servicio el área delante de él':''}`]));
+ if(reclose)steps.push(['CERRAR',`${trip.name} · repone ${km(len(up))} km aguas arriba de la falla`]);
+ isl.forEach(i=>steps.push(i.t?['CERRAR',`${i.t.p.name} · transfiere ${km(i.l)} km a ${cn(i.t.o)}${i.cand.length>1?' (alternos: '+i.cand.slice(1).map(c=>c.p.name).join(', ')+')':''}. Verifique que ese circuito soporte la carga.`]:['ALERTA',`Sin enlace de respaldo: ${km(i.l)} km quedan sin servicio.`]));
+ /* restablecimiento previsto (por longitud de línea): estado final = aperturas + enlaces elegidos */
+ ovr=new Map([...B].map(p=>[p,0]));isl.forEach(i=>i.t&&ovr.set(i.t.p,1));
+ const Ef=energized(),tgt=new Map(ovr),aff=len(dn),rest=len(new Set([...dn].filter(n=>Ef.has(n))));
+ ovr=null;plan={f,Z,Z0,B,Bl,trip,reclose,isl,steps,dn,aff,rest,src,Lc:len(new Set(comp.keys())),pct:aff?100*rest/aff:100,tgt,lostKm:isl.reduce((s,i)=>s+i.l,0),noBk:isl.filter(i=>!i.t).reduce((s,i)=>s+i.l,0)};
+ Bl.forEach(p=>hl.set(p,'ab'));if(reclose)hl.set(trip,'ce');isl.forEach(i=>i.t&&hl.set(i.t.p,'ce'));
+ pts.forEach(mk);plan.un=ex(Z)+isl.filter(i=>!i.t).reduce((t,i)=>t+ex(i.S),0);return plan}
+/* Maniobra 1: restauradores y seccionamiento. Maniobra 2 (recomendada): abrir puentes en Anclajes Dobles para recuperar más carga. */
+function runFault0(q){const P=analyze(q,new Set());if(!plan)return;let rec=null;
+ if(P&&P.Bl){const D=pts.filter(p=>p.t=='DR'&&p.st&&p.n>=0);
+  if(D.length){let u=new Set(D),Q=analyze(q,u);
+   if(Q&&Q.Bl&&Q.rest>P.rest+1){for(const d of D){if(!Q.B.has(d))continue;const v=new Set(u);v.delete(d);const W=analyze(q,v);if(W&&W.Bl&&W.rest>=Q.rest-1){u=v;Q=W}}
+    rec={Q:{Z:Q.Z,tgt:Q.tgt,rest:Q.rest,pct:Q.pct,ads:Q.Bl.filter(p=>p.t=='DR')}}}else rec={none:1};
+   analyze(q,new Set())}
+  plan.rec=rec}
+ show();if(plan.Bl)log('Falla analizada en '+cn(plan.f.F)+': maniobra 1 con '+plan.Bl.length+' apertura(s) y '+plan.isl.filter(i=>i.t).length+' transferencia(s); restablecimiento previsto '+plan.pct.toFixed(1)+' %'+demL(plan,plan.rest))}
+function runFault(q){try{runFault0(q)}catch(e){log('⚠ Error en el análisis: '+e.message);console.error(e)}}
+const served=P=>{const E=energized();return len(new Set([...P.dn].filter(n=>E.has(n))))},pc=(P,x)=>P.aff?100*x/P.aff:100,f1=x=>x.toFixed(1)+' %';
+/* diferencia entre el estado actual (tras la maniobra 1) y el estado que deja la maniobra con Anclaje Doble */
+function recDiff(P){const Q=P.rec&&P.rec.Q;if(!Q)return{ab:[],ce:[]};const pre=new Map(prevSt||pts.map(p=>[p,p.st])),want=p=>Q.tgt.has(p)?Q.tgt.get(p):pre.get(p),sw=pts.filter(p=>!T[p.t].sv&&p.n>=0);
+ return{ab:sw.filter(p=>p.st==1&&want(p)==0).sort((x,y)=>(x.t=='DR'?0:1)-(y.t=='DR'?0:1)||RK[x.t]-RK[y.t]),ce:sw.filter(p=>p.st==0&&want(p)==1).sort((x,y)=>(x.t=='ENL')-(y.t=='ENL')||RK[x.t]-RK[y.t])}}
+const recSteps=d=>[...d.ab.map(p=>['ABRIR',p.t=='DR'?`${p.name} · Anclaje Doble · ${p.cn} · abrir puentes: solo queda sin servicio el área entre los anclajes`:`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}`]),
+ ...d.ce.map(p=>['CERRAR',p.t=='ENL'?`${p.name} · enlace ${cn(p.n)} – ${cn(p.n2)} · transfiere el tramo recuperado`:`${p.name} · ${T[p.t].n} · ${cn(p.n)} · repone el tramo hasta el anclaje doble`])];
+const li=a=>`<ol>${a.map(s=>`<li><em class="${s[0]}">${s[0]}</em> ${esc(s[1])}</li>`).join('')}</ol>`;
+function show(){draw();const P=plan;map.setView(P.f.p,Math.max(map.getZoom(),15));panel()}
+const dem=P=>P&&P.src&&P.Lc?DEM.get(dkey(P.src.name)):null,
+ demL=(P,x)=>{const d=dem(P);return d?` · ${fu(d.u*x/P.Lc)} usuarios · ${(d.mw*x/P.Lc).toFixed(2)} MW`:''};
+function demTxt(P,rest,lbl){if(!P.src)return'';const d=dem(P);
+ if(!d)return`<div class="sum" style="color:#ffc233">⚠ El interruptor «${esc(P.src.name)}» no coincide con ningún circuito de la tabla de usuarios y demandas; renómbrelo igual que en la tabla para calcular usuarios y demanda.</div>`;
+ const k=x=>d.u*x/P.Lc,m=x=>d.mw*x/P.Lc;
+ return`<div class="sum">Circuito «${esc(d.n)}» (${fu(d.u)} usuarios · ${d.mw.toFixed(2)} MW): afectados <b>${fu(k(P.aff))} usuarios · ${m(P.aff).toFixed(2)} MW</b> · ${lbl} <b class="pct">${fu(k(rest))} usuarios · ${m(rest).toFixed(2)} MW</b> · sin servicio <b>${fu(k(P.aff)-k(rest))} usuarios · ${(m(P.aff)-m(rest)).toFixed(2)} MW</b></div>`}
+function panel(){const P=plan,rec=P.rec,Q=rec&&rec.Q;let h='';
+ if(P.Bl){if(!P.done)h+=`<div class="sum">Restablecimiento previsto con la maniobra 1: <span class="pct">${f1(P.pct)}</span> (${km(P.rest)} de ${km(P.aff)} km afectados, por longitud de línea) · Zona en falla ${km(len(P.Z))} km · Sin servicio por maniobra ${km(P.lostKm)} km · Sin respaldo ${km(P.noBk)} km</div>`+demTxt(P,P.rest,'se restablecerían con la maniobra 1');
+  else{const sv=served(P);h+=`<div class="sum">${P.done==1?'Maniobra 1 ejecutada':'Maniobra 2 ejecutada'} · Restablecido <span class="pct">${f1(pc(P,sv))}</span> (${km(sv)} de ${km(P.aff)} km afectados)${P.done==2?` · tras la maniobra 1: ${f1(P.pct1)}`:''}</div>`+demTxt(P,sv,'restablecidos')}}
+ h+=(P.Bl&&P.done?'<div class="sum">Maniobra 1 · restauradores y seccionamiento</div>':'')+li(P.steps);
+ if(P.Bl&&P.done==1){if(Q){const sv=served(P),d=recDiff(P);P.rec.S2=recSteps(d);
+   h+=`<div class="rec"><b>Recomendación: recuperar más carga abriendo puentes en ${Q.ads.map(p=>p.name).sort().join(', ')}</b><br>Restablecimiento ${f1(pc(P,sv))} → <span class="pct">${f1(Q.pct)}</span> (+${(Q.pct-pc(P,sv)).toFixed(1)} puntos · +${km(Q.rest-sv)} km${(d=>d?` · +${fu(d.u*(Q.rest-sv)/P.Lc)} usuarios · +${(d.mw*(Q.rest-sv)/P.Lc).toFixed(2)} MW`:'')(dem(P))}). Anclaje Doble como último recurso: queda sin servicio solo el área entre los anclajes. Pulse «Ejecutar maniobra 2».${li(P.rec.S2)}</div>`}
+  else if(rec&&rec.none)h+='<div class="rec">Anclajes Dobles: ninguno permite recuperar más carga en esta falla.</div>'}
+ if(P.done==2&&rec&&rec.S2)h+=`<div class="rec"><b>Maniobra 2 · Anclaje Doble</b>${li(rec.S2)}</div>`;
+ $('#pl').innerHTML=h;$('#bx').textContent=P.done==1&&Q?'Ejecutar maniobra 2 · Anclaje Doble':P.done?'Maniobra ejecutada':'Ejecutar maniobra 1'}
+function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:7,opacity:.95};
+ if(!P.done){
+  P.isl.forEach(i=>{L.polyline(segs(i.S),{color:'#ffa657',weight:6,dashArray:'8 8'}).addTo(ov);if(i.t)L.polyline([N[i.t.p.n].p,N[i.t.p.n2].p],{color:'#3ddc84',weight:3,dashArray:'4 6'}).addTo(ov)});
+  L.polyline(segs(P.Z),RED).addTo(ov)
+ }else{
+  /* rojo: sin servicio dentro del tramo; naranja: sin servicio por maniobra fuera del tramo; verde: servido por otro circuito (transferencia) */
+  const E=energized(),Zf=P.done==2?P.rec.Q.Z:P.Z,all=new Set(P.Z),rd=new Set(),og=new Set(),gr=new Set();
+  P.isl.forEach(i=>i.S.forEach(n=>all.add(n)));
+  all.forEach(n=>{if(!E.has(n)||Zf.has(n))(P.Z.has(n)?rd:og).add(n);else if(N[E.get(n).n].c!==N[n].c)gr.add(n)});
+  L.polyline(segs(og),{color:'#ffa657',weight:6,dashArray:'8 8'}).addTo(ov);
+  L.polyline(segs(gr),{color:'#3ddc84',weight:6}).addTo(ov);
+  pts.forEach(p=>{if(p.t=='ENL'&&p.st&&p.n>=0&&p.n2>=0)L.polyline([N[p.n].p,N[p.n2].p],{color:'#3ddc84',weight:3,dashArray:'4 6'}).addTo(ov)});
+  L.polyline(segs(rd),RED).addTo(ov)}
+ L.marker(P.f.p,{icon:L.divIcon({className:'',html:'<div class="fl">⚡</div>',iconSize:[30,30],iconAnchor:[15,15]})}).addTo(ov)}
+function exec2(){const P=plan,d=recDiff(P);P.rec.S2=recSteps(d);
+ d.ab.forEach(p=>{p.st=0;log('ABRIR '+p.name+(p.t=='DR'?' (puentes del Anclaje Doble)':''))});d.ce.forEach(p=>{p.st=1;log('CERRAR '+p.name)});
+ P.done=2;P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pc(P,served(P)))+demL(P,served(P)))}
+function doBx(){const P=plan;if(!P||!P.Bl)return log('⚠ Marque primero un punto de falla');
+ if(P.done==1){if(P.rec&&P.rec.Q)return exec2();return log('No hay una maniobra adicional recomendada')}
+ if(P.done)return log('La maniobra ya fue ejecutada; use Normalizar para volver al estado normal');
+ prevSt=pts.map(p=>[p,p.st]);log('DISPARO automático '+P.trip.name);P.Bl.forEach(p=>{p.st=0;log('ABRIR '+p.name)});
+ if(P.reclose)log('CERRAR '+P.trip.name+' (reposición aguas arriba)');
+ P.isl.forEach(i=>{if(i.t){i.t.p.st=1;log('CERRAR '+i.t.p.name+' · '+km(i.l)+' km transferidos')}});
+ P.done=1;P.pct1=pc(P,served(P));if(P.rec&&P.rec.Q)P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 1 ejecutada · restablecimiento '+f1(P.pct1)+demL(P,served(P)))}
+$('#dx').onchange=async e=>{if(e.target.files[0])await loadDem(e.target.files[0]);e.target.value=''};
+try{const sv=localStorage.getItem('gc_dem');setDem(sv?JSON.parse(sv):DEM0,false)}catch(e){setDem(DEM0,false)}
+$('#bx').onclick=()=>{try{doBx()}catch(e){log('⚠ Error en la maniobra: '+e.message);console.error(e)}};
+$('#bn').onclick=()=>{if(prevSt){prevSt.forEach(([p,s])=>p.st=s);prevSt=null;log('Estado normal restablecido')}clearPlan();save()};
+function clearPlan(){plan=null;hl=new Map();ov.clearLayers();$('#pl').innerHTML='';$('#bx').textContent='Ejecutar maniobra 1';pts.forEach(mk)}
+list();cnt();
+
+/* ===== Avisos, búsqueda, respaldo e inspección ===== */
+let tt;function toast(m,b,f){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}t.innerHTML=`<span>${esc(m)}</span>${b?`<button>${b}</button>`:''}`;t.classList.add('on');if(b)t.querySelector('button').onclick=()=>{t.classList.remove('on');f()};clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),7000)}
+document.addEventListener('click',e=>{if(innerWidth<=800&&e.target.closest&&e.target.closest('#tb button,#sv button')){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}});
+addEventListener('resize',()=>map.invalidateSize());setTimeout(()=>map.invalidateSize(),300);
+/* búsqueda de equipos y circuitos */
+const sq=L.control({position:'topleft'});sq.onAdd=()=>{const d=L.DomUtil.create('div','leaflet-bar sq');d.innerHTML='<input id="sqi" placeholder="🔎 Buscar equipo o circuito" autocomplete="off"><div id="sqr"></div>';L.DomEvent.disableClickPropagation(d);return d};sq.addTo(map);
+$('#sqi').oninput=function(){const v=this.value.trim().toLowerCase(),r=$('#sqr');r.innerHTML='';if(!v)return;
+ const a=[...pts.filter(p=>p.vis!==0&&p.name.toLowerCase().includes(v)).map(p=>({n:p.name,s:T[p.t].n+(p.cn?' · '+p.cn:''),f:()=>{map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}})),...circ.filter(c=>c.name.toLowerCase().includes(v)).map(c=>({n:c.name,s:'Circuito',f:()=>map.fitBounds(c.layer.getBounds())}))].slice(0,7);
+ a.forEach(x=>{const b=document.createElement('button');b.innerHTML=`<b>${esc(x.n)}</b> <small style="display:inline;padding:0">${esc(x.s)}</small>`;b.onclick=()=>{x.f();r.innerHTML='';this.value=''};r.appendChild(b)});if(!a.length)r.innerHTML='<small>Sin resultados</small>'};
+/* respaldo completo en un archivo */
+const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
+$('#bk').onclick=async()=>{try{const files=[];for(const k of['c','s'])for(const c of arr(k))if(c.blob)files.push({k,name:c.name,kmz:c.kmz,b:await b64(c.blob)});
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files})],{type:'application/json'}));a.download='gridctrl-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+ try{localStorage.setItem('gc_bk',Date.now())}catch(e){}toast('Respaldo guardado: '+pts.length+' equipos y '+files.length+' KMZ')}catch(e){log('⚠ No se pudo crear el respaldo')}};
+$('#br').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let d;try{d=JSON.parse(await f.text());if(!d.gridctrl)throw 0}catch(x){return log('⚠ El archivo no es un respaldo de GridCtrl')}
+ if(!confirm('Restaurar reemplazará los equipos y cruces actuales. ¿Continuar?'))return;
+ loadPts(d.pts||[]);save();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();
+ for(const x of d.files||[]){if(arr(x.k).some(c=>c.name==x.name))continue;await ingest(new File([Uint8Array.from(atob(x.b),ch=>ch.charCodeAt(0))],x.name+(x.kmz?'.kmz':'.kml')),x.k)}
+ list();resolveLinks(1);clearPlan();fitAll();toast('Respaldo restaurado')};
+setTimeout(()=>{try{if(pts.length&&Date.now()-(+localStorage.getItem('gc_bk')||0)>14*864e5)toast('💾 Sin respaldo reciente de sus datos','Respaldar',()=>$('#bk').click())}catch(e){}},6000);
+/* modo inspección: recorre los equipos del circuito desde su interruptor, con voz y GPS */
+let ins=null;const insb=(()=>{const d=document.createElement('div');d.id='ins';map.getContainer().appendChild(d);L.DomEvent.disableClickPropagation(d);return d})();
+const say=t=>{if(!ins||ins.mute||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='es-MX';speechSynthesis.speak(u)}catch(e){}};
+const fmtM=m=>m>=1000?(m/1000).toFixed(1)+' kilómetros':Math.round(m/10)*10+' metros';
+function insStart(id){const ip=byId(id);if(!ip||!ip.cn)return;attach();if(ip.n<0)return log('⚠ '+ip.name+' no está sobre la línea de su circuito');
+ const D=new Map([[ip.n,0]]),dn=new Set,cn_=ip.cn;
+ for(;;){let n=-1,b=1e18;D.forEach((d,k)=>{if(!dn.has(k)&&d<b){b=d;n=k}});if(n<0)break;dn.add(n);for(const e of G.N[n].adj){if(e.tie)continue;const m=nb(n,e),d=b+e.l;if(!D.has(m)||d<D.get(m))D.set(m,d)}}
+ const list=pts.filter(p=>p.vis!==0&&!T[p.t].sv&&p.t!='DR'&&(p.cn==cn_||p.cn2==cn_)).map(p=>({p,d:D.get(p.t=='ENL'&&p.cn2==cn_?p.n2:p.n)})).filter(x=>x.d!=null).sort((a,b)=>a.d-b.d);
+ if(!list.length)return log('⚠ No hay equipos alcanzables en '+cn_);
+ insStop();ins={cn:cn_,list,i:0,ok:new Set,sk:new Set,say:{},mute:false};map.closePopup();
+ navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>ins?ins.wl=w:w.release()).catch(()=>{});
+ insGo(0);ins.tm=setInterval(insTick,2000)}
+function insGo(i){ins.i=i;ins.say={};const x=ins.list[i];if(!x)return insEnd();const p=x.p;map.panTo([p.lat,p.lng]);
+ say((i?'Siguiente: ':'Iniciando inspección del circuito '+ins.cn+'. Primer equipo: ')+T[p.t].n+' '+p.name);insDraw();insUi()}
+function insTick(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p;ins.near=null;
+ if(me){const d=map.distance(me.getLatLng(),[p.lat,p.lng]),s=ins.say;ins.near=d;
+  if(d<=25&&!s.h)(s.h=1,say('Llegó a '+T[p.t].n+' '+p.name+(p.st?', cerrado':', abierto')+'. Confirme la revisión.'));
+  else if(d<=100&&d>25&&!s.m)(s.m=1,say('En cien metros, '+T[p.t].n+' '+p.name));
+  else if(d>100&&d<=300&&!s.f)(s.f=1,say('En '+fmtM(d)+', '+T[p.t].n+' '+p.name))}
+ insDraw();insUi()}
+function insDraw(){ins.ln&&ins.ln.remove();ins.ln=null;const x=ins.list[ins.i];if(x&&me)ins.ln=L.polyline([me.getLatLng(),[x.p.lat,x.p.lng]],{color:'#ffc233',weight:3,dashArray:'6 8',interactive:false}).addTo(map)}
+function insUi(){const x=ins.list[ins.i];if(!x)return;const p=x.p,n=ins.list.length,k=ins.ok.size+ins.sk.size;
+ insb.innerHTML=`<div class="ih"><b>🧭 ${esc(ins.cn)}</b><span>${k}/${n}</span><button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div><div class="ib"><div class="in"><b>${esc(p.name)}</b><small>${T[p.t].n} · ${Math.round(x.d)} m desde el interruptor${ins.near!=null?' · a '+Math.round(ins.near)+' m de usted':''}</small></div><div class="ia"><button onclick="insNext(1)">Omitir</button><button class="ok ${ins.near!=null&&ins.near<=25?'pulse':''}" onclick="insNext()">✔ Revisado</button></div></div><div class="bar"><i style="width:${k/n*100}%"></i></div>`}
+function insNext(sk){const x=ins.list[ins.i];(sk?ins.sk:ins.ok).add(x.p);insGo(ins.i+1)}
+function insMute(){ins.mute=!ins.mute;if(ins.mute&&window.speechSynthesis)speechSynthesis.cancel();insUi()}
+function insEnd(){clearInterval(ins.tm);ins.ln&&ins.ln.remove();const n=ins.list.length;say('Inspección terminada. '+ins.ok.size+' de '+n+' equipos revisados.');
+ ins.rep='Inspección '+ins.cn+' · '+new Date().toLocaleString()+'\n'+ins.list.map(x=>(ins.ok.has(x.p)?'✔ ':'✖ ')+x.p.name+' ('+T[x.p.t].n+')').join('\n');log('🧭 Inspección de '+ins.cn+': '+ins.ok.size+'/'+n+' equipos revisados');
+ insb.innerHTML=`<div class="ih"><b>🧭 Inspección terminada</b><span>${ins.ok.size}/${n}</span><button onclick="insStop()">✕</button></div><div class="ib"><div class="in">Revisados: <b>${ins.ok.size}</b> · omitidos: <b>${ins.sk.size}</b></div><div class="ia"><button class="ok" onclick="insShare()">Compartir reporte</button></div></div>`}
+function insShare(){const t=ins.rep;navigator.share?navigator.share({title:'Inspección '+ins.cn,text:t}).catch(()=>{}):navigator.clipboard.writeText(t).then(()=>toast('Reporte copiado'))}
+function insStop(){if(!ins)return;clearInterval(ins.tm);ins.ln&&ins.ln.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
+</script></body></html>
