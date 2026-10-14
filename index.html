@@ -19,7 +19,6 @@ button:hover,.btn:hover{border-color:var(--a)}button.on{background:var(--a);colo
 .r input[type=color]{width:22px;height:22px;padding:0;border:0;background:none}.r button{padding:0 7px}
 #cl,#sl,#ptl{max-height:210px;overflow:auto;margin-top:6px}small.h{display:block;color:var(--m);margin:6px 0 0}
 #log{max-height:150px;overflow:auto;font:11px ui-monospace,Consolas,monospace;color:var(--m)}
-#bf{border-color:var(--r);color:var(--r);width:100%}#bf.on{background:var(--r);color:#fff}
 ol{padding-left:20px;margin:8px 0}li{margin:5px 0}em{font:700 11px ui-monospace,Consolas,monospace;font-style:normal}
 .ABRIR{color:var(--g)}.CERRAR{color:var(--r)}.ALERTA{color:var(--y)}.VERIF{color:var(--a)}.sum{color:var(--m);font-size:12px;margin-top:8px}.pct{font-weight:700;color:var(--g)}.rec{border:1px solid var(--y);border-radius:8px;padding:8px;margin-top:8px;font-size:12px}
 .pt{--c:#e5384a;position:absolute;transform:translate(-50%,-50%);display:flex;gap:4px;align-items:center;padding:2px 6px;min-height:22px;white-space:nowrap;font:700 11px ui-monospace,Consolas,monospace;color:#fff;background:var(--c);border:2px solid #fff;box-shadow:0 0 6px #000a}
@@ -53,6 +52,33 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 #side{position:fixed;left:0;right:0;bottom:0;z-index:1200;max-height:72dvh;border:1px solid var(--l);border-radius:18px 18px 0 0;box-shadow:0 -10px 30px #000c;transform:translateY(105%);transition:transform .28s;padding-bottom:80px}body.sheet #side{transform:none}
 #shb{display:block;position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:1300;background:var(--a);color:#04121c;border:0;font-weight:700;padding:10px 16px;box-shadow:0 4px 16px #000a}
 #mvbar,#ins{bottom:calc(64px + env(safe-area-inset-bottom))}#co{display:none}input,select{font-size:16px}button,.btn{min-height:42px}.sq input{width:min(210px,52vw)}}
+
+/* ===== v3: panel compacto, secciones plegables, pulsación larga, inspección por calles ===== */
+body{grid-template-columns:300px 1fr}
+#side{padding:8px;font-size:12.5px}
+h1{font-size:15px;margin:0 0 8px}h1 small{font-size:10.5px}
+section{padding:8px;margin-bottom:8px;border-radius:9px}
+h2.acc{cursor:pointer;user-select:none;-webkit-user-select:none;justify-content:flex-start;align-items:center;gap:6px;margin:0 0 6px;padding:3px 0}
+h2.acc::before{content:'▾';color:var(--a);width:12px;flex:none}section.cl>h2.acc::before{content:'▸'}
+h2.acc b{margin-left:auto}section.cl>h2.acc{margin-bottom:0}section.cl>*:not(h2){display:none!important}
+#cl,#sl,#ptl{max-height:150px}#log{max-height:110px}
+.stg .r{padding:1px 0}
+.leaflet-container{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.lpr{position:absolute;z-index:900;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:3px solid #ff4d5e;background:#ff4d5e22;box-shadow:0 0 14px #ff4d5e;pointer-events:none;animation:lpr .45s ease-out forwards}
+@keyframes lpr{from{transform:scale(.25);opacity:.15}to{transform:scale(1.05);opacity:1}}
+#ins .nx{display:flex;gap:8px;align-items:center;padding:7px 10px;background:#12263a;border-top:1px solid var(--l);border-bottom:1px solid var(--l);font-size:13px}
+#ins .nx i{font:700 22px/1 system-ui;font-style:normal;color:#8cd0ff;flex:none;width:26px;text-align:center}
+#ins .nx span{flex:1;min-width:0}#ins .nx b{color:#fff}
+#ins .sl{max-height:26dvh;overflow:auto;background:#0c1620;font-size:12px}#ins .sl div{display:flex;gap:8px;padding:5px 10px;border-top:1px solid var(--l)}#ins .sl div.cur{background:#17304a}
+#ins .mn{flex-direction:column;align-items:stretch}#ins .mn button{width:100%}
+#ins .ih button{padding:4px 9px;min-height:32px}
+#rp textarea,#rp input{width:100%;box-sizing:border-box;margin-top:6px;background:#0c1620;color:var(--t);border:1px solid var(--l);border-radius:8px;padding:8px;font:13px system-ui}#rp textarea{resize:vertical}
+@media(max-width:800px){
+#side{max-height:46dvh;padding:8px 8px 58px}
+h1{margin-bottom:6px}h1 small{display:none}
+section{margin-bottom:6px}
+#cl,#sl,#ptl{max-height:120px}#log{max-height:90px}
+#ins .sl{max-height:22dvh}}
 </style></head><body>
 <button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button>
 <aside id="side">
@@ -71,8 +97,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 <small class="h">Cada interruptor toma sus usuarios y su demanda (MW) de la tabla cuando su nombre coincide con el del circuito (sin importar mayúsculas, espacios ni guiones). Se reparten por igual a lo largo de la línea de cada circuito, porque la tabla solo trae totales por circuito.</small>
 <label class="btn">Cargar tabla (.xlsx o .csv)<input id="dx" type="file" accept=".xlsx,.csv" hidden></label><div id="dl"></div></section>
 <section><h2>Falla y maniobra</h2>
-<button id="bf" data-m="FALLA">Marcar punto de falla</button><div id="pl"></div>
+<small class="h" style="margin:0 0 6px">⚡ Para marcar una <b>falla</b>, <b>mantenga pulsado</b> el punto sobre la línea del circuito (o sobre un equipo). Después pulse «Ejecutar maniobra 1».</small><div id="pl"></div>
 <div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn">Normalizar</button></div></section>
+<section><h2>Guardado en este dispositivo</h2><div id="stg" class="stg"></div></section>
 <section><h2>Bitácora</h2><div id="log"></div></section>
 </aside><div id="map"></div>
 <script>
@@ -103,12 +130,12 @@ let circ=[],pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0
 const ov=L.layerGroup().addTo(map),st=p=>ovr&&ovr.has(p)?ovr.get(p):p.st,km=m=>(m/1000).toFixed(2);
 /* ---------- Usuarios y demandas por circuito (ligados por nombre al interruptor) ---------- */
 const DEM0=[]; /* versión web: la tabla de usuarios y demandas NO va incluida; se carga en cada dispositivo con «Cargar tabla» */
-let DEM=new Map();
+let DEM=new Map(),DEMR=[];
 const dkey=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,''),
  fu=x=>Math.round(x).toLocaleString('es-MX'),
  pn=x=>{if(typeof x=='number')return x;let t=String(x??'').trim().replace(/[^0-9.,\-]/g,'');if(t.includes('.')&&t.includes(','))t=t.replace(/,/g,'');else if(/^\d{1,3}(,\d{3})+$/.test(t))t=t.replace(/,/g,'');else t=t.replace(',','.');return parseFloat(t)};
-function setDem(rows,persist){DEM=new Map(rows.map(r=>[dkey(r[0]),{n:r[0],u:r[1],mw:r[2]}]));
- if(persist){try{localStorage.setItem('gc_dem',JSON.stringify(rows))}catch(e){}}dlist();if(persist)clearPlan()}
+function setDem(rows,persist){DEMR=rows;DEM=new Map(rows.map(r=>[dkey(r[0]),{n:r[0],u:r[1],mw:r[2]}]));
+ if(persist){try{localStorage.setItem('gc_dem',JSON.stringify(rows))}catch(e){}kvSet('dem',rows)}dlist();if(persist)clearPlan()}
 function dlist(){const ints=pts.filter(p=>p.t=='INT'),ok=ints.filter(p=>DEM.get(dkey(p.name)));
  $('#dm').textContent=DEM.size+' circuitos';if(!DEM.size){$('#dl').innerHTML='<small class="h" style="color:#ffc233">Aún no hay tabla de usuarios y demandas en este dispositivo: pulse «Cargar tabla (.xlsx o .csv)». Se guarda aquí y no hay que repetirlo.</small>';return}
  $('#dl').innerHTML=`<small class="h">${ok.length} de ${ints.length} interruptores con datos · ${new Set(ok.map(p=>dkey(p.name))).size} de ${DEM.size} circuitos de la tabla ya tienen interruptor</small>`+
@@ -133,11 +160,6 @@ const fmt=l=>l.lat.toFixed(6)+', '+l.lng.toFixed(6);
 const cc=L.control({position:'bottomleft'});cc.onAdd=()=>{const d=L.DomUtil.create('div','co');d.id='co';d.textContent='Mueva el cursor · clic derecho copia las coordenadas';return d};cc.addTo(map);
 map.on('mousemove',e=>$('#co').textContent=fmt(e.latlng));
 map.on('contextmenu',e=>{const s=fmt(e.latlng);try{navigator.clipboard.writeText(s).catch(()=>{})}catch(x){}log('Coordenadas: '+s+' (copiadas)')});
-const gc=L.control({position:'topleft'});gc.onAdd=()=>{const d=L.DomUtil.create('div','leaflet-bar gt');d.innerHTML='<input id="gi" placeholder="Pegue lat, lng de Google Maps"><button id="gb">Ir</button>';L.DomEvent.disableClickPropagation(d);return d};gc.addTo(map);
-let gm;function goTo(){const m=$('#gi').value.match(/-?\d+(?:\.\d+)?/g);if(!m||m.length<2)return log('⚠ Formato esperado: 27.486100, -99.506900');
- const la=+m[0],lo=+m[1];if(Math.abs(la)>90||Math.abs(lo)>180)return log('⚠ Fuera de rango: use latitud, longitud');
- gm&&gm.remove();gm=L.circleMarker([la,lo],{radius:10,color:'#ff4d5e',weight:3,fillOpacity:.25}).addTo(map).bindTooltip(la+', '+lo);map.setView([la,lo],17)}
-$('#gb').onclick=goTo;$('#gi').addEventListener('keydown',e=>{if(e.key=='Enter')goTo()});
 /* ---------- Mi ubicación (GPS del celular o red de la PC), en tiempo real ---------- */
 map.createPane('gps').style.zIndex=450;map.createPane('ad').style.zIndex=445;
 let me,meAcc,follow=false;
@@ -152,9 +174,11 @@ if(navigator.geolocation)navigator.geolocation.watchPosition(pos=>{const ll=[pos
  e=>{log('⚠ Ubicación no disponible: '+e.message);warnGps()},{enableHighAccuracy:true,maximumAge:2000,timeout:30000});
 else log('⚠ Este navegador no admite geolocalización');
 /* ---------- KMZ ---------- */
-const DB=new Promise(r=>{try{const q=indexedDB.open('gridctrl',1);q.onupgradeneeded=()=>q.result.createObjectStore('f',{keyPath:'id'});q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
+const DB=new Promise(r=>{try{const q=indexedDB.open('gridctrl',2);q.onupgradeneeded=()=>{const d=q.result;if(!d.objectStoreNames.contains('f'))d.createObjectStore('f',{keyPath:'id'});if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv',{keyPath:'k'})};q.onsuccess=()=>r(q.result);q.onerror=()=>r(null);setTimeout(()=>r(null),8000)}catch(e){r(null)}});
 DB.then(d=>{if(!d)log("⚠ El navegador no permite guardar los KMZ (IndexedDB); abra la app desde https")});try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 const dbDo=async(m,v)=>{const d=await DB;if(!d)return;return new Promise(r=>{try{const o=d.transaction('f',m=='getAll'?'readonly':'readwrite').objectStore('f'),q=m=='getAll'?o.getAll():m=='put'?o.put(v):o.delete(v);q.onsuccess=()=>r(q.result);q.onerror=()=>r()}catch(e){r()}})};
+/* copia interna (equipos, cruces y tabla) en IndexedDB, además de localStorage */
+const kvDo=async(m,v)=>{const d=await DB;if(!d||!d.objectStoreNames.contains('kv'))return;return new Promise(r=>{try{const o=d.transaction('kv',m=='get'?'readonly':'readwrite').objectStore('kv'),q=m=='get'?o.get(v):o.put(v);q.onsuccess=()=>r(q.result);q.onerror=()=>r()}catch(e){r()}})},kvSet=(k,v)=>kvDo('put',{k,v,t:Date.now()});
 const rec=c=>({id:c.id,k:c.k,kmz:c.kmz,t:c.t,name:c.name,color:c.color,on:c.on,blob:c.blob});
 async function openKml(f,kmz){let z,x;if(kmz){z=await JSZip.loadAsync(f);const e=Object.values(z.files).find(n=>!n.dir&&/\.kml$/i.test(n.name));if(!e)throw'sin KML interno';x=await e.async('string')}else x=await f.text();return{z,d:new DOMParser().parseFromString(x,'text/xml')}}
 const lines=d=>{const r=[];for(const e of d.getElementsByTagName('LineString')){const c=e.getElementsByTagName('coordinates')[0].textContent.trim().split(/\s+/).map(s=>s.split(',').map(Number)).filter(a=>a.length>1&&!isNaN(a[0])&&!isNaN(a[1])).map(a=>[a[1],a[0]]);if(c.length>1)r.push(c)}return r};
@@ -194,12 +218,12 @@ if(!window.isSecureContext)warnGps();
 const bt=(k,v)=>`<button data-m="${k}" style="--c:${v.c}">${v.n}</button>`,E=Object.entries(T);
 $('#tb').innerHTML=E.filter(([k,v])=>!v.sv).map(([k,v])=>bt(k,v)).join('')+'<button data-m="TRAZO" style="--c:#00e5ff">Trazar flujo en cruce</button>';
 $('#sv').innerHTML=E.filter(([k,v])=>v.sv).map(([k,v])=>bt(k,v)).join('');
-function setMode(m){if(mode=='TRAZO'&&m!='TRAZO')endTrace(0);if(mode=='DR'&&m!='DR')drReset();mode=m;map.doubleClickZoom[m=='TRAZO'?'disable':'enable']();document.querySelectorAll('#tb button,#sv button,#bf').forEach(b=>b.classList.toggle('on',b.dataset.m==m));map.getContainer().style.cursor=m?'crosshair':''}
-document.querySelectorAll('#tb button,#sv button,#bf').forEach(b=>b.onclick=()=>setMode(mode==b.dataset.m?null:b.dataset.m));
+function setMode(m){if(mode=='TRAZO'&&m!='TRAZO')endTrace(0);if(mode=='DR'&&m!='DR')drReset();mode=m;map.doubleClickZoom[m=='TRAZO'?'disable':'enable']();document.querySelectorAll('#tb button,#sv button').forEach(b=>b.classList.toggle('on',b.dataset.m==m));map.getContainer().style.cursor=m?'crosshair':''}
+document.querySelectorAll('#tb button,#sv button').forEach(b=>b.onclick=()=>setMode(mode==b.dataset.m?null:b.dataset.m));
 addEventListener('keydown',e=>{if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.key=='Escape')setMode(null);if(e.key=='Enter'&&mode=='TRAZO')endTrace(1)});
 addEventListener('error',e=>log('⚠ Error en la aplicación: '+(e.message||'desconocido')));addEventListener('unhandledrejection',e=>log('⚠ Error: '+((e.reason&&e.reason.message)||e.reason)));
 const demPop=p=>p.t!='INT'?'':(d=>d?`Usuarios: <b>${fu(d.u)}</b> · Demanda: <b>${d.mw.toFixed(2)} MW</b><br>`:(DEM.size?`<b style="color:#b8860b">Sin datos</b>: su nombre no coincide con ningún circuito de la tabla<br>`:`<b style="color:#b8860b">Sin tabla</b> de usuarios y demandas cargada en este dispositivo<br>`))(DEM.get(dkey(p.name)));
-const pop=p=>`<b>${esc(p.name)}</b><br>${T[p.t].n}${T[p.t].sv?'':` · <b style="color:${p.st?'#d12':'#1a9c57'}">${p.st?'CERRADO':'ABIERTO'}</b>`}<br>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><input value="${esc(p.name)}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)"><br>${demPop(p)}${cPop(p)}${T[p.t].sv?'':`<button onclick="tog(${p.id})">${p.st?'Abrir':'Cerrar'}</button> `}${p.t=='INT'&&p.cn?`<button onclick="insStart(${p.id})">🧭 Inspeccionar circuito</button> `:''}<button onclick="mvArm(${p.id})">📍 Mover ubicación</button> <button onclick="del(${p.id})">Eliminar</button>`;
+const pop=p=>`<b>${esc(p.name)}</b><br>${T[p.t].n}${T[p.t].sv?'':` · <b style="color:${p.st?'#d12':'#1a9c57'}">${p.st?'CERRADO':'ABIERTO'}</b>`}<br>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><input value="${esc(p.name)}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)"><br>${demPop(p)}${cPop(p)}${T[p.t].sv?'':`<button onclick="tog(${p.id})">${p.st?'Abrir':'Cerrar'}</button> `}${!T[p.t].sv&&p.t!='DR'&&p.cn?`<button onclick="${p.t=='INT'?'insStart':'insMenu'}(${p.id})">🧭 ${p.t=='INT'?'Inspeccionar circuito':'Inspeccionar desde aquí'}</button> `:''}<button onclick="mvArm(${p.id})">📍 Mover ubicación</button> <button onclick="del(${p.id})">Eliminar</button>`;
 function mk(p){const t=T[p.t],dr=p.t=='DR',h=L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],html:t.sv?`<div class="sv">${t.svg}</div>`:`<div class="pt ${p.st?'':'op'} ${hl.get(p)||''}${p.t=='ENL'&&p.cn&&!p.cn2?' pend':''}" style="border-radius:${t.r}px${dr?';transform:translate(-50%,calc(-100% - 12px))':''}">${t.svg||''}${esc(p.name)}</div>`});
  if(dr)drMark(p);
  if(p.m){p.m.setIcon(h);if(mv&&mv.p===p){const e=p.m.getElement();e&&e.classList.add('mving')}return pvis(p)}
@@ -212,7 +236,7 @@ const byId=id=>pts.find(p=>p.id==id),cnt=()=>{$('#pc').textContent=pts.length;pl
 function plist(){dlist();$('#ptl').innerHTML=pts.map(p=>`<div class="r" style="${p.vis===0?'opacity:.5':''}"><input type="checkbox" ${p.vis===0?'':'checked'} onchange="pshow(${p.id},this.checked)" title="Mostrar / ocultar en el mapa"><i style="flex:none;width:11px;height:11px;border-radius:${T[p.t].r}px;background:${T[p.t].c}"></i><input value="${esc(p.name)}" title="${T[p.t].n}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)" style="flex:1;min-width:0;background:#0a1219;color:var(--t);border:1px solid var(--l);border-radius:4px;padding:3px 5px">${T[p.t].sv?'':`<small style="flex:none;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m)" title="Circuito">${esc(p.t=='ENL'?(p.cn||'?')+' ↔ '+(p.cn2||'⏳ pendiente'):p.cn||'sin circuito')}</small>`}<button onclick="goP(${p.id})">⌖</button></div>`).join('')}
 function goP(id){const p=byId(id);if(p.vis===0){p.vis=1;pvis(p);save();plist();clearPlan()}map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}
 const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,...(p.vis===0?{vis:0}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{})});
-const save=()=>{try{localStorage.setItem('gc_pts',JSON.stringify(pts.map(ser)))}catch(e){}};
+const save=()=>{try{localStorage.setItem('gc_pts',JSON.stringify(pts.map(ser)))}catch(e){}kvSet('pts',pts.map(ser))};
 function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1};if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}pts.push(p);mk(p);return p}
 function tog(id){const p=byId(id);p.st^=1;log((p.st?'CERRAR ':'ABRIR ')+p.name+' (manual)');p.m.closePopup();save();clearPlan()}
 function del(id){const p=byId(id);if(mv&&mv.p===p)mvCancel(1);const o=ser(p);p.m.remove();p.g&&p.g.remove();pts=pts.filter(x=>x!=p);cnt();save();clearPlan();toast('Eliminado: '+p.name,'Deshacer',()=>{const q=addPt(o);cnt();save();clearPlan();log('↩ '+q.name+' restaurado')})}
@@ -222,7 +246,7 @@ try{loadPts(JSON.parse(localStorage.getItem('gc_pts')||'[]'))}catch(e){}
 $('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({puntos:pts.map(ser),flujos:flows},null,1)],{type:'application/json'}));a.download='puntos_secc-m.json';a.click()};
 $('#im').onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());loadPts(Array.isArray(j)?j:j.puntos||[]);if(j.flujos){flows=j.flujos;fseq=Math.max(0,...flows.map(f=>f.id));saveF();redrawF()}save();clearPlan();log('Importados '+pts.length+' puntos')}catch(x){log('⚠ JSON inválido')}e.target.value=''};
 map.on('click',e=>{const q=[e.latlng.lat,e.latlng.lng];
- if(mode=='FALLA'){setMode(null);runFault(q)}else if(mode=='TRAZO')addV(q);else if(mode=='DR')drClick(q);else if(T[mode]){if(T[mode].sv){addPt({t:mode,lat:q[0],lng:q[1]});cnt();save();clearPlan()}else addEq(mode,q)}});
+ if(mode=='TRAZO')addV(q);else if(mode=='DR')drClick(q);else if(T[mode]){if(T[mode].sv){addPt({t:mode,lat:q[0],lng:q[1]});cnt();save();clearPlan()}else addEq(mode,q)}});
 /* ---------- Anclaje Doble: marca de un lado a otro, ligada a UN circuito ---------- */
 let drA=null,drRe=null,drRub=null;const drTmp=L.layerGroup().addTo(map);
 function fillDc(){const d=$('#dc'),v=d.value;d.innerHTML='<option value="">Automático (el circuito más cercano)</option>'+circ.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');d.value=circ.some(c=>c.name==v)?v:''}
@@ -314,7 +338,7 @@ map.on('mousemove',e=>{if(drRub)drRub.setLatLngs([drA,[e.latlng.lat,e.latlng.lng
 /* ---------- Trazos de flujo en cruces: definen la conectividad real ---------- */
 map.createPane('flow').style.zIndex=440;
 let flows=[],draft=[],fseq=0;const dl=L.polyline([],{pane:'flow',color:'#00e5ff',weight:4,dashArray:'6 6',interactive:false}).addTo(map),dv=L.layerGroup().addTo(map),fg=L.layerGroup().addTo(map);
-const bear=(a,b)=>Math.atan2((b[1]-a[1])*Math.cos(a[0]*rad),b[0]-a[0])/rad,saveF=()=>{try{localStorage.setItem('gc_flows',JSON.stringify(flows))}catch(e){}};
+const bear=(a,b)=>Math.atan2((b[1]-a[1])*Math.cos(a[0]*rad),b[0]-a[0])/rad,saveF=()=>{try{localStorage.setItem('gc_flows',JSON.stringify(flows))}catch(e){}kvSet('flows',flows)};
 try{flows=JSON.parse(localStorage.getItem('gc_flows')||'[]');fseq=Math.max(0,...flows.map(f=>f.id))}catch(e){}
 const dvr=()=>{dl.setLatLngs(draft);dv.clearLayers();draft.forEach(q=>L.circleMarker(q,{pane:'flow',radius:4,color:'#00e5ff',fillOpacity:1,interactive:false}).addTo(dv))};
 function addV(q){draft.push(q);dvr()}
@@ -491,44 +515,268 @@ $('#sqi').oninput=function(){const v=this.value.trim().toLowerCase(),r=$('#sqr')
 /* respaldo completo en un archivo */
 const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 $('#bk').onclick=async()=>{try{const files=[];for(const k of['c','s'])for(const c of arr(k))if(c.blob)files.push({k,name:c.name,kmz:c.kmz,b:await b64(c.blob)});
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files,dem:DEMR})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
  try{localStorage.setItem('gc_bk',Date.now())}catch(e){}toast('Respaldo guardado: '+pts.length+' equipos y '+files.length+' KMZ')}catch(e){log('⚠ No se pudo crear el respaldo')}};
 $('#br').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let d;try{d=JSON.parse(await f.text());if(!d.gridctrl)throw 0}catch(x){return log('⚠ El archivo no es un respaldo de SECC-M')}
  if(!confirm('Restaurar reemplazará los equipos y cruces actuales. ¿Continuar?'))return;
- loadPts(d.pts||[]);save();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();
+ loadPts(d.pts||[]);save();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();if(Array.isArray(d.dem)&&d.dem.length)setDem(d.dem,true);
  for(const x of d.files||[]){if(arr(x.k).some(c=>c.name==x.name))continue;await ingest(new File([Uint8Array.from(atob(x.b),ch=>ch.charCodeAt(0))],x.name+(x.kmz?'.kmz':'.kml')),x.k)}
  list();resolveLinks(1);clearPlan();fitAll();toast('Respaldo restaurado')};
-setTimeout(()=>{try{if(pts.length&&Date.now()-(+localStorage.getItem('gc_bk')||0)>14*864e5)toast('💾 Sin respaldo reciente de sus datos','Respaldar',()=>$('#bk').click())}catch(e){}},6000);
-/* modo inspección: recorre los equipos del circuito desde su interruptor, con voz y GPS */
-let ins=null;const insb=(()=>{const d=document.createElement('div');d.id='ins';map.getContainer().appendChild(d);L.DomEvent.disableClickPropagation(d);return d})();
-const say=t=>{if(!ins||ins.mute||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='es-MX';speechSynthesis.speak(u)}catch(e){}};
-const fmtM=m=>m>=1000?(m/1000).toFixed(1)+' kilómetros':Math.round(m/10)*10+' metros';
-function insStart(id){const ip=byId(id);if(!ip||!ip.cn)return;attach();if(ip.n<0)return log('⚠ '+ip.name+' no está sobre la línea de su circuito');
- const D=new Map([[ip.n,0]]),dn=new Set,cn_=ip.cn;
- for(;;){let n=-1,b=1e18;D.forEach((d,k)=>{if(!dn.has(k)&&d<b){b=d;n=k}});if(n<0)break;dn.add(n);for(const e of G.N[n].adj){if(e.tie)continue;const m=nb(n,e),d=b+e.l;if(!D.has(m)||d<D.get(m))D.set(m,d)}}
- const list=pts.filter(p=>p.vis!==0&&!T[p.t].sv&&p.t!='DR'&&(p.cn==cn_||p.cn2==cn_)).map(p=>({p,d:D.get(p.t=='ENL'&&p.cn2==cn_?p.n2:p.n)})).filter(x=>x.d!=null).sort((a,b)=>a.d-b.d);
- if(!list.length)return log('⚠ No hay equipos alcanzables en '+cn_);
- insStop();ins={cn:cn_,list,i:0,ok:new Set,sk:new Set,say:{},mute:false};map.closePopup();
+setTimeout(()=>{try{if(pts.length&&Date.now()-(+localStorage.getItem('gc_bk')||0)>7*864e5)toast('💾 Sin respaldo reciente de sus datos','Respaldar',()=>$('#bk').click())}catch(e){}},6000);
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+if('serviceWorker' in navigator&&location.protocol=='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script>
+/* ===== Panel compacto: secciones plegables (en el celular solo se abre una a la vez) ===== */
+var ins=null; /* estado de la inspección (se declara aquí para que exista siempre) */
+(function(){
+ const mob=()=>innerWidth<=800,secs=()=>[...document.querySelectorAll('#side>section')].filter(s=>s.querySelector(':scope>h2')),key=s=>s.querySelector('h2').firstChild.textContent.trim();
+ let st={};try{st=JSON.parse(localStorage.getItem('gc_sec')||'{}')}catch(e){}
+ secs().forEach(s=>{const h=s.querySelector('h2');h.classList.add('acc');if(mob()||st[key(s)])s.classList.add('cl');
+  h.addEventListener('click',()=>{const c=!s.classList.contains('cl');if(!c&&mob())secs().forEach(o=>{if(o!==s)o.classList.add('cl')});s.classList.toggle('cl',c);
+   if(!mob()){st[key(s)]=c?1:0;try{localStorage.setItem('gc_sec',JSON.stringify(st))}catch(e){}}})});
+ /* tocar el mapa cierra el panel en el celular */
+ map.on('click',()=>{if(mob()&&document.body.classList.contains('sheet')){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}});
+ /* abre el panel en la sección cuyo título contiene «sub» */
+ window.openSec=sub=>{const s=secs().find(s=>s.querySelector('h2').textContent.includes(sub));if(!s)return;
+  if(mob()){secs().forEach(o=>{if(o!==s)o.classList.add('cl')});document.body.classList.add('sheet');$('#shb').textContent='✕ Cerrar'}
+  s.classList.remove('cl');
+  setTimeout(()=>{try{s.scrollIntoView({block:'start',behavior:'smooth'})}catch(e){}if(mob()&&typeof plan!=='undefined'&&plan)map.panBy([0,Math.round($('#side').offsetHeight/2)])},350)};
+})();
+</script>
+<script>
+/* ===== Falla por pulsación larga: mantenga pulsado un punto del mapa (o un equipo) ===== */
+(function(){
+ const mc=map.getContainer(),MS=600,TOL=14,IGN='.leaflet-control,.leaflet-popup,#mvbar,#ins,#toast,button,input,select,textarea,a,label';
+ let lp=null,hit=0;
+ const busy=()=>{try{return !!(mode||mv||ins)}catch(e){return false}};
+ const cancel=()=>{if(!lp)return;clearTimeout(lp.t);clearTimeout(lp.t2);lp.r&&lp.r.remove();lp=null};
+ function fire(){const s=lp;if(!s)return;cancel();hit=Date.now();try{navigator.vibrate&&navigator.vibrate(35)}catch(e){}
+  const q=s.pp?[s.pp.lat,s.pp.lng]:(l=>[l.lat,l.lng])(map.containerPointToLatLng([s.x,s.y]));window.faultAt(q,s.pp)}
+ mc.addEventListener('pointerdown',e=>{cancel();
+  if(e.isPrimary===false||(e.pointerType=='mouse'&&e.button!==0)||busy())return;
+  if(e.target.closest&&e.target.closest(IGN))return;
+  const b=mc.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top,ic=e.target.closest&&e.target.closest('.leaflet-marker-icon');
+  const pp=ic?(pts.find(p=>p.m&&p.m.getElement()===ic&&!T[p.t].sv)||null):null;
+  lp={x,y,sx:e.clientX,sy:e.clientY,pp,t:setTimeout(fire,MS),t2:setTimeout(()=>{if(lp&&!lp.r){const r=document.createElement('div');r.className='lpr';r.style.left=x+'px';r.style.top=y+'px';mc.appendChild(r);lp.r=r}},160)}},true);
+ mc.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-lp.sx,e.clientY-lp.sy)>TOL)cancel()},true);
+ ['pointerup','pointercancel','pointerleave'].forEach(t=>mc.addEventListener(t,cancel,true));
+ map.on('movestart zoomstart dragstart',cancel);
+ /* después de una pulsación larga no debe abrirse la ventana del equipo ni el menú del navegador */
+ mc.addEventListener('click',e=>{if(Date.now()-hit<800){e.stopImmediatePropagation();e.preventDefault()}},true);
+ mc.addEventListener('contextmenu',e=>{if(lp){e.preventDefault();e.stopImmediatePropagation();fire();return}
+  if(e.pointerType=='touch'||Date.now()-hit<1500){e.preventDefault();e.stopImmediatePropagation()}},true);
+ /* punto de falla: se busca la línea de circuito más cercana (máx. 200 m) y se calcula la maniobra */
+ window.faultAt=function(q,pp){
+  if(!circ.some(c=>c.on)){toast('Cargue y active al menos un circuito para marcar una falla');return}
+  const go=()=>{runFault(q);if(!plan){toast('No hay una línea de circuito a menos de 200 m de ese punto: mantenga pulsado sobre la línea');return}
+   window.openSec&&window.openSec('Falla')};
+  if(plan&&plan.done){toast('Hay una maniobra ejecutada. ¿Normalizar y marcar la nueva falla aquí?','Normalizar y marcar',()=>{$('#bn').click();go()});return}
+  go()};
+ /* aviso de ayuda la primera vez (ya no hay botón «Marcar punto de falla») */
+ setTimeout(()=>{try{if(!localStorage.getItem('gc_lp')&&circ.length){localStorage.setItem('gc_lp','1');toast('💡 Para marcar una falla, mantenga pulsado el punto sobre la línea del circuito')}}catch(e){}},5000);
+})();
+</script>
+<script>
+/* ===== Inspección guiada por calles: desde un interruptor, restaurador, seccionamiento, fusible/cuchilla o enlace ===== */
+const insb=(()=>{const d=document.createElement('div');d.id='ins';map.getContainer().appendChild(d);L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);return d})();
+const insSay=t=>{if(!ins||ins.mute||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='es-MX';speechSynthesis.speak(u)}catch(e){}};
+const insFm=m=>m>=950?(m/1000).toFixed(1).replace('.',',')+' kilómetros':Math.max(10,Math.round(m/10)*10)+' metros';
+const insFk=m=>m>=950?(m/1000).toFixed(1)+' km':Math.round(m/10)*10+' m';
+const insFt=s=>s<90?'1 min':s<5400?Math.round(s/60)+' min':Math.floor(s/3600)+' h '+Math.round(s%3600/60)+' min';
+const insCap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+/* distancias por la línea del circuito (cola de prioridad), sin cruzar enlaces ni tramos descartados */
+function insDij(s){const N=G.N,D=new Float64Array(N.length).fill(Infinity),h=[[0,s]];D[s]=0;
+ const up=i=>{while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p}},
+  dn=()=>{const t=h[0],l=h.pop();if(h.length){h[0]=l;let i=0;for(;;){const a=2*i+1,b=a+1;let m=i;if(a<h.length&&h[a][0]<h[m][0])m=a;if(b<h.length&&h[b][0]<h[m][0])m=b;if(m==i)break;[h[m],h[i]]=[h[i],h[m]];i=m}}return t};
+ while(h.length){const[d,n]=dn();if(d>D[n])continue;for(const e of N[n].adj){if(e.d||e.tie)continue;const m=e.a==n?e.b:e.a,nd=d+e.l;if(nd<D[m]){D[m]=nd;h.push([nd,m]);up(h.length-1)}}}return D}
+/* equipos a inspeccionar, en orden de recorrido (siempre el más cercano por la línea). dir: 'all' | 'down' (hacia el final) | 'up' (hacia el interruptor) */
+function insBuild(ip,c,dir){if(typeof plan!=='undefined'&&plan)clearPlan();attach();const N=G.N,o=(ip.t=='ENL'&&ip.cn2==c)?ip.n2:ip.n;
+ if(o==null||o<0||!N[o]||cn(o)!=c)return null;
+ const D0=insDij(o),eq=pts.filter(p=>p.vis!==0&&!T[p.t].sv&&p.t!='DR'&&(p.cn==c||p.cn2==c)).map(p=>({p,n:(p.t=='ENL'&&p.cn2==c)?p.n2:p.n})).filter(x=>x.n>=0&&N[x.n]&&cn(x.n)==c&&D0[x.n]<Infinity);
+ let keep=eq;
+ if(dir&&dir!='all'){const src=pts.find(p=>p.t=='INT'&&p.cn==c&&p.n>=0&&cn(p.n)==c);
+  if(src){const par=new Map([[src.n,-1]]),q=[src.n];for(let k=0;k<q.length;k++){const n=q[k];for(const e of N[n].adj){if(e.d||e.tie)continue;const m=nb(n,e);if(!par.has(m)){par.set(m,n);q.push(m)}}}
+   const sub=n=>{for(let x=n;x!=null&&x>=0;x=par.get(x))if(x==o)return true;return false};
+   keep=eq.filter(x=>x.p===ip||(dir=='down'?sub(x.n):!sub(x.n)))}}
+ const out=[{p:ip,n:o,d:0}],rest=new Set(keep.filter(x=>x.p!==ip));let D=D0;
+ while(rest.size){let b=null,bd=Infinity;rest.forEach(x=>{if(D[x.n]<bd){bd=D[x.n];b=x}});if(!b)break;rest.delete(b);out.push({p:b.p,n:b.n,d:bd});D=insDij(b.n)}
+ return out}
+/* ventana para elegir desde un equipo que no es interruptor */
+function insMenu(id){const p=byId(id);if(!p)return;map.closePopup();insStop();
+ const bt=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=f;return b},go=(d,c)=>{insb.innerHTML='';insStart(id,d,c)};
+ insb.innerHTML='';const h=document.createElement('div');h.className='ih';h.innerHTML='<b>🧭 Inspeccionar desde '+esc(p.name)+'</b>';h.appendChild(bt('✕',()=>{insb.innerHTML=''}));
+ const bd=document.createElement('div');bd.className='ib mn';
+ if(p.t=='ENL')[p.cn,p.cn2].filter(Boolean).forEach(c=>bd.appendChild(bt('Circuito '+c+' (desde el enlace)',()=>go('all',c))));
+ else{const src=pts.some(q=>q.t=='INT'&&q.cn==p.cn);
+  if(src){bd.appendChild(bt('→ Hacia el final del circuito',()=>go('down')));bd.appendChild(bt('← Hacia el interruptor',()=>go('up')))}
+  bd.appendChild(bt('↔ Todo el circuito '+p.cn,()=>go('all')))}
+ insb.append(h,bd)}
+function insStart(id,dir,cnn){const ip=byId(id);if(!ip)return;const c=cnn||ip.cn;if(!c)return;
+ const list=insBuild(ip,c,dir||'all');if(!list)return toast('⚠ '+ip.name+' no está sobre la línea de su circuito');
+ if(list.length<2)return toast(dir&&dir!='all'?'No hay más equipos en esa dirección':'No hay otros equipos alcanzables en '+c);
+ insStop();ins={cn:c,list,i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0};map.closePopup();
  navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>ins?ins.wl=w:w.release()).catch(()=>{});
  insGo(0);ins.tm=setInterval(insTick,2000)}
-function insGo(i){ins.i=i;ins.say={};const x=ins.list[i];if(!x)return insEnd();const p=x.p;map.panTo([p.lat,p.lng]);
- say((i?'Siguiente: ':'Iniciando inspección del circuito '+ins.cn+'. Primer equipo: ')+T[p.t].n+' '+p.name);insDraw();insUi()}
+/* ---------- rutas por calles (OSRM, mapa de OpenStreetMap) ---------- */
+async function insRoute(a,b,prof){const co=a[1].toFixed(6)+','+a[0].toFixed(6)+';'+b[1].toFixed(6)+','+b[0].toFixed(6),q='?overview=full&geometries=geojson&steps=true&alternatives=false',
+ us=prof=='foot'?['https://routing.openstreetmap.de/routed-foot/route/v1/driving/'+co+q]:['https://routing.openstreetmap.de/routed-car/route/v1/driving/'+co+q,'https://router.project-osrm.org/route/v1/driving/'+co+q];
+ for(const u of us){let t;try{const ac=new AbortController();t=setTimeout(()=>ac.abort(),9000);const r=await fetch(u,{signal:ac.signal});clearTimeout(t);if(!r.ok)continue;const j=await r.json();if(j.code!='Ok'||!j.routes||!j.routes[0])continue;return insParse(j,a)}catch(e){clearTimeout(t)}}
+ return null}
+function insParse(j,a){const R0=j.routes[0],ll=c=>[c[1],c[0]],steps=[];
+ for(const lg of R0.legs)for(const s of lg.steps){const g=s.geometry.coordinates.map(ll);if(g.length<2)g.push(g[0]);const cum=[0];for(let i=1;i<g.length;i++)cum.push(cum[i-1]+dist(g[i-1],g[i]));steps.push({m:s.maneuver||{},nm:s.name||s.ref||'',g,cum,len:cum[cum.length-1],d:s.distance||0,t:s.duration||0})}
+ const w=(j.waypoints||[])[1]||{};return{rp:R0.geometry.coordinates.map(ll),steps,dist:R0.distance,dur:R0.duration,end:w.location?ll(w.location):null,snap:w.distance||0,from:a}}
+async function insFetch(){if(!ins||ins.ld)return;const x=ins.list[ins.i];if(!x)return;const p=x.p,to=[p.lat,p.lng],from=me?[me.getLatLng().lat,me.getLatLng().lng]:ins.prev;
+ ins.try=Date.now();ins.dest=to;
+ if(!from){ins.msg='Active la ubicación (GPS) para recibir las indicaciones de ruta por calles';insDraw();insUpd();return}
+ const tok=++ins.tok;ins.ld=1;ins.msg='';insUpd();
+ let r=null;try{r=await insRoute(from,to,ins.prof)}catch(e){r=null}
+ if(!ins||tok!==ins.tok)return;ins.ld=0;
+ if(!r){ins.err='Sin conexión con el servicio de rutas';ins.fb=[from,to];if(ins.intro)insSay(ins.intro);ins.intro='';insDraw(1);insUpd();return}
+ ins.rt=r;ins.pr=null;ins.err='';ins.fb=null;ins.ann={};
+ insSay((ins.intro?ins.intro+'. ':'')+'Ruta de '+insFm(r.dist)+'. '+insCap(insStepTxt(r.steps[0],'')));ins.intro='';
+ insDraw(1);insUi()}
+function insRetry(){if(ins&&ins.err){ins.err='';ins.try=0;insFetch()}}
+/* ---------- textos de las indicaciones ---------- */
+const INS_MOD={'uturn':'dé vuelta en U','sharp right':'gire a la derecha en forma cerrada','right':'gire a la derecha','slight right':'gire ligeramente a la derecha','straight':'continúe de frente','slight left':'gire ligeramente a la izquierda','left':'gire a la izquierda','sharp left':'gire a la izquierda en forma cerrada'},
+ INS_ORD=['','primera','segunda','tercera','cuarta','quinta','sexta','séptima','octava','novena'],INS_ARW={'uturn':'↶','sharp right':'↱','right':'↱','slight right':'↗','straight':'↑','slight left':'↖','left':'↰','sharp left':'↰'};
+function insStepTxt(s,eq){const m=s.m||{},t=m.type,md=m.modifier,nm=s.nm,on=nm?' por '+nm:'',en=nm?' en '+nm:'',L_=md&&md.includes('left'),R_=md&&md.includes('right');
+ switch(t){
+  case 'depart':{const b=m.bearing_after;return 'avance'+on+(b==null?'':' hacia el '+['norte','noreste','este','sureste','sur','suroeste','oeste','noroeste'][Math.round(b/45)%8])}
+  case 'arrive':return 'llegará a su destino'+(eq?', '+eq:'')+(md=='left'?', a su izquierda':md=='right'?', a su derecha':'');
+  case 'turn':return (INS_MOD[md]||'continúe')+en;
+  case 'end of road':return 'al final de la calle, '+(INS_MOD[md]||'continúe')+en;
+  case 'new name':return nm?'continúe'+on:'continúe de frente';
+  case 'continue':return md&&md!='straight'?(INS_MOD[md]||'continúe')+en:'continúe de frente'+on;
+  case 'merge':return 'incorpórese'+(L_?' a la izquierda':R_?' a la derecha':'')+en;
+  case 'on ramp':return 'tome la rampa de acceso'+en;
+  case 'off ramp':return 'tome la salida'+en;
+  case 'fork':return 'en la bifurcación, '+(L_?'mantenga la izquierda':R_?'mantenga la derecha':'continúe de frente')+en;
+  case 'roundabout':case 'rotary':return 'en la glorieta, tome la '+(INS_ORD[m.exit]||(m.exit||'')+'ª')+' salida'+en;
+  case 'roundabout turn':return (INS_MOD[md]||'continúe')+' en la glorieta'+en;
+  case 'exit roundabout':case 'exit rotary':return 'salga de la glorieta'+en;
+  default:return (INS_MOD[md]||'continúe')+en}}
+const insIco=s=>s.m.type=='arrive'?'🏁':s.m.type=='depart'?'🧭':(INS_ARW[s.m.modifier]||'↑');
+/* ---------- recorrido ---------- */
+function insGo(i){ins.i=i;ins.say={};ins.ann={};ins.rt=null;ins.pr=null;ins.err='';ins.msg='';ins.fb=null;ins.ld=0;ins.offc=0;ins.near=null;ins.tok++;const x=ins.list[i];if(!x)return insEnd();const p=x.p;
+ ins.intro=(i?'Siguiente: ':'Iniciando inspección del circuito '+ins.cn+'. Primer equipo: ')+T[p.t].n+' '+p.name;
+ if(!me&&!ins.prev){insSay(ins.intro);ins.intro='';map.setView([p.lat,p.lng],Math.max(map.getZoom(),16))}
+ insDraw();insUi();insFetch()}
 function insTick(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p;ins.near=null;
- if(me){const d=map.distance(me.getLatLng(),[p.lat,p.lng]),s=ins.say;ins.near=d;
-  if(d<=25&&!s.h)(s.h=1,say('Llegó a '+T[p.t].n+' '+p.name+(p.st?', cerrado':', abierto')+'. Confirme la revisión.'));
-  else if(d<=100&&d>25&&!s.m)(s.m=1,say('En cien metros, '+T[p.t].n+' '+p.name));
-  else if(d>100&&d<=300&&!s.f)(s.f=1,say('En '+fmtM(d)+', '+T[p.t].n+' '+p.name))}
- insDraw();insUi()}
-function insDraw(){ins.ln&&ins.ln.remove();ins.ln=null;const x=ins.list[ins.i];if(x&&me)ins.ln=L.polyline([me.getLatLng(),[x.p.lat,x.p.lng]],{color:'#ffc233',weight:3,dashArray:'6 8',interactive:false}).addTo(map)}
-function insUi(){const x=ins.list[ins.i];if(!x)return;const p=x.p,n=ins.list.length,k=ins.ok.size+ins.sk.size;
- insb.innerHTML=`<div class="ih"><b>🧭 ${esc(ins.cn)}</b><span>${k}/${n}</span><button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div><div class="ib"><div class="in"><b>${esc(p.name)}</b><small>${T[p.t].n} · ${Math.round(x.d)} m desde el interruptor${ins.near!=null?' · a '+Math.round(ins.near)+' m de usted':''}</small></div><div class="ia"><button onclick="insNext(1)">Omitir</button><button class="ok ${ins.near!=null&&ins.near<=25?'pulse':''}" onclick="insNext()">✔ Revisado</button></div></div><div class="bar"><i style="width:${k/n*100}%"></i></div>`}
-function insNext(sk){const x=ins.list[ins.i];(sk?ins.sk:ins.ok).add(x.p);insGo(ins.i+1)}
+ if(!ins.rt&&!ins.ld&&(me||ins.prev)&&(ins.msg||Date.now()-(ins.try||0)>12000))insFetch();
+ if(me){const d=map.distance(me.getLatLng(),[p.lat,p.lng]),s=ins.say;ins.near=d;insFollow();
+  if(d<=30&&!s.h){s.h=1;insSay('Llegó a '+T[p.t].n+' '+p.name+(p.st?', cerrado':', abierto')+'. Confirme la revisión.')}
+  else if(!ins.rt&&!ins.ld){if(d<=100&&d>30&&!s.m){s.m=1;insSay('En cien metros, '+T[p.t].n+' '+p.name)}else if(d>100&&d<=300&&!s.f){s.f=1;insSay('En '+insFm(d)+', '+T[p.t].n+' '+p.name)}}}
+ insUpd()}
+/* posición sobre la ruta, avisos de maniobra y recálculo si se sale de la ruta */
+function insFollow(){const r=ins.rt;if(!r||!me||ins.ld)return;const ll=me.getLatLng(),q=[ll.lat,ll.lng],k=Math.cos(q[0]*rad),s0=Math.max(0,(ins.pr?ins.pr.si:0)-1);let b=null;
+ for(let si=s0;si<r.steps.length;si++){const g=r.steps[si].g;for(let j=1;j<g.length;j++){const a=g[j-1],c=g[j],ax=(a[1]-q[1])*k,ay=a[0]-q[0],dx=(c[1]-a[1])*k,dy=c[0]-a[0],t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/(dx*dx+dy*dy||1))),d=Math.hypot(ax+t*dx,ay+t*dy)*rad*R;if(!b||d<b.d)b={d,si,j,t}}}
+ if(!b)return;const s=r.steps[b.si],along=s.cum[b.j-1]+b.t*(s.cum[b.j]-s.cum[b.j-1]),rem=Math.max(0,s.len-along);let tot=rem;for(let i=b.si+1;i<r.steps.length;i++)tot+=r.steps[i].len;
+ const prev=ins.pr&&ins.pr.si;ins.pr={si:b.si,rem,tot,off:b.d};if(prev!==b.si&&ins.open)insUi();
+ const lim=Math.max(45,Math.min(120,(meAcc?meAcc.getRadius():0)*1.5));
+ if(b.d>lim){ins.offc=(ins.offc||0)+1;if(ins.offc>=2&&Date.now()-(ins.rr||0)>10000){ins.rr=Date.now();ins.offc=0;insSay('Recalculando ruta');insFetch()}return}ins.offc=0;
+ const nx=r.steps[b.si+1];if(!nx||ins.say.h)return;const rm=Math.round(rem),TH=[25,80,250],t=TH.find(x=>rm<=x),A=ins.ann[b.si];
+ if(t===undefined||(nx.m.type=='arrive'&&rm<=25))return;
+ if((!A||(t<A.t&&(A.r-rm>=40||(t==25&&A.r>40))))&&Date.now()-(ins.ls||0)>3500){ins.ann[b.si]={t,r:rm};ins.ls=Date.now();
+  const e=ins.list[ins.i].p,tx=insStepTxt(nx,T[e.t].n+' '+e.name);insSay(t==25&&nx.m.type!='arrive'?insCap(tx):'En '+insFm(rm)+', '+tx)}}
+/* ---------- mapa ---------- */
+function insDraw(fit){if(!ins)return;if(!ins.lg)ins.lg=L.layerGroup().addTo(map);ins.lg.clearLayers();const x=ins.list[ins.i];if(!x)return;const p=x.p,g=ins.lg,r=ins.rt,to=[p.lat,p.lng];
+ L.circleMarker(to,{radius:22,color:'#ffc233',weight:3,fillColor:'#ffc233',fillOpacity:.15,interactive:false}).addTo(g);
+ if(r){L.polyline(r.rp,{color:'#fff',weight:10,opacity:.9,interactive:false,lineCap:'round'}).addTo(g);L.polyline(r.rp,{color:'#2f80ff',weight:6,opacity:1,interactive:false,lineCap:'round'}).addTo(g);
+  if(r.end&&r.snap>6)L.polyline([r.end,to],{color:'#2f80ff',weight:3,dashArray:'3 7',interactive:false}).addTo(g);
+  if(fit){if(me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');map.setView(me.getLatLng(),Math.max(map.getZoom(),16))}else map.fitBounds(L.latLngBounds(r.rp).extend(to),{padding:[50,50],maxZoom:17})}}
+ else if(ins.fb){L.polyline(ins.fb,{color:'#9aa7b3',weight:3,dashArray:'6 8',interactive:false}).addTo(g);if(fit)map.fitBounds(L.latLngBounds(ins.fb),{padding:[50,50],maxZoom:17})}}
+/* ---------- barra inferior ---------- */
+function insBanner(){const x=ins.list[ins.i],r=ins.rt,eq=T[x.p.t].n+' '+x.p.name;
+ if(ins.ld)return{i:'⏳',t:'Calculando la ruta por calles…'};
+ if(ins.err)return{i:'⚠',t:esc(ins.err)+': no se puede guiar por calles. Se reintenta solo (toque aquí para reintentar).'};
+ if(ins.msg)return{i:'📍',t:esc(ins.msg)};
+ if(!r)return{i:'📍',t:'Preparando…'};
+ if(ins.pr){const nx=r.steps[ins.pr.si+1];return nx?{i:insIco(nx),t:'<b>'+insFk(ins.pr.rem)+'</b> · '+esc(insCap(insStepTxt(nx,eq)))}:{i:'🏁',t:'Llegando a su destino'}}
+ return{i:'🧭',t:'Ruta: <b>'+insFk(r.dist)+'</b> · '+insFt(r.dur)+' · '+esc(insCap(insStepTxt(r.steps[0],'')))}}
+const insInfo=x=>T[x.p.t].n+(ins.rt?' · '+insFk(ins.rt.dist)+' · '+insFt(ins.rt.dur):'')+(ins.near!=null?' · a '+Math.round(ins.near)+' m de usted':'');
+function insListHtml(){const r=ins.rt;if(!r||!ins.open)return'';const cur=ins.pr?ins.pr.si+1:-1;
+ return'<div class="sl">'+r.steps.map((s,i)=>`<div class="${i==cur?'cur':''}"><span style="flex:none;width:18px">${insIco(s)}</span><span style="flex:1">${esc(insCap(insStepTxt(s,'')))}</span><small style="flex:none;color:var(--m)">${insFk(s.d)}</small></div>`).join('')+'</div>'}
+function insUi(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p,n=ins.list.length,k=ins.ok.size+ins.sk.size,b=insBanner(),old=insb.querySelector('.sl'),sc=old?old.scrollTop:0;
+ insb.innerHTML=`<div class="ih"><b>🧭 ${esc(ins.cn)}</b><span>${k}/${n}</span><button onclick="insProf()" title="Tipo de ruta">${ins.prof=='foot'?'🚶':'🚗'}</button><button onclick="insToggleList()" title="Indicaciones">📋</button><button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div>
+<div class="nx" onclick="insRetry()"><i id="ins-i">${b.i}</i><span id="ins-b">${b.t}</span></div>${insListHtml()}
+<div class="ib"><div class="in"><b>${esc(p.name)}</b><small id="ins-s">${esc(insInfo(x))}</small></div><div class="ia"><button onclick="insNext(1)">Omitir</button><button id="ins-ok" class="ok ${ins.near!=null&&ins.near<=30?'pulse':''}" onclick="insNext()">✔ Revisado</button></div></div><div class="bar"><i style="width:${k/n*100}%"></i></div>`;
+ const nw=insb.querySelector('.sl');if(nw)nw.scrollTop=sc}
+/* actualiza solo los textos (sin reconstruir los botones, para no perder toques en el celular) */
+function insUpd(){if(!ins)return;const x=ins.list[ins.i],t=insb.querySelector('#ins-b');if(!x||!t)return;const b=insBanner();insb.querySelector('#ins-i').textContent=b.i;t.innerHTML=b.t;insb.querySelector('#ins-s').textContent=insInfo(x);insb.querySelector('#ins-ok').classList.toggle('pulse',ins.near!=null&&ins.near<=30)}
+function insToggleList(){ins.open=!ins.open;insUi()}
+function insProf(){ins.prof=ins.prof=='foot'?'car':'foot';try{localStorage.setItem('gc_prof',ins.prof)}catch(e){}ins.rt=null;ins.pr=null;ins.err='';ins.ld=0;ins.tok++;ins.rr=0;insFetch();insUi()}
+function insNext(sk){const x=ins.list[ins.i];(sk?ins.sk:ins.ok).add(x.p);ins.prev=[x.p.lat,x.p.lng];insGo(ins.i+1)}
 function insMute(){ins.mute=!ins.mute;if(ins.mute&&window.speechSynthesis)speechSynthesis.cancel();insUi()}
-function insEnd(){clearInterval(ins.tm);ins.ln&&ins.ln.remove();const n=ins.list.length;say('Inspección terminada. '+ins.ok.size+' de '+n+' equipos revisados.');
+function insEnd(){clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;const n=ins.list.length;insSay('Inspección terminada. '+ins.ok.size+' de '+n+' equipos revisados.');
  ins.rep='Inspección '+ins.cn+' · '+new Date().toLocaleString()+'\n'+ins.list.map(x=>(ins.ok.has(x.p)?'✔ ':'✖ ')+x.p.name+' ('+T[x.p.t].n+')').join('\n');log('🧭 Inspección de '+ins.cn+': '+ins.ok.size+'/'+n+' equipos revisados');
  insb.innerHTML=`<div class="ih"><b>🧭 Inspección terminada</b><span>${ins.ok.size}/${n}</span><button onclick="insStop()">✕</button></div><div class="ib"><div class="in">Revisados: <b>${ins.ok.size}</b> · omitidos: <b>${ins.sk.size}</b></div><div class="ia"><button class="ok" onclick="insShare()">Compartir reporte</button></div></div>`}
 function insShare(){const t=ins.rep;navigator.share?navigator.share({title:'Inspección '+ins.cn,text:t}).catch(()=>{}):navigator.clipboard.writeText(t).then(()=>toast('Reporte copiado'))}
-function insStop(){if(!ins)return;clearInterval(ins.tm);ins.ln&&ins.ln.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
-try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-if('serviceWorker' in navigator&&location.protocol=='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
-</script></body></html>
+function insStop(){if(!ins)return;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
+</script>
+<script>
+/* ===== Guardado: copia interna en IndexedDB, almacenamiento protegido y estado visible ===== */
+(function(){
+ const S={ls:false,idb:false,pe:null,use:null},fm=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.round(b/1024)+' KB',
+  stand=(()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}})();
+ function ui(){const e=$('#stg');if(!e)return;const ok='<b style="color:var(--g)">✔</b>',no='<b style="color:var(--r)">✖</b>';let bk=0;try{bk=+localStorage.getItem('gc_bk')||0}catch(x){}
+  e.innerHTML=`<div class="r"><span>Equipos <b>${pts.length}</b> · cruces <b>${flows.length}</b> · KMZ <b>${circ.length+subs.length}</b> · tabla <b>${DEM.size}</b></span></div>
+<div class="r"><span>${S.ls?ok:no} Guardado principal (navegador)</span></div><div class="r"><span>${S.idb?ok:no} Copia interna (IndexedDB)</span></div>
+<div class="r"><span>${S.pe?ok:'<b style="color:var(--y)">!</b>'} Almacenamiento protegido: <b>${S.pe?'sí':'no'}</b></span></div>
+<div class="r"><span>${stand?'App instalada':'Abierta en el navegador'}${S.use!=null?' · usado '+fm(S.use):''} · último respaldo: <b>${bk?new Date(bk).toLocaleDateString():'nunca'}</b></span></div>
+${S.ls&&S.idb?'':'<small class="h" style="color:var(--y)">⚠ El navegador está bloqueando el guardado. En Chrome: ⋮ → Configuración → Configuración de sitios → Cookies y datos de sitios: permita esta página (no use «Bloquear todas las cookies») y no la abra en modo incógnito.</small>'}
+${S.pe?'':'<small class="h">ℹ Sin protección, el navegador puede borrar los datos si el teléfono se queda sin espacio. Mantenga la app instalada, deje espacio libre y haga un respaldo.</small>'}
+<button id="stb" style="width:100%;margin-top:6px">💾 Respaldar ahora</button>`;
+  const b=$('#stb');if(b)b.onclick=()=>$('#bk').click()}
+ async function check(){
+  try{localStorage.setItem('gc_t','1');S.ls=localStorage.getItem('gc_t')=='1';localStorage.removeItem('gc_t')}catch(e){S.ls=false}
+  S.idb=!!(await DB);
+  try{if(navigator.storage&&navigator.storage.persisted){S.pe=await navigator.storage.persisted();if(!S.pe&&navigator.storage.persist)S.pe=await navigator.storage.persist()}}catch(e){}
+  try{const e=await navigator.storage.estimate();S.use=e.usage}catch(e){}
+  /* si el almacenamiento principal quedó vacío, se recupera de la copia interna */
+  const rs=[],get=async k=>{try{const r=await kvDo('get',k);return r&&r.v&&r.v.length?r.v:null}catch(e){return null}};
+  const kp=await get('pts'),kf=await get('flows'),kd=await get('dem');
+  if(!pts.length&&kp)try{loadPts(kp);save();rs.push(pts.length+' equipos')}catch(e){log('⚠ No se pudieron recuperar los equipos: '+e.message)}
+  if(!flows.length&&kf)try{flows=kf;fseq=Math.max(0,...flows.map(f=>f.id||0));saveF();redrawF();rs.push(flows.length+' cruces')}catch(e){log('⚠ No se pudieron recuperar los cruces: '+e.message)}
+  if(!DEM.size&&kd)try{setDem(kd,true);rs.push('tabla de '+kd.length+' circuitos')}catch(e){log('⚠ No se pudo recuperar la tabla: '+e.message)}
+  if(rs.length){try{resolveLinks();clearPlan()}catch(e){}toast('♻ Datos recuperados de la copia interna: '+rs.join(', '));log('♻ Recuperado de la copia interna: '+rs.join(', '))}
+  try{if(pts.length)kvSet('pts',pts.map(ser));if(flows.length)kvSet('flows',flows);if(DEMR.length)kvSet('dem',DEMR)}catch(e){}
+  ui();
+  if(!S.ls||!S.idb)toast('⚠ El navegador no está guardando todos sus datos. Revise «Guardado en este dispositivo» en el panel.');
+  log('Guardado: principal '+(S.ls?'sí':'NO')+' · copia interna '+(S.idb?'sí':'NO')+' · protegido '+(S.pe?'sí':'no')+' · '+(stand?'app instalada':'navegador'));
+  setTimeout(()=>{if(!pts.length&&!circ.length&&!subs.length&&!DEM.size)toast('No hay datos guardados en este dispositivo. ¿Tiene un respaldo?','Restaurar respaldo',()=>$('#br').click())},4500)}
+ check();setInterval(ui,5000);
+})();
+</script>
+<script>
+/* ===== Reporte de la falla: causa + foto + ubicación, listos para enviar por WhatsApp ===== */
+(function(){
+ const host=$('#pl');if(!host)return;let photo=null;
+ const d=document.createElement('div');d.id='rp';
+ d.innerHTML=`<div class="sum"><b>📣 Reporte de la falla</b></div>
+<textarea id="rpt" rows="2" placeholder="Causa de la falla (ej. rama sobre la línea, ave, vehículo, equipo dañado…)"></textarea>
+<div class="g"><label class="btn">📷 Foto de la causa<input type="file" id="rpf" accept="image/*" capture="environment" hidden></label><span id="rpn" class="h" style="align-self:center;margin:0"></span></div>
+<input id="rpw" type="tel" inputmode="numeric" placeholder="WhatsApp destino con lada (ej. 5218671234567)">
+<div class="g"><button id="rps">📤 Enviar con foto</button><button id="rpm">💬 Solo texto al número</button></div>
+<small class="h">Incluye la ubicación de la falla (enlace de Google Maps). Una página web no puede enviar WhatsApp en segundo plano: se abre WhatsApp con todo listo y usted pulsa «Enviar».</small>`;
+ host.after(d);
+ const $r=s=>d.querySelector(s),num=$r('#rpw');try{num.value=localStorage.getItem('gc_wa')||''}catch(e){}
+ num.addEventListener('change',()=>{try{localStorage.setItem('gc_wa',num.value.replace(/\D/g,''))}catch(e){}});
+ /* reduce la foto (máx. 1600 px) para que se envíe rápido con datos móviles */
+ async function shrink(f){try{const bm=await createImageBitmap(f),k=Math.min(1,1600/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+  const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.82));return b?new File([b],'causa_falla.jpg',{type:'image/jpeg'}):f}catch(e){return f}}
+ $r('#rpf').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;photo=await shrink(f);$r('#rpn').textContent='✔ '+Math.round(photo.size/1024)+' KB'});
+ const msg=()=>{const q=plan.f.p,c=plan.trip&&plan.trip.cn,e=plan.trip&&plan.trip.name,t=$r('#rpt').value.trim();
+  return '⚡ FALLA'+(c?' · circuito '+c:'')+(e?'\nProtección que operó: '+e:'')+'\nCausa: '+(t||'(sin descripción)')+'\n📍 https://www.google.com/maps?q='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n🕒 '+new Date().toLocaleString()};
+ const wa=text=>{const n=num.value.replace(/\D/g,'');window.open('https://wa.me/'+n+'?text='+encodeURIComponent(text),'_blank')};
+ const need=()=>{if(typeof plan!=='undefined'&&plan&&plan.f)return true;toast('Primero marque la falla: mantenga pulsado el punto sobre la línea del circuito');return false};
+ $r('#rpm').onclick=()=>{if(!need())return;if(!num.value.replace(/\D/g,''))return toast('Escriba el número de WhatsApp destino');wa(msg());log('📣 Reporte de falla abierto en WhatsApp (solo texto)')};
+ $r('#rps').onclick=async()=>{if(!need())return;const text=msg();
+  if(navigator.share){const data={text,title:'Falla'};let sinFoto=false;
+   if(photo){if(navigator.canShare&&navigator.canShare({files:[photo]}))data.files=[photo];else sinFoto=true}
+   try{await navigator.share(data);log('📣 Reporte de falla compartido'+(data.files?' con foto':''));if(sinFoto)toast('Este navegador no puede compartir la foto: adjúntela en WhatsApp');return}catch(e){if(e&&e.name=='AbortError')return}}
+  if(!num.value.replace(/\D/g,''))return toast('Escriba el número de WhatsApp destino');
+  wa(text);if(photo)toast('Se abrió WhatsApp con el texto: adjunte la foto desde su galería')};
+})();
+</script>
+</body></html>
