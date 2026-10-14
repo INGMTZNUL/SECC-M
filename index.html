@@ -1,6 +1,8 @@
 <!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1219"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="Icon-192.png"><link rel="apple-touch-icon" href="Icon-apple-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <title>SECC-M · Maniobras por Falla</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet.gridlayer.googlemutant@0.16.0/dist/Leaflet.GoogleMutant.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -79,6 +81,22 @@ h1{margin-bottom:6px}h1 small{display:none}
 section{margin-bottom:6px}
 #cl,#sl,#ptl{max-height:120px}#log{max-height:90px}
 #ins .sl{max-height:22dvh}}
+
+/* ===== v4: tipografía del Panel (Barlow Semi Condensed para texto, Barlow Condensed para títulos) y reporte por WhatsApp ===== */
+:root{--fp:'Barlow Semi Condensed','Roboto Condensed','Arial Narrow',system-ui,sans-serif;--fh:'Barlow Condensed','Barlow Semi Condensed','Roboto Condensed','Arial Narrow',system-ui,sans-serif}
+#side,#side button,#side .btn,#side input,#side select,#side textarea{font-family:var(--fp)}
+#side{font-size:13.5px;font-variant-numeric:tabular-nums}
+#side h1{font-family:var(--fh);font-weight:700;font-size:19px;letter-spacing:.02em}
+#side h1 small{font-family:var(--fp);font-size:11.5px;letter-spacing:0}
+#side h2{font-family:var(--fh);font-weight:600;font-size:14.5px;letter-spacing:.03em}
+#side em{font-family:var(--fh);font-weight:700;font-size:13px;letter-spacing:.04em}
+#side #log{font-family:var(--fp);font-size:12px}
+#rp .wn{display:flex;gap:6px;margin-top:6px;align-items:stretch}
+#rp .wn b{display:flex;align-items:center;padding:0 9px;border:1px solid var(--l);border-radius:8px;background:#15222f;color:var(--a);font-family:var(--fh);font-size:15px;letter-spacing:.04em}
+#rp .wn input{margin-top:0;flex:1;min-width:0}
+#rp .wn button{white-space:nowrap;padding:0 10px;border-radius:8px}
+#rp #rps{width:100%;margin-top:8px;background:var(--g);color:#04121c;border-color:var(--g);font-weight:700}
+#rp #rpn{cursor:pointer}
 </style></head><body>
 <button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button>
 <aside id="side">
@@ -749,34 +767,54 @@ ${S.pe?'':'<small class="h">ℹ Sin protección, el navegador puede borrar los d
 })();
 </script>
 <script>
-/* ===== Reporte de la falla: causa + foto + ubicación, listos para enviar por WhatsApp ===== */
+/* ===== Reporte de la falla: un solo botón de WhatsApp (equipo, usuarios, demanda, protección, causa, ubicación y foto) ===== */
 (function(){
- const host=$('#pl');if(!host)return;let photo=null;
+ const host=$('#pl');if(!host)return;let photo=null,fkEdit='';
  const d=document.createElement('div');d.id='rp';
  d.innerHTML=`<div class="sum"><b>📣 Reporte de la falla</b></div>
+<input id="rpp" type="text" autocomplete="off" placeholder="Protección operada (ej. 51, 51N, 79)">
 <textarea id="rpt" rows="2" placeholder="Causa de la falla (ej. rama sobre la línea, ave, vehículo, equipo dañado…)"></textarea>
 <div class="g"><label class="btn">📷 Foto de la causa<input type="file" id="rpf" accept="image/*" capture="environment" hidden></label><span id="rpn" class="h" style="align-self:center;margin:0"></span></div>
-<input id="rpw" type="tel" inputmode="numeric" placeholder="WhatsApp destino con lada (ej. 5218671234567)">
-<div class="g"><button id="rps">📤 Enviar con foto</button><button id="rpm">💬 Solo texto al número</button></div>
-<small class="h">Incluye la ubicación de la falla (enlace de Google Maps). Una página web no puede enviar WhatsApp en segundo plano: se abre WhatsApp con todo listo y usted pulsa «Enviar».</small>`;
+<div class="wn"><b>521</b><input id="rpw" type="tel" inputmode="numeric" autocomplete="off" placeholder="WhatsApp destino (10 dígitos)"></div>
+<button id="rps" type="button">📤 Enviar por WhatsApp</button>
+<small class="h" id="rpi"></small>`;
  host.after(d);
- const $r=s=>d.querySelector(s),num=$r('#rpw');try{num.value=localStorage.getItem('gc_wa')||''}catch(e){}
- num.addEventListener('change',()=>{try{localStorage.setItem('gc_wa',num.value.replace(/\D/g,''))}catch(e){}});
+ const $r=s=>d.querySelector(s),num=$r('#rpw'),pro=$r('#rpp'),cau=$r('#rpt'),pic=$r('#rpf'),pnm=$r('#rpn');
+ /* el número se guarda y se usa siempre a 10 dígitos; el 521 se agrega al enviar (acepta pegar +52…, 521… o 044…) */
+ const n10=v=>{const x=String(v||'').replace(/\D/g,'');return x.length>10?x.slice(-10):x};
+ const fk=()=>typeof plan!=='undefined'&&plan&&plan.f?plan.f.p.join(','):'';
+ try{num.value=n10(localStorage.getItem('gc_wa'))}catch(e){}
+ const hint=()=>{const n=n10(num.value),to=n.length==10?' de 521'+n:'';
+  $r('#rpi').textContent=photo?'Con foto: se abre WhatsApp con todo listo; elija el chat'+(to||' del destinatario')+' y pulse «Enviar».':'Sin foto: se abre el chat'+(to||' del número')+' con el texto y la ubicación; pulse «Enviar».'};
+ const quitaFoto=()=>{photo=null;pic.value='';pnm.textContent='';hint()};
+ num.addEventListener('input',()=>{const v=n10(num.value);if(v!==num.value)num.value=v;try{localStorage.setItem('gc_wa',v)}catch(e){}hint()});
+ [pro,cau].forEach(x=>x.addEventListener('input',()=>{fkEdit=fk()}));
+ /* elegir el número desde los contactos del teléfono (Chrome en Android) */
+ if('contacts' in navigator&&'ContactsManager' in window){const b=document.createElement('button');b.type='button';b.textContent='👤 Contactos';$r('.wn').append(b);
+  b.onclick=async()=>{try{const r=await navigator.contacts.select(['tel'],{multiple:false}),t=r&&r[0]&&r[0].tel&&r[0].tel[0];
+   if(!t){if(r&&r.length)toast('Ese contacto no tiene teléfono');return}
+   num.value=n10(t);num.dispatchEvent(new Event('input'))}catch(e){toast('No se pudo abrir la lista de contactos')}}}
  /* reduce la foto (máx. 1600 px) para que se envíe rápido con datos móviles */
  async function shrink(f){try{const bm=await createImageBitmap(f),k=Math.min(1,1600/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
   const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.82));return b?new File([b],'causa_falla.jpg',{type:'image/jpeg'}):f}catch(e){return f}}
- $r('#rpf').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;photo=await shrink(f);$r('#rpn').textContent='✔ '+Math.round(photo.size/1024)+' KB'});
- const msg=()=>{const q=plan.f.p,c=plan.trip&&plan.trip.cn,e=plan.trip&&plan.trip.name,t=$r('#rpt').value.trim();
-  return '⚡ FALLA'+(c?' · circuito '+c:'')+(e?'\nProtección que operó: '+e:'')+'\nCausa: '+(t||'(sin descripción)')+'\n📍 https://www.google.com/maps?q='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n🕒 '+new Date().toLocaleString()};
- const wa=text=>{const n=num.value.replace(/\D/g,'');window.open('https://wa.me/'+n+'?text='+encodeURIComponent(text),'_blank')};
+ pic.addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;photo=await shrink(f);fkEdit=fk();pnm.textContent='✔ '+Math.round(photo.size/1024)+' KB · quitar';hint()});
+ pnm.onclick=()=>{if(photo)quitaFoto()};
+ /* mensaje: Equipo Operado, Usuarios, Demanda (afectados por la operación del equipo), Protección Operada, Causa de Falla y ubicación */
+ const msg=()=>{const P=plan,t=P.trip,dd=dem(P),ok=!!(dd&&P.Lc&&P.aff!=null),q=P.f.p,
+   us=ok?fu(dd.u*P.aff/P.Lc):'sin dato',dm=ok?(dd.mw*P.aff/P.Lc).toFixed(2)+' MW':'sin dato';
+  return '⚡ FALLA\nEquipo Operado: '+(t?t.name+(t.cn?' ('+t.cn+')':''):'sin dato')+'\nUsuarios: '+us+'\nDemanda: '+dm+'\nProtección Operada: '+(pro.value.trim()||'sin dato')+'\nCausa de Falla: '+(cau.value.trim()||'(sin descripción)')+'\n📍 https://www.google.com/maps?q='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n🕒 '+new Date().toLocaleString('es-MX')};
  const need=()=>{if(typeof plan!=='undefined'&&plan&&plan.f)return true;toast('Primero marque la falla: mantenga pulsado el punto sobre la línea del circuito');return false};
- $r('#rpm').onclick=()=>{if(!need())return;if(!num.value.replace(/\D/g,''))return toast('Escriba el número de WhatsApp destino');wa(msg());log('📣 Reporte de falla abierto en WhatsApp (solo texto)')};
- $r('#rps').onclick=async()=>{if(!need())return;const text=msg();
-  if(navigator.share){const data={text,title:'Falla'};let sinFoto=false;
-   if(photo){if(navigator.canShare&&navigator.canShare({files:[photo]}))data.files=[photo];else sinFoto=true}
-   try{await navigator.share(data);log('📣 Reporte de falla compartido'+(data.files?' con foto':''));if(sinFoto)toast('Este navegador no puede compartir la foto: adjúntela en WhatsApp');return}catch(e){if(e&&e.name=='AbortError')return}}
-  if(!num.value.replace(/\D/g,''))return toast('Escriba el número de WhatsApp destino');
-  wa(text);if(photo)toast('Se abrió WhatsApp con el texto: adjunte la foto desde su galería')};
+ const aTexto=(text,n,conFoto)=>{if(n.length!=10)return toast('Escriba el número de WhatsApp destino (10 dígitos)');
+  window.open('https://wa.me/521'+n+'?text='+encodeURIComponent(text),'_blank');log('📣 Reporte de falla abierto en WhatsApp (texto y ubicación)');
+  if(conFoto)toast('Se abrió WhatsApp con el texto: adjunte la foto desde su galería')};
+ /* un solo botón: con foto → se comparte foto + mensaje en un solo envío; sin foto → chat directo al número con texto y ubicación */
+ $r('#rps').onclick=async()=>{if(!need())return;const k=fk();
+  if(fkEdit&&fkEdit!==k){pro.value=cau.value='';fkEdit='';quitaFoto();return toast('Esos datos eran de otra falla: capture protección, causa y foto de esta falla')}
+  const text=msg(),n=n10(num.value);fkEdit=k;
+  if(photo&&navigator.share&&navigator.canShare&&navigator.canShare({files:[photo]})){
+   try{await navigator.share({files:[photo],text,title:'Falla'});log('📣 Reporte de falla compartido con foto');quitaFoto();return}catch(e){if(e&&e.name=='AbortError')return}}
+  aTexto(text,n,!!photo)};
+ hint();
 })();
 </script>
 </body></html>
