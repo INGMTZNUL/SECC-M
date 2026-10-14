@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1219"><link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0a1219"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" href="Icon-192.png"><link rel="apple-touch-icon" href="Icon-apple-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <title>SECC-M · Maniobras por Falla</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -56,7 +56,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 </style></head><body>
 <button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button>
 <aside id="side">
-<h1>SEEC-M<small>Maniobras de Seccionamiento ante Falla en las RGD</small></h1>
+<h1>SECC-M<small>Maniobras de Seccionamiento ante Falla en las RGD</small></h1>
 <section><h2>Circuitos KMZ <b id="cc">0/100</b></h2>
 <label class="btn">Cargar archivos KMZ / KML<input id="fi" type="file" accept=".kmz,.kml" multiple hidden></label>
 <div id="cl"></div><small class="h">Solo los circuitos marcados participan en el análisis. Los archivos se guardan en el dispositivo y se cargan solos al reabrir.</small>
@@ -219,7 +219,7 @@ function del(id){const p=byId(id);if(mv&&mv.p===p)mvCancel(1);const o=ser(p);p.m
 function ren(id,el){const p=byId(id);p.name=el.value.trim()||'s/n';el.value=p.name;save();mk(p);dlist();if(!el.closest('#ptl'))plist()}
 function loadPts(a){mvCancel(1);pts.forEach(p=>{p.m&&p.m.remove();p.g&&p.g.remove()});pts=[];a.map(o=>({...o,t:o.t=='SP'?'RES':o.t})).filter(o=>T[o.t]).forEach(addPt);cnt()}
 try{loadPts(JSON.parse(localStorage.getItem('gc_pts')||'[]'))}catch(e){}
-$('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({puntos:pts.map(ser),flujos:flows},null,1)],{type:'application/json'}));a.download='puntos_gridctrl.json';a.click()};
+$('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({puntos:pts.map(ser),flujos:flows},null,1)],{type:'application/json'}));a.download='puntos_secc-m.json';a.click()};
 $('#im').onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());loadPts(Array.isArray(j)?j:j.puntos||[]);if(j.flujos){flows=j.flujos;fseq=Math.max(0,...flows.map(f=>f.id));saveF();redrawF()}save();clearPlan();log('Importados '+pts.length+' puntos')}catch(x){log('⚠ JSON inválido')}e.target.value=''};
 map.on('click',e=>{const q=[e.latlng.lat,e.latlng.lng];
  if(mode=='FALLA'){setMode(null);runFault(q)}else if(mode=='TRAZO')addV(q);else if(mode=='DR')drClick(q);else if(T[mode]){if(T[mode].sv){addPt({t:mode,lat:q[0],lng:q[1]});cnt();save();clearPlan()}else addEq(mode,q)}});
@@ -491,9 +491,9 @@ $('#sqi').oninput=function(){const v=this.value.trim().toLowerCase(),r=$('#sqr')
 /* respaldo completo en un archivo */
 const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 $('#bk').onclick=async()=>{try{const files=[];for(const k of['c','s'])for(const c of arr(k))if(c.blob)files.push({k,name:c.name,kmz:c.kmz,b:await b64(c.blob)});
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files})],{type:'application/json'}));a.download='gridctrl-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
  try{localStorage.setItem('gc_bk',Date.now())}catch(e){}toast('Respaldo guardado: '+pts.length+' equipos y '+files.length+' KMZ')}catch(e){log('⚠ No se pudo crear el respaldo')}};
-$('#br').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let d;try{d=JSON.parse(await f.text());if(!d.gridctrl)throw 0}catch(x){return log('⚠ El archivo no es un respaldo de GridCtrl')}
+$('#br').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let d;try{d=JSON.parse(await f.text());if(!d.gridctrl)throw 0}catch(x){return log('⚠ El archivo no es un respaldo de SECC-M')}
  if(!confirm('Restaurar reemplazará los equipos y cruces actuales. ¿Continuar?'))return;
  loadPts(d.pts||[]);save();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();
  for(const x of d.files||[]){if(arr(x.k).some(c=>c.name==x.name))continue;await ingest(new File([Uint8Array.from(atob(x.b),ch=>ch.charCodeAt(0))],x.name+(x.kmz?'.kmz':'.kml')),x.k)}
