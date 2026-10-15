@@ -97,6 +97,12 @@ section{margin-bottom:6px}
 #rp .wn button{white-space:nowrap;padding:0 10px;border-radius:8px}
 #rp #rps{width:100%;margin-top:8px;background:var(--g);color:#04121c;border-color:var(--g);font-weight:700}
 #rp #rpn{cursor:pointer}
+
+/* ===== v5: restaurador en Modo Switch y transferencias activas ===== */
+.pt.swm{border-style:dashed}
+#xs .xr{display:flex;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--l)}#xs .xr:first-child{border-top:0}
+#xs .xr>div{flex:1;min-width:0}#xs .xr small{display:block;color:var(--m);margin-top:2px}
+#xs .xr button{flex:none;padding:0 10px;min-height:34px}
 </style></head><body>
 <button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button>
 <aside id="side">
@@ -107,7 +113,7 @@ section{margin-bottom:6px}
 <label class="btn" style="margin-top:8px">Cargar KMZ de subestaciones (imágenes / figuras)<input id="fs" type="file" accept=".kmz,.kml" multiple hidden></label><div id="sl"></div></section>
 <section><h2>Puntos del sistema <b id="pc"></b></h2>
 <small class="h"><b>Circuito del equipo</b>: aplica a todo lo que marque (interruptor, restaurador, seccionamiento, cuchilla, enlace, Anclaje Doble y cruces)<select id="dc" style="width:100%;margin-top:3px"></select></small><div class="g" id="tb"></div><h2 style="margin-top:10px">Servicios importantes</h2><div class="g" id="sv"></div>
-<small class="h">Rojo = cerrado, verde = abierto. Elija un tipo y haga clic en el mapa (Esc cancela). Anclaje Doble: se recomienda como segunda maniobra, después de la primera (restauradores y seccionamiento); márquelo con 2 clics (un lado y el otro, en la dirección en que están los puentes de su circuito). Elija arriba el circuito del equipo o déjelo en Automático. Restaurador: se abre solo si la falla queda delante de él. Cruces: con "Trazar flujo en cruce" dibuje por dónde pasa la corriente en cada línea (clic en cada vértice; Enter o "Terminar trazo" para cerrar cada trazo). Haga un trazo por cada línea; la app conecta solo lo que usted trace. Acerque el mapa y haga clic sobre la línea, un poco antes y después del cruce. Para borrar un trazo, haga clic sobre él con la herramienta desactivada. Arrastre un punto para moverlo. Para renombrar, edite el nombre en la lista.</small>
+<small class="h">Rojo = cerrado, verde = abierto. Elija un tipo y haga clic en el mapa (Esc cancela). Anclaje Doble: se recomienda como segunda maniobra, después de la primera (restauradores y seccionamiento); márquelo con 2 clics (un lado y el otro, en la dirección en que están los puentes de su circuito). Elija arriba el circuito del equipo o déjelo en Automático. Restaurador: en Modo Restaurador se abre solo si la falla queda delante de él (aguas abajo); en Modo Switch no opera solo y se usa como seccionador (cambie el modo en la ventana del equipo). Cruces: con "Trazar flujo en cruce" dibuje por dónde pasa la corriente en cada línea (clic en cada vértice; Enter o "Terminar trazo" para cerrar cada trazo). Haga un trazo por cada línea; la app conecta solo lo que usted trace. Acerque el mapa y haga clic sobre la línea, un poco antes y después del cruce. Para borrar un trazo, haga clic sobre él con la herramienta desactivada. Arrastre un punto para moverlo. Para renombrar, edite el nombre en la lista.</small>
 <div class="g"><button id="be">Terminar trazo (Enter)</button><button id="bu">Deshacer vértice</button></div><div id="ptl"></div><small class="h">Casilla: mostrar u ocultar cada equipo en el mapa (un equipo oculto no participa en el análisis, igual que los circuitos).<br>Tolerancia de unión de líneas (m): <input id="tol" type="number" value="4" min="0.5" max="5" step="0.5" style="width:60px"></small>
 <div class="g"><button id="ex">Exportar puntos</button><label class="btn">Importar puntos<input id="im" type="file" accept=".json" hidden></label></div>
 <div class="g"><button id="bk">💾 Respaldo completo</button><label class="btn">Restaurar respaldo<input id="br" type="file" accept=".json" hidden></label></div><small class="h">El respaldo guarda equipos, cruces y KMZ en un solo archivo: sirve para pasar su información a otro celular.</small><small class="h">🔒 Sus KMZ, tablas y equipos se guardan solo en este dispositivo: la app no sube archivos a ningún servidor.</small></section>
@@ -116,7 +122,8 @@ section{margin-bottom:6px}
 <label class="btn">Cargar tabla (.xlsx o .csv)<input id="dx" type="file" accept=".xlsx,.csv" hidden></label><div id="dl"></div></section>
 <section><h2>Falla y maniobra</h2>
 <small class="h" style="margin:0 0 6px">⚡ Para marcar una <b>falla</b>, <b>mantenga pulsado</b> el punto sobre la línea del circuito (o sobre un equipo). Después pulse «Ejecutar maniobra 1».</small><div id="pl"></div>
-<div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn">Normalizar</button></div></section>
+<div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn" title="Regresa todos los equipos al estado normal y borra las transferencias activas">Normalizar todo</button></div></section>
+<section id="xs"><h2>Transferencias activas <b id="xn"></b></h2><div id="xl2"></div><small class="h">Al ejecutar una maniobra, el tramo transferido pasa a ser parte del circuito huésped (cuenta sus usuarios y demanda) y se queda así, también al cerrar y reabrir la app, hasta que pulse «Normalizar» en esa transferencia o «Normalizar todo».</small></section>
 <section><h2>Guardado en este dispositivo</h2><div id="stg" class="stg"></div></section>
 <section><h2>Bitácora</h2><div id="log"></div></section>
 </aside><div id="map"></div>
@@ -145,6 +152,7 @@ window.initGM=()=>{try{gR=L.gridLayer.googleMutant({type:'roadmap',maxZoom:21});
 if(L.gridLayer.googleMutant){const g=document.createElement('script');g.src='https://maps.googleapis.com/maps/api/js?key='+GMAPS_KEY+'&callback=initGM';g.async=true;g.onerror=()=>gOff('No cargó Google Maps (¿sin conexión?)');document.head.appendChild(g)}else setTimeout(()=>gOff('No cargó el complemento de Google Maps'),0);
 let tileWarn=0;[calles,carto,sat].forEach(t=>t.on('tileerror',()=>{if(!tileWarn++)log('⚠ No cargan los mosaicos del mapa: revise su conexión o cambie de capa (control arriba a la derecha)')}));
 let circ=[],pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0;
+let XF=[]; /* transferencias y maniobras activas: se guardan en el dispositivo hasta que se normalicen a mano */
 const ov=L.layerGroup().addTo(map),st=p=>ovr&&ovr.has(p)?ovr.get(p):p.st,km=m=>(m/1000).toFixed(2);
 /* ---------- Usuarios y demandas por circuito (ligados por nombre al interruptor) ---------- */
 const DEM0=[]; /* versión web: la tabla de usuarios y demandas NO va incluida; se carga en cada dispositivo con «Cargar tabla» */
@@ -241,8 +249,8 @@ document.querySelectorAll('#tb button,#sv button').forEach(b=>b.onclick=()=>setM
 addEventListener('keydown',e=>{if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.key=='Escape')setMode(null);if(e.key=='Enter'&&mode=='TRAZO')endTrace(1)});
 addEventListener('error',e=>log('⚠ Error en la aplicación: '+(e.message||'desconocido')));addEventListener('unhandledrejection',e=>log('⚠ Error: '+((e.reason&&e.reason.message)||e.reason)));
 const demPop=p=>p.t!='INT'?'':(d=>d?`Usuarios: <b>${fu(d.u)}</b> · Demanda: <b>${d.mw.toFixed(2)} MW</b><br>`:(DEM.size?`<b style="color:#b8860b">Sin datos</b>: su nombre no coincide con ningún circuito de la tabla<br>`:`<b style="color:#b8860b">Sin tabla</b> de usuarios y demandas cargada en este dispositivo<br>`))(DEM.get(dkey(p.name)));
-const pop=p=>`<b>${esc(p.name)}</b><br>${T[p.t].n}${T[p.t].sv?'':` · <b style="color:${p.st?'#d12':'#1a9c57'}">${p.st?'CERRADO':'ABIERTO'}</b>`}<br>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><input value="${esc(p.name)}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)"><br>${demPop(p)}${cPop(p)}${T[p.t].sv?'':`<button onclick="tog(${p.id})">${p.st?'Abrir':'Cerrar'}</button> `}${!T[p.t].sv&&p.t!='DR'&&p.cn?`<button onclick="${p.t=='INT'?'insStart':'insMenu'}(${p.id})">🧭 ${p.t=='INT'?'Inspeccionar circuito':'Inspeccionar desde aquí'}</button> `:''}<button onclick="mvArm(${p.id})">📍 Mover ubicación</button> <button onclick="del(${p.id})">Eliminar</button>`;
-function mk(p){const t=T[p.t],dr=p.t=='DR',h=L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],html:t.sv?`<div class="sv">${t.svg}</div>`:`<div class="pt ${p.st?'':'op'} ${hl.get(p)||''}${p.t=='ENL'&&p.cn&&!p.cn2?' pend':''}" style="border-radius:${t.r}px${dr?';transform:translate(-50%,calc(-100% - 12px))':''}">${t.svg||''}${esc(p.name)}</div>`});
+const pop=p=>`<b>${esc(p.name)}</b><br>${T[p.t].n}${T[p.t].sv?'':` · <b style="color:${p.st?'#d12':'#1a9c57'}">${p.st?'CERRADO':'ABIERTO'}</b>`}<br>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><input value="${esc(p.name)}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)"><br>${demPop(p)}${cPop(p)}${p.t=='RES'?mdPop(p):''}${T[p.t].sv?'':`<button onclick="tog(${p.id})">${p.st?'Abrir':'Cerrar'}</button> `}${!T[p.t].sv&&p.t!='DR'&&p.cn?`<button onclick="${p.t=='INT'?'insStart':'insMenu'}(${p.id})">🧭 ${p.t=='INT'?'Inspeccionar circuito':'Inspeccionar desde aquí'}</button> `:''}<button onclick="mvArm(${p.id})">📍 Mover ubicación</button> <button onclick="del(${p.id})">Eliminar</button>`;
+function mk(p){const t=T[p.t],dr=p.t=='DR',h=L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],html:t.sv?`<div class="sv">${t.svg}</div>`:`<div class="pt ${p.st?'':'op'} ${hl.get(p)||''}${p.t=='ENL'&&p.cn&&!p.cn2?' pend':''}${p.t=='RES'&&p.md=='SW'?' swm':''}" style="border-radius:${t.r}px${dr?';transform:translate(-50%,calc(-100% - 12px))':''}">${t.svg||''}${esc(p.name)}${p.t=='RES'&&p.md=='SW'?' · SW':''}</div>`});
  if(dr)drMark(p);
  if(p.m){p.m.setIcon(h);if(mv&&mv.p===p){const e=p.m.getElement();e&&e.classList.add('mving')}return pvis(p)}
  p.m=L.marker([p.lat,p.lng],{icon:h,draggable:false}).addTo(map).bindTooltip(()=>p.name+(p.cn?' · '+p.cn+(p.cn2?' ↔ '+p.cn2:''):'')).bindPopup(()=>pop(p));
@@ -253,14 +261,47 @@ function pshow(id,v){const p=byId(id);p.vis=v?1:0;pvis(p);save();plist();clearPl
 const byId=id=>pts.find(p=>p.id==id),cnt=()=>{$('#pc').textContent=pts.length;plist()};
 function plist(){dlist();$('#ptl').innerHTML=pts.map(p=>`<div class="r" style="${p.vis===0?'opacity:.5':''}"><input type="checkbox" ${p.vis===0?'':'checked'} onchange="pshow(${p.id},this.checked)" title="Mostrar / ocultar en el mapa"><i style="flex:none;width:11px;height:11px;border-radius:${T[p.t].r}px;background:${T[p.t].c}"></i><input value="${esc(p.name)}" title="${T[p.t].n}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)" style="flex:1;min-width:0;background:#0a1219;color:var(--t);border:1px solid var(--l);border-radius:4px;padding:3px 5px">${T[p.t].sv?'':`<small style="flex:none;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m)" title="Circuito">${esc(p.t=='ENL'?(p.cn||'?')+' ↔ '+(p.cn2||'⏳ pendiente'):p.cn||'sin circuito')}</small>`}<button onclick="goP(${p.id})">⌖</button></div>`).join('')}
 function goP(id){const p=byId(id);if(p.vis===0){p.vis=1;pvis(p);save();plist();clearPlan()}map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}
-const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,...(p.vis===0?{vis:0}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{})});
+const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,u:p.u,...(p.vis===0?{vis:0}:{}),...(p.t=='RES'&&p.md=='SW'?{md:'SW'}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{})});
 const save=()=>{try{localStorage.setItem('gc_pts',JSON.stringify(pts.map(ser)))}catch(e){}kvSet('pts',pts.map(ser))};
-function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1};if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}pts.push(p);mk(p);return p}
+function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1,u:o.u||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7))};if(p.t=='RES')p.md=o.md=='SW'?'SW':'RES';if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}pts.push(p);mk(p);return p}
+/* ---------- Restaurador: Modo Restaurador (opera solo ante falla aguas abajo) / Modo Switch (no opera solo) ---------- */
+const mdPop=p=>`Modo: <select onchange="setMd(${p.id},this.value)"><option value="RES" ${p.md=='SW'?'':'selected'}>Restaurador (opera solo)</option><option value="SW" ${p.md=='SW'?'selected':''}>Switch (no opera solo)</option></select><br>`;
+function setMd(id,v){const p=byId(id);if(!p||p.t!='RES')return;p.md=v=='SW'?'SW':'RES';p.m.closePopup();save();mk(p);clearPlan();log(p.name+' en Modo '+(p.md=='SW'?'Switch (no opera automáticamente)':'Restaurador (opera automáticamente)'))}
 function tog(id){const p=byId(id);p.st^=1;log((p.st?'CERRAR ':'ABRIR ')+p.name+' (manual)');p.m.closePopup();save();clearPlan()}
 function del(id){const p=byId(id);if(mv&&mv.p===p)mvCancel(1);const o=ser(p);p.m.remove();p.g&&p.g.remove();pts=pts.filter(x=>x!=p);cnt();save();clearPlan();toast('Eliminado: '+p.name,'Deshacer',()=>{const q=addPt(o);cnt();save();clearPlan();log('↩ '+q.name+' restaurado')})}
 function ren(id,el){const p=byId(id);p.name=el.value.trim()||'s/n';el.value=p.name;save();mk(p);dlist();if(!el.closest('#ptl'))plist()}
-function loadPts(a){mvCancel(1);pts.forEach(p=>{p.m&&p.m.remove();p.g&&p.g.remove()});pts=[];a.map(o=>({...o,t:o.t=='SP'?'RES':o.t})).filter(o=>T[o.t]).forEach(addPt);cnt()}
+function loadPts(a){try{mvCancel(1)}catch(e){}pts.forEach(p=>{p.m&&p.m.remove();p.g&&p.g.remove()});pts=[];a.map(o=>({...o,t:o.t=='SP'?'RES':o.t})).filter(o=>T[o.t]).forEach(addPt);cnt()}
+/*XF-INI*/
+/* ---------- Transferencias y maniobras activas: se conservan al reabrir hasta que se normalicen a mano ---------- */
+const ptU=u=>pts.find(p=>p.u===u),xfSave=()=>{try{localStorage.setItem('gc_xf',JSON.stringify(XF))}catch(e){}kvSet('xf',XF)},
+ stDiff=snap=>snap.map(([p,s])=>p.st!==s?[p.u,s,p.st]:null).filter(Boolean),
+ xfTit=r=>(r.eq||'Maniobra')+' · '+new Date(r.t).toLocaleString('es-MX',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+/* estado normal = estado actual con todos los cambios de las transferencias deshechos (solo en memoria) */
+function xfNormal(){const w=new Map(pts.map(p=>[p,p.st]));[...XF].reverse().forEach(r=>[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(p&&w.get(p)===c[2])w.set(p,c[1])}));return w}
+function xfAdd(P,snap){const N=G.N,tr=P.isl.filter(i=>i.t).map(i=>({e:i.t.p.name,de:circ[N[[...i.S][0]].c].name,a:cn(i.t.o),km:+(i.l/1000).toFixed(2)}));
+ const r={id:Date.now(),t:Date.now(),fp:P.f.p,eq:P.trip.name,fc:cn(P.f.F),tr,chg:stDiff(snap)};XF.push(r);P.xid=r.id;xfSave();xfList()}
+function xfRevert(r){let s=0;[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(!p)return;if(p.st===c[2]){p.st=c[1];log((c[1]?'CERRAR ':'ABRIR ')+p.name+' (normalizar)')}else s++});XF=XF.filter(x=>x!==r);return s}
+function xfRev(id){const r=XF.find(x=>x.id==id);if(!r)return;const s=xfRevert(r);prevSt=null;xfSave();save();clearPlan();xfList();log('Normalizado: '+xfTit(r)+(s?' · ⚠ '+s+' equipo(s) ya habían cambiado y se dejaron como están':''))}
+function xfAll(){let s=0;[...XF].reverse().forEach(r=>{s+=xfRevert(r)});XF=[];xfSave();return s}
+function xfGo(id){const r=XF.find(x=>x.id==id);if(r&&r.fp){if(innerWidth<=800){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}map.setView(r.fp,Math.max(map.getZoom(),16))}}
+function xfList(){const e=$('#xl2');if(!e)return;$('#xn').textContent=XF.length||'';
+ e.innerHTML=XF.length?XF.map(r=>`<div class="xr"><div><b>${esc(xfTit(r))}</b><small>${r.tr&&r.tr.length?r.tr.map(t=>esc(t.amb?`${t.e} (${t.de} ↔ ${t.a})`:`${t.km} km de ${t.de} → ${t.a} · enlace ${t.e}`)).join('<br>'):'Sin transferencia entre circuitos'}<br>Falla en ${esc(r.fc||'')}</small></div><button onclick="xfGo(${r.id})" title="Ir a la falla">⌖</button><button onclick="xfRev(${r.id})">Normalizar</button></div>`).join(''):'<small class="h">Sin transferencias activas: todos los circuitos están en estado normal.</small>'}
+/*XF-FIN*/
+/*HD-INI*/
+/* usuarios y demanda del circuito huésped: su propia carga + la de los tramos que le fueron transferidos (cada tramo con la densidad de su circuito de origen) */
+function hostDem(src,comp){const d0=DEM.get(dkey(src.name));if(!d0||!XF.length)return d0||null;
+ try{const o=ovr;ovr=xfNormal();let E0;try{E0=energized()}finally{ovr=o}
+  const N=G.N,L0=new Map(),cur=new Map(),C=new Set(comp.keys());
+  E0.forEach((p,n)=>{for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&E0.has(e.b))L0.set(p,(L0.get(p)||0)+e.l)});
+  C.forEach(n=>{const p=E0.get(n)||src;for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&C.has(e.b))cur.set(p,(cur.get(p)||0)+e.l)});
+  if(!(L0.get(src)>0))return d0;
+  let u=0,mw=0,xu=0,xm=0;
+  cur.forEach((l,p)=>{const d=p===src?d0:DEM.get(dkey(p.name)),l0=L0.get(p);if(!d||!(l0>0))return;const k=l/l0;u+=d.u*k;mw+=d.mw*k;if(p!==src){xu+=d.u*k;xm+=d.mw*k}});
+  return{n:d0.n,u,mw,xu,xm}}catch(e){return d0}}
+/*HD-FIN*/
 try{loadPts(JSON.parse(localStorage.getItem('gc_pts')||'[]'))}catch(e){}
+try{XF=JSON.parse(localStorage.getItem('gc_xf')||'[]');if(!Array.isArray(XF))XF=[]}catch(e){XF=[]}
+if(pts.length)save();xfList();
 $('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({puntos:pts.map(ser),flujos:flows},null,1)],{type:'application/json'}));a.download='puntos_secc-m.json';a.click()};
 $('#im').onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());loadPts(Array.isArray(j)?j:j.puntos||[]);if(j.flujos){flows=j.flujos;fseq=Math.max(0,...flows.map(f=>f.id));saveF();redrawF()}save();clearPlan();log('Importados '+pts.length+' puntos')}catch(x){log('⚠ JSON inválido')}e.target.value=''};
 map.on('click',e=>{const q=[e.latlng.lat,e.latlng.lng];
@@ -422,7 +463,7 @@ const energized=()=>{const S=new Map();pts.forEach(p=>{if(p.t=='INT'&&p.n>=0&&st
 const len=S=>{let s=0;S.forEach(n=>{for(const e of G.N[n].adj)if(!e.d&&!e.tie&&e.a==n&&S.has(e.b))s+=e.l});return s};
 const segs=S=>{const r=[],N=G.N;S.forEach(n=>{for(const e of N[n].adj){if(e.d||e.tie)continue;const o=nb(n,e);if(S.has(o)?e.a==n:N[o].sw)r.push([N[n].p,N[o].p])}});return r};
 /* ---------- Lógica SCADA de falla ---------- */
-const RK={INT:0,RES:1,SS:2,CCF:3,ENL:3.5,DR:4};let DRU=new Set();
+const RK={INT:0,RES:1,SS:2,CCF:3,ENL:3.5,DR:4},rkp=p=>p.t=='RES'&&p.md=='SW'?RK.SS:RK[p.t];let DRU=new Set();
 function analyze(q,u){DRU=u;clearPlan();
  if(!circ.some(c=>c.on))return log('⚠ Cargue y active al menos un circuito');
  attach();ovr=null;const f=locate(q,200);if(!f)return log('⚠ La falla debe marcarse sobre una línea (máx. 200 m)');
@@ -434,7 +475,7 @@ function analyze(q,u){DRU=u;clearPlan();
  /* Z = zona en falla (entre los anclajes dobles abiertos); Z0 = tramo de línea completo afectado (anclajes dobles sin abrir) */
  const[Z,B]=flood(DRU),Z0=DRU.size?flood(new Set())[0]:Z;
  const comp=new Map(),par=new Map();walk(src.n,comp,src,par);
- let trip=null;for(let n=F;n!==undefined;n=par.get(n)){const w=N[n].sw;if(w&&(w.t=='INT'||w.t=='RES')&&st(w)){trip=w;break}}
+ let trip=null;const swSkip=[];for(let n=F;n!==undefined;n=par.get(n)){const w=N[n].sw;if(w&&(w.t=='INT'||w.t=='RES')&&st(w)){if(w.t=='RES'&&w.md=='SW'){swSkip.push(w.name);continue}trip=w;break}}
  trip=trip||src;const kids=new Map();par.forEach((a,c)=>(kids.get(a)||kids.set(a,[]).get(a)).push(c));
  const dn=new Set([trip.n]),qd=[trip.n];while(qd.length)for(const c of kids.get(qd.pop())||[]){dn.add(c);qd.push(c)}
  ovr=new Map([...B].map(p=>[p,0]));
@@ -445,8 +486,10 @@ function analyze(q,u){DRU=u;clearPlan();
   while(a.length){const n=a.pop();for(const x of N[n].adj){if(x.d||x.tie)continue;const m=nb(n,x);if(!lost.has(m)||seen.has(m))continue;seen.add(m);S.add(m);a.push(m)}}
   const l=len(S);if(l>0){const cand=[];pts.forEach(p=>{if(p.t!='ENL'||st(p)||p.n<0)return;const a1=S.has(p.n),b1=S.has(p.n2);if(a1==b1)return;const o=a1?p.n2:p.n;
     if(post.has(o)&&!Z.has(o))cand.push({p,o,d:dist([p.lat,p.lng],f.p)})});cand.sort((x,y)=>x.d-y.d);isl.push({S,l,cand,t:cand[0]})}});
- const Bl=[...B].sort((a,b)=>(RK[a.t]-RK[b.t])||dist([a.lat,a.lng],f.p)-dist([b.lat,b.lng],f.p)),reclose=!B.has(trip),steps=[];
+ const Bl=[...B].sort((a,b)=>(rkp(a)-rkp(b))||dist([a.lat,a.lng],f.p)-dist([b.lat,b.lng],f.p)),reclose=!B.has(trip),steps=[];
  steps.push(['VERIF',`Disparó automáticamente ${trip.name} (${cn(trip.n)}). Falla en ${cn(F)}; zona a aislar: ${km(len(Z))} km.`]);
+ if(swSkip.length)steps.push(['VERIF',`${swSkip.join(', ')}: en Modo Switch, no opera automáticamente ante esta falla; se usa como seccionador y dispara ${trip.name}.`]);
+ {const fo=circ[N[F].c].name,ho=src.cn||src.name;if(fo!=ho)steps.push(['VERIF',`El tramo con falla es de ${fo}, pero hoy lo alimenta ${ho} (transferencia vigente): se analiza como parte del circuito huésped ${ho}.`])}
  if(Z0.size>Z.size)steps.push(['VERIF',`Tramo de línea afectado por completo: ${km(len(Z0))} km (antes, en y después de la falla). Se marca como normal hasta que los anclajes dobles estén abiertos y el restaurador/alimentador y el enlace estén cerrados para recuperar las cargas de antes y después del punto de falla.`]);
  Bl.filter(p=>p!=trip).forEach(p=>steps.push(['ABRIR',`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}${p.t=='DR'?' · abrir la línea (ÚLTIMO RECURSO): queda sin servicio el área delante de él':''}`]));
  if(reclose)steps.push(['CERRAR',`${trip.name} · repone ${km(len(up))} km aguas arriba de la falla`]);
@@ -454,7 +497,7 @@ function analyze(q,u){DRU=u;clearPlan();
  /* restablecimiento previsto (por longitud de línea): estado final = aperturas + enlaces elegidos */
  ovr=new Map([...B].map(p=>[p,0]));isl.forEach(i=>i.t&&ovr.set(i.t.p,1));
  const Ef=energized(),tgt=new Map(ovr),aff=len(dn),rest=len(new Set([...dn].filter(n=>Ef.has(n))));
- ovr=null;plan={f,Z,Z0,B,Bl,trip,reclose,isl,steps,dn,aff,rest,src,Lc:len(new Set(comp.keys())),pct:aff?100*rest/aff:100,tgt,lostKm:isl.reduce((s,i)=>s+i.l,0),noBk:isl.filter(i=>!i.t).reduce((s,i)=>s+i.l,0)};
+ ovr=null;plan={f,Z,Z0,B,Bl,trip,reclose,isl,steps,dn,aff,rest,src,hd:hostDem(src,comp),Lc:len(new Set(comp.keys())),pct:aff?100*rest/aff:100,tgt,lostKm:isl.reduce((s,i)=>s+i.l,0),noBk:isl.filter(i=>!i.t).reduce((s,i)=>s+i.l,0)};
  Bl.forEach(p=>hl.set(p,'ab'));if(reclose)hl.set(trip,'ce');isl.forEach(i=>i.t&&hl.set(i.t.p,'ce'));
  pts.forEach(mk);plan.un=ex(Z)+isl.filter(i=>!i.t).reduce((t,i)=>t+ex(i.S),0);return plan}
 /* Maniobra 1: restauradores y seccionamiento. Maniobra 2 (recomendada): abrir puentes en Anclajes Dobles para recuperar más carga. */
@@ -470,17 +513,17 @@ function runFault(q){try{runFault0(q)}catch(e){log('⚠ Error en el análisis: '
 const served=P=>{const E=energized();return len(new Set([...P.dn].filter(n=>E.has(n))))},pc=(P,x)=>P.aff?100*x/P.aff:100,f1=x=>x.toFixed(1)+' %';
 /* diferencia entre el estado actual (tras la maniobra 1) y el estado que deja la maniobra con Anclaje Doble */
 function recDiff(P){const Q=P.rec&&P.rec.Q;if(!Q)return{ab:[],ce:[]};const pre=new Map(prevSt||pts.map(p=>[p,p.st])),want=p=>Q.tgt.has(p)?Q.tgt.get(p):pre.get(p),sw=pts.filter(p=>!T[p.t].sv&&p.n>=0);
- return{ab:sw.filter(p=>p.st==1&&want(p)==0).sort((x,y)=>(x.t=='DR'?0:1)-(y.t=='DR'?0:1)||RK[x.t]-RK[y.t]),ce:sw.filter(p=>p.st==0&&want(p)==1).sort((x,y)=>(x.t=='ENL')-(y.t=='ENL')||RK[x.t]-RK[y.t])}}
+ return{ab:sw.filter(p=>p.st==1&&want(p)==0).sort((x,y)=>(x.t=='DR'?0:1)-(y.t=='DR'?0:1)||rkp(x)-rkp(y)),ce:sw.filter(p=>p.st==0&&want(p)==1).sort((x,y)=>(x.t=='ENL')-(y.t=='ENL')||rkp(x)-rkp(y))}}
 const recSteps=d=>[...d.ab.map(p=>['ABRIR',p.t=='DR'?`${p.name} · Anclaje Doble · ${p.cn} · abrir puentes: solo queda sin servicio el área entre los anclajes`:`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}`]),
  ...d.ce.map(p=>['CERRAR',p.t=='ENL'?`${p.name} · enlace ${cn(p.n)} – ${cn(p.n2)} · transfiere el tramo recuperado`:`${p.name} · ${T[p.t].n} · ${cn(p.n)} · repone el tramo hasta el anclaje doble`])];
 const li=a=>`<ol>${a.map(s=>`<li><em class="${s[0]}">${s[0]}</em> ${esc(s[1])}</li>`).join('')}</ol>`;
 function show(){draw();const P=plan;map.setView(P.f.p,Math.max(map.getZoom(),15));panel()}
-const dem=P=>P&&P.src&&P.Lc?DEM.get(dkey(P.src.name)):null,
+const dem=P=>P&&P.src&&P.Lc?(P.hd||DEM.get(dkey(P.src.name))||null):null,
  demL=(P,x)=>{const d=dem(P);return d?` · ${fu(d.u*x/P.Lc)} usuarios · ${(d.mw*x/P.Lc).toFixed(2)} MW`:''};
 function demTxt(P,rest,lbl){if(!P.src)return'';const d=dem(P);
  if(!d)return`<div class="sum" style="color:#ffc233">⚠ El interruptor «${esc(P.src.name)}» no coincide con ningún circuito de la tabla de usuarios y demandas; renómbrelo igual que en la tabla para calcular usuarios y demanda.</div>`;
  const k=x=>d.u*x/P.Lc,m=x=>d.mw*x/P.Lc;
- return`<div class="sum">Circuito «${esc(d.n)}» (${fu(d.u)} usuarios · ${d.mw.toFixed(2)} MW): afectados <b>${fu(k(P.aff))} usuarios · ${m(P.aff).toFixed(2)} MW</b> · ${lbl} <b class="pct">${fu(k(rest))} usuarios · ${m(rest).toFixed(2)} MW</b> · sin servicio <b>${fu(k(P.aff)-k(rest))} usuarios · ${(m(P.aff)-m(rest)).toFixed(2)} MW</b></div>`}
+ return`<div class="sum">Circuito «${esc(d.n)}» (${fu(d.u)} usuarios · ${d.mw.toFixed(2)} MW${d.xu>0?', incluye '+fu(d.xu)+' usuarios y '+d.xm.toFixed(2)+' MW transferidos de otro circuito':''}): afectados <b>${fu(k(P.aff))} usuarios · ${m(P.aff).toFixed(2)} MW</b> · ${lbl} <b class="pct">${fu(k(rest))} usuarios · ${m(rest).toFixed(2)} MW</b> · sin servicio <b>${fu(k(P.aff)-k(rest))} usuarios · ${(m(P.aff)-m(rest)).toFixed(2)} MW</b></div>`}
 function panel(){const P=plan,rec=P.rec,Q=rec&&rec.Q;let h='';
  if(P.Bl){if(!P.done)h+=`<div class="sum">Restablecimiento previsto con la maniobra 1: <span class="pct">${f1(P.pct)}</span> (${km(P.rest)} de ${km(P.aff)} km afectados, por longitud de línea) · Zona en falla ${km(len(P.Z))} km · Sin servicio por maniobra ${km(P.lostKm)} km · Sin respaldo ${km(P.noBk)} km</div>`+demTxt(P,P.rest,'se restablecerían con la maniobra 1');
   else{const sv=served(P);h+=`<div class="sum">${P.done==1?'Maniobra 1 ejecutada':'Maniobra 2 ejecutada'} · Restablecido <span class="pct">${f1(pc(P,sv))}</span> (${km(sv)} de ${km(P.aff)} km afectados)${P.done==2?` · tras la maniobra 1: ${f1(P.pct1)}`:''}</div>`+demTxt(P,sv,'restablecidos')}}
@@ -504,20 +547,20 @@ function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:
   pts.forEach(p=>{if(p.t=='ENL'&&p.st&&p.n>=0&&p.n2>=0)L.polyline([N[p.n].p,N[p.n2].p],{color:'#3ddc84',weight:3,dashArray:'4 6'}).addTo(ov)});
   L.polyline(segs(rd),RED).addTo(ov)}
  L.marker(P.f.p,{icon:L.divIcon({className:'',html:'<div class="fl">⚡</div>',iconSize:[30,30],iconAnchor:[15,15]})}).addTo(ov)}
-function exec2(){const P=plan,d=recDiff(P);P.rec.S2=recSteps(d);
+function exec2(){const P=plan,d=recDiff(P),snap2=pts.map(p=>[p,p.st]);P.rec.S2=recSteps(d);
  d.ab.forEach(p=>{p.st=0;log('ABRIR '+p.name+(p.t=='DR'?' (puentes del Anclaje Doble)':''))});d.ce.forEach(p=>{p.st=1;log('CERRAR '+p.name)});
- P.done=2;P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pc(P,served(P)))+demL(P,served(P)))}
+ {const r=XF.find(x=>x.id==P.xid);if(r){r.chg.push(...stDiff(snap2));d.ce.filter(p=>p.t=='ENL').forEach(p=>r.tr.push({e:p.name,de:p.cn,a:p.cn2,km:0,amb:1}));xfSave();xfList()}}P.done=2;P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pc(P,served(P)))+demL(P,served(P)))}
 function doBx(){const P=plan;if(!P||!P.Bl)return log('⚠ Marque primero un punto de falla');
  if(P.done==1){if(P.rec&&P.rec.Q)return exec2();return log('No hay una maniobra adicional recomendada')}
  if(P.done)return log('La maniobra ya fue ejecutada; use Normalizar para volver al estado normal');
  prevSt=pts.map(p=>[p,p.st]);log('DISPARO automático '+P.trip.name);P.Bl.forEach(p=>{p.st=0;log('ABRIR '+p.name)});
  if(P.reclose)log('CERRAR '+P.trip.name+' (reposición aguas arriba)');
  P.isl.forEach(i=>{if(i.t){i.t.p.st=1;log('CERRAR '+i.t.p.name+' · '+km(i.l)+' km transferidos')}});
- P.done=1;P.pct1=pc(P,served(P));if(P.rec&&P.rec.Q)P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 1 ejecutada · restablecimiento '+f1(P.pct1)+demL(P,served(P)))}
+ xfAdd(P,prevSt);P.done=1;P.pct1=pc(P,served(P));if(P.rec&&P.rec.Q)P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 1 ejecutada · restablecimiento '+f1(P.pct1)+demL(P,served(P)))}
 $('#dx').onchange=async e=>{if(e.target.files[0])await loadDem(e.target.files[0]);e.target.value=''};
 try{const sv=localStorage.getItem('gc_dem');setDem(sv?JSON.parse(sv):DEM0,false)}catch(e){setDem(DEM0,false)}
 $('#bx').onclick=()=>{try{doBx()}catch(e){log('⚠ Error en la maniobra: '+e.message);console.error(e)}};
-$('#bn').onclick=()=>{if(prevSt){prevSt.forEach(([p,s])=>p.st=s);prevSt=null;log('Estado normal restablecido')}clearPlan();save()};
+$('#bn').onclick=()=>{if(XF.length){const s=xfAll();prevSt=null;log('Estado normal restablecido: transferencias normalizadas'+(s?' · ⚠ '+s+' equipo(s) ya habían cambiado y se dejaron como están':''))}else if(prevSt){prevSt.forEach(([p,s])=>p.st=s);prevSt=null;log('Estado normal restablecido')}clearPlan();save();xfList()};
 function clearPlan(){plan=null;hl=new Map();ov.clearLayers();$('#pl').innerHTML='';$('#bx').textContent='Ejecutar maniobra 1';pts.forEach(mk)}
 list();cnt();
 
@@ -533,11 +576,11 @@ $('#sqi').oninput=function(){const v=this.value.trim().toLowerCase(),r=$('#sqr')
 /* respaldo completo en un archivo */
 const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 $('#bk').onclick=async()=>{try{const files=[];for(const k of['c','s'])for(const c of arr(k))if(c.blob)files.push({k,name:c.name,kmz:c.kmz,b:await b64(c.blob)});
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files,dem:DEMR})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files,dem:DEMR,xf:XF})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
  try{localStorage.setItem('gc_bk',Date.now())}catch(e){}toast('Respaldo guardado: '+pts.length+' equipos y '+files.length+' KMZ')}catch(e){log('⚠ No se pudo crear el respaldo')}};
 $('#br').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let d;try{d=JSON.parse(await f.text());if(!d.gridctrl)throw 0}catch(x){return log('⚠ El archivo no es un respaldo de SECC-M')}
  if(!confirm('Restaurar reemplazará los equipos y cruces actuales. ¿Continuar?'))return;
- loadPts(d.pts||[]);save();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();if(Array.isArray(d.dem)&&d.dem.length)setDem(d.dem,true);
+ loadPts(d.pts||[]);save();XF=Array.isArray(d.xf)?d.xf:[];xfSave();xfList();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();if(Array.isArray(d.dem)&&d.dem.length)setDem(d.dem,true);
  for(const x of d.files||[]){if(arr(x.k).some(c=>c.name==x.name))continue;await ingest(new File([Uint8Array.from(atob(x.b),ch=>ch.charCodeAt(0))],x.name+(x.kmz?'.kmz':'.kml')),x.k)}
  list();resolveLinks(1);clearPlan();fitAll();toast('Respaldo restaurado')};
 setTimeout(()=>{try{if(pts.length&&Date.now()-(+localStorage.getItem('gc_bk')||0)>7*864e5)toast('💾 Sin respaldo reciente de sus datos','Respaldar',()=>$('#bk').click())}catch(e){}},6000);
@@ -589,7 +632,7 @@ var ins=null; /* estado de la inspección (se declara aquí para que exista siem
   if(!circ.some(c=>c.on)){toast('Cargue y active al menos un circuito para marcar una falla');return}
   const go=()=>{runFault(q);if(!plan){toast('No hay una línea de circuito a menos de 200 m de ese punto: mantenga pulsado sobre la línea');return}
    window.openSec&&window.openSec('Falla')};
-  if(plan&&plan.done){toast('Hay una maniobra ejecutada. ¿Normalizar y marcar la nueva falla aquí?','Normalizar y marcar',()=>{$('#bn').click();go()});return}
+  if(plan&&plan.done)log('La transferencia anterior sigue activa: pulse Normalizar cuando el circuito vuelva a su estado normal');
   go()};
  /* aviso de ayuda la primera vez (ya no hay botón «Marcar punto de falla») */
  setTimeout(()=>{try{if(!localStorage.getItem('gc_lp')&&circ.length){localStorage.setItem('gc_lp','1');toast('💡 Para marcar una falla, mantenga pulsado el punto sobre la línea del circuito')}}catch(e){}},5000);
@@ -753,12 +796,13 @@ ${S.pe?'':'<small class="h">ℹ Sin protección, el navegador puede borrar los d
   try{const e=await navigator.storage.estimate();S.use=e.usage}catch(e){}
   /* si el almacenamiento principal quedó vacío, se recupera de la copia interna */
   const rs=[],get=async k=>{try{const r=await kvDo('get',k);return r&&r.v&&r.v.length?r.v:null}catch(e){return null}};
-  const kp=await get('pts'),kf=await get('flows'),kd=await get('dem');
+  const kp=await get('pts'),kf=await get('flows'),kd=await get('dem'),kx=await get('xf');
   if(!pts.length&&kp)try{loadPts(kp);save();rs.push(pts.length+' equipos')}catch(e){log('⚠ No se pudieron recuperar los equipos: '+e.message)}
   if(!flows.length&&kf)try{flows=kf;fseq=Math.max(0,...flows.map(f=>f.id||0));saveF();redrawF();rs.push(flows.length+' cruces')}catch(e){log('⚠ No se pudieron recuperar los cruces: '+e.message)}
   if(!DEM.size&&kd)try{setDem(kd,true);rs.push('tabla de '+kd.length+' circuitos')}catch(e){log('⚠ No se pudo recuperar la tabla: '+e.message)}
+  if(!XF.length&&kx)try{XF=kx;xfSave();xfList();rs.push(XF.length+' transferencias activas')}catch(e){log('⚠ No se pudieron recuperar las transferencias: '+e.message)}
   if(rs.length){try{resolveLinks();clearPlan()}catch(e){}toast('♻ Datos recuperados de la copia interna: '+rs.join(', '));log('♻ Recuperado de la copia interna: '+rs.join(', '))}
-  try{if(pts.length)kvSet('pts',pts.map(ser));if(flows.length)kvSet('flows',flows);if(DEMR.length)kvSet('dem',DEMR)}catch(e){}
+  try{if(pts.length)kvSet('pts',pts.map(ser));if(flows.length)kvSet('flows',flows);if(DEMR.length)kvSet('dem',DEMR);if(XF.length)kvSet('xf',XF)}catch(e){}
   ui();
   if(!S.ls||!S.idb)toast('⚠ El navegador no está guardando todos sus datos. Revise «Guardado en este dispositivo» en el panel.');
   log('Guardado: principal '+(S.ls?'sí':'NO')+' · copia interna '+(S.idb?'sí':'NO')+' · protegido '+(S.pe?'sí':'no')+' · '+(stand?'app instalada':'navegador'));
