@@ -122,8 +122,8 @@ section{margin-bottom:6px}
 <label class="btn">Cargar tabla (.xlsx o .csv)<input id="dx" type="file" accept=".xlsx,.csv" hidden></label><div id="dl"></div></section>
 <section><h2>Falla y maniobra</h2>
 <small class="h" style="margin:0 0 6px">⚡ Para marcar una <b>falla</b>, <b>mantenga pulsado</b> el punto sobre la línea del circuito (o sobre un equipo). Después pulse «Ejecutar maniobra 1».</small><div id="pl"></div>
-<div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn" title="Regresa todos los equipos al estado normal y borra las transferencias activas">Normalizar todo</button></div></section>
-<section id="xs"><h2>Transferencias activas <b id="xn"></b></h2><div id="xl2"></div><small class="h">Al ejecutar una maniobra, el tramo transferido pasa a ser parte del circuito huésped (cuenta sus usuarios y demanda) y se queda así, también al cerrar y reabrir la app, hasta que pulse «Normalizar» en esa transferencia o «Normalizar todo».</small></section>
+<div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn" title="Normaliza solo las maniobras calculadas al marcar una falla; no afecta a las secciones transferidas">Normalizar</button></div></section>
+<section id="xs"><h2>Transferencias activas <b id="xn"></b></h2><div id="xl2"></div><small class="h">Aquí aparece todo tramo que hoy alimenta otro circuito por un enlace cerrado, ya sea por una maniobra calculada o manual (abrir un seccionamiento y cerrar un enlace). Se conserva, también al reabrir la app, aunque marque otra falla en el trayecto restante de su circuito, hasta que pulse «Normalizar» en esa transferencia. Si la falla queda en el circuito huésped y deja sin servicio al tramo transferido, el análisis propone normalizarla (abrir el enlace y cerrar el seccionamiento). El botón «Normalizar» de arriba no toca estas transferencias.</small></section>
 <section><h2>Guardado en este dispositivo</h2><div id="stg" class="stg"></div></section>
 <section><h2>Bitácora</h2><div id="log"></div></section>
 </aside><div id="map"></div>
@@ -152,7 +152,7 @@ window.initGM=()=>{try{gR=L.gridLayer.googleMutant({type:'roadmap',maxZoom:21});
 if(L.gridLayer.googleMutant){const g=document.createElement('script');g.src='https://maps.googleapis.com/maps/api/js?key='+GMAPS_KEY+'&callback=initGM';g.async=true;g.onerror=()=>gOff('No cargó Google Maps (¿sin conexión?)');document.head.appendChild(g)}else setTimeout(()=>gOff('No cargó el complemento de Google Maps'),0);
 let tileWarn=0;[calles,carto,sat].forEach(t=>t.on('tileerror',()=>{if(!tileWarn++)log('⚠ No cargan los mosaicos del mapa: revise su conexión o cambie de capa (control arriba a la derecha)')}));
 let circ=[],pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0;
-let XF=[]; /* transferencias y maniobras activas: se guardan en el dispositivo hasta que se normalicen a mano */
+let XF=[],XT=[],xfPrev=null,xfTm=0,QUIET=0; /* XF: maniobras calculadas activas (se guardan en el dispositivo); XT: transferencias activas detectadas por la topología */
 const ov=L.layerGroup().addTo(map),st=p=>ovr&&ovr.has(p)?ovr.get(p):p.st,km=m=>(m/1000).toFixed(2);
 /* ---------- Usuarios y demandas por circuito (ligados por nombre al interruptor) ---------- */
 const DEM0=[]; /* versión web: la tabla de usuarios y demandas NO va incluida; se carga en cada dispositivo con «Cargar tabla» */
@@ -272,25 +272,52 @@ function del(id){const p=byId(id);if(mv&&mv.p===p)mvCancel(1);const o=ser(p);p.m
 function ren(id,el){const p=byId(id);p.name=el.value.trim()||'s/n';el.value=p.name;save();mk(p);dlist();if(!el.closest('#ptl'))plist()}
 function loadPts(a){try{mvCancel(1)}catch(e){}pts.forEach(p=>{p.m&&p.m.remove();p.g&&p.g.remove()});pts=[];a.map(o=>({...o,t:o.t=='SP'?'RES':o.t})).filter(o=>T[o.t]).forEach(addPt);cnt()}
 /*XF-INI*/
-/* ---------- Transferencias y maniobras activas: se conservan al reabrir hasta que se normalicen a mano ---------- */
+/* ---------- Transferencias activas (se detectan por la topología, también las manuales) y maniobras calculadas ---------- */
 const ptU=u=>pts.find(p=>p.u===u),xfSave=()=>{try{localStorage.setItem('gc_xf',JSON.stringify(XF))}catch(e){}kvSet('xf',XF)},
- stDiff=snap=>snap.map(([p,s])=>p.st!==s?[p.u,s,p.st]:null).filter(Boolean),
- xfTit=r=>(r.eq||'Maniobra')+' · '+new Date(r.t).toLocaleString('es-MX',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-/* estado normal = estado actual con todos los cambios de las transferencias deshechos (solo en memoria) */
-function xfNormal(){const w=new Map(pts.map(p=>[p,p.st]));[...XF].reverse().forEach(r=>[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(p&&w.get(p)===c[2])w.set(p,c[1])}));return w}
-function xfAdd(P,snap){const N=G.N,tr=P.isl.filter(i=>i.t).map(i=>({e:i.t.p.name,de:circ[N[[...i.S][0]].c].name,a:cn(i.t.o),km:+(i.l/1000).toFixed(2)}));
- const r={id:Date.now(),t:Date.now(),fp:P.f.p,eq:P.trip.name,fc:cn(P.f.F),tr,chg:stDiff(snap)};XF.push(r);P.xid=r.id;xfSave();xfList()}
-function xfRevert(r){let s=0;[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(!p)return;if(p.st===c[2]){p.st=c[1];log((c[1]?'CERRAR ':'ABRIR ')+p.name+' (normalizar)')}else s++});XF=XF.filter(x=>x!==r);return s}
-function xfRev(id){const r=XF.find(x=>x.id==id);if(!r)return;const s=xfRevert(r);prevSt=null;xfSave();save();clearPlan();xfList();log('Normalizado: '+xfTit(r)+(s?' · ⚠ '+s+' equipo(s) ya habían cambiado y se dejaron como están':''))}
-function xfAll(){let s=0;[...XF].reverse().forEach(r=>{s+=xfRevert(r)});XF=[];xfSave();return s}
-function xfGo(id){const r=XF.find(x=>x.id==id);if(r&&r.fp){if(innerWidth<=800){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}map.setView(r.fp,Math.max(map.getZoom(),16))}}
-function xfList(){const e=$('#xl2');if(!e)return;$('#xn').textContent=XF.length||'';
- e.innerHTML=XF.length?XF.map(r=>`<div class="xr"><div><b>${esc(xfTit(r))}</b><small>${r.tr&&r.tr.length?r.tr.map(t=>esc(t.amb?`${t.e} (${t.de} ↔ ${t.a})`:`${t.km} km de ${t.de} → ${t.a} · enlace ${t.e}`)).join('<br>'):'Sin transferencia entre circuitos'}<br>Falla en ${esc(r.fc||'')}</small></div><button onclick="xfGo(${r.id})" title="Ir a la falla">⌖</button><button onclick="xfRev(${r.id})">Normalizar</button></div>`).join(''):'<small class="h">Sin transferencias activas: todos los circuitos están en estado normal.</small>'}
+ stDiff=snap=>snap.map(([p,s])=>p.st!==s?[p.u,s,p.st]:null).filter(Boolean),BOOT=Date.now();
+/* tramo de un circuito que hoy alimenta otro circuito por un enlace cerrado: se detecta solo, sea la maniobra manual o calculada */
+function transfers(E){E=E||energized();const N=G.N,out=[],seen=new Set(),
+  isT=n=>{if(!E.has(n))return false;const w=N[n].sw;if(w&&!st(w))return false;return N[E.get(n).n].c!==N[n].c};
+ E.forEach((h0,n0)=>{if(seen.has(n0)||!isT(n0))return;const S=new Set([n0]),q=[n0];seen.add(n0);
+  while(q.length){const n=q.pop();for(const e of N[n].adj){if(e.d||e.tie)continue;const m=nb(n,e);if(seen.has(m)||E.get(m)!==h0||!isT(m))continue;seen.add(m);S.add(m);q.push(m)}}
+  const from=N[n0].c,ties=pts.filter(p=>p.t=='ENL'&&p.n>=0&&p.n2>=0&&st(p)&&(S.has(p.n)!==S.has(p.n2)));
+  if(!ties.length)return;
+  /* equipos abiertos que separan el tramo de su circuito de origen (cerrarlos lo regresa a su circuito) */
+  const ret=pts.filter(p=>p.t!='ENL'&&!T[p.t].sv&&p.n>=0&&!st(p)&&(()=>{const ms=N[p.n].adj.filter(e=>!e.d&&!e.tie).map(e=>nb(p.n,e));return ms.some(m=>S.has(m))&&ms.some(m=>!S.has(m)&&N[m].c===from)})());
+  out.push({S,from,host:h0,l:len(S),ties,ret,fromName:circ[from].name,to:cn(h0.n),at:[ties[0].lat,ties[0].lng],key:circ[from].name+'>'+cn(h0.n)+'|'+ties.map(p=>p.name).sort().join(',')})});
+ return out}
+/* estado normal de las transferencias (solo en memoria): enlaces abiertos y seccionamientos de regreso cerrados */
+const trNormal=trs=>{const w=new Map();trs.forEach(t=>{t.ties.forEach(p=>w.set(p,0));t.ret.forEach(p=>w.set(p,1))});return w};
+const ensureG=()=>{if(plan||(typeof ins!=='undefined'&&ins))return;QUIET=1;try{attach()}finally{QUIET=0}};
+function xfRefresh(){clearTimeout(xfTm);xfTm=setTimeout(()=>{try{
+  if(!circ.some(c=>c.on)||!pts.length){XT=[];xfList();return}
+  ensureG();XT=transfers();
+  if(xfPrev&&Date.now()-BOOT>20000){const nw=XT.filter(t=>!xfPrev.has(t.key));
+   nw.forEach(t=>log('🔁 Transferencia activa detectada: '+t.fromName+' → '+t.to+' · '+km(t.l)+' km (enlace '+t.ties.map(p=>p.name).join(', ')+')'));
+   if(nw.length)toast('🔁 Transferencia activa: '+nw.map(t=>t.fromName+' → '+t.to+' · '+km(t.l)+' km').join('; '))}
+  xfPrev=new Set(XT.map(t=>t.key));xfList()}catch(e){console.error(e)}},300)}
+const xfBoot=setInterval(()=>{if(xfPrev)clearInterval(xfBoot);else xfRefresh()},2500);
+function xfGo(k){const t=XT.find(x=>x.key==k);if(t&&t.at){if(innerWidth<=800){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}map.setView(t.at,Math.max(map.getZoom(),16))}}
+/* normalizar una transferencia: abrir su enlace y cerrar el seccionamiento que la regresa a su circuito */
+function trRev(k){ensureG();const t=transfers().find(x=>x.key==k);if(!t)return xfRefresh();
+ if(!t.ret.length)return toast('No hay un seccionamiento abierto que regrese ese tramo a su circuito: opere el equipo manualmente');
+ t.ties.forEach(p=>{p.st=0;log('ABRIR '+p.name+' (normalizar transferencia)')});t.ret.forEach(p=>{p.st=1;log('CERRAR '+p.name+' (normalizar transferencia)')});
+ save();clearPlan();log('Transferencia normalizada: '+t.fromName+' recupera '+km(t.l)+' km')}
+function xfList(){const e=$('#xl2');if(!e)return;$('#xn').textContent=XT.length||'';
+ const m=XF.length?`<small class="h">Maniobras calculadas activas: ${XF.length}. El botón «Normalizar» las deshace; las transferencias no se tocan.</small>`:'';
+ e.innerHTML=(XT.length?XT.map(t=>`<div class="xr"><div><b>${esc(t.fromName)} → ${esc(t.to)}</b> · ${km(t.l)} km<small>Enlace ${esc(t.ties.map(p=>p.name).join(', '))}${t.ret.length?' · seccionamiento abierto: '+esc(t.ret.map(p=>p.name).join(', ')):''}</small></div><button data-a="go" data-k="${esc(t.key)}" title="Ir al enlace">⌖</button><button data-a="rev" data-k="${esc(t.key)}">Normalizar</button></div>`).join(''):'<small class="h">Sin transferencias activas: todos los circuitos están en su estado normal.</small>')+m}
+if($('#xl2'))$('#xl2').addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b)return;b.dataset.a=='rev'?trRev(b.dataset.k):xfGo(b.dataset.k)});
+/* maniobras calculadas (las de «Ejecutar maniobra»): se guardan para poder normalizarlas, aun al reabrir la app */
+function xfAdd(P,snap){const r={id:Date.now(),t:Date.now(),fp:P.f.p,eq:P.trip.name,fc:cn(P.f.F),chg:stDiff(snap),keep:P.isl.filter(i=>i.t).flatMap(i=>[i.t.p.u,...(i.t.norm?i.t.norm.ties.map(e=>e.u):[])])};XF.push(r);P.xid=r.id;xfSave();xfRefresh()}
+const protPts=()=>{const s=new Set();try{transfers().forEach(t=>{t.ties.forEach(p=>s.add(p));t.ret.forEach(p=>s.add(p))})}catch(e){}return s};
+function xfRevert(r,prot){let s=0,k=0;const kp=new Set(r.keep||[]);[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(!p)return;if(prot.has(p)||kp.has(c[0])){k++;return}if(p.st===c[2]){p.st=c[1];log((c[1]?'CERRAR ':'ABRIR ')+p.name+' (normalizar)')}else s++});XF=XF.filter(x=>x!==r);return{s,k}}
+function xfAll(){ensureG();const prot=protPts();let s=0,k=0;[...XF].reverse().forEach(r=>{const x=xfRevert(r,prot);s+=x.s;k+=x.k});XF=[];xfSave();return{s,k}}
 /*XF-FIN*/
 /*HD-INI*/
 /* usuarios y demanda del circuito huésped: su propia carga + la de los tramos que le fueron transferidos (cada tramo con la densidad de su circuito de origen) */
-function hostDem(src,comp){const d0=DEM.get(dkey(src.name));if(!d0||!XF.length)return d0||null;
- try{const o=ovr;ovr=xfNormal();let E0;try{E0=energized()}finally{ovr=o}
+function hostDem(src,comp,trs){const d0=DEM.get(dkey(src.name));if(!d0)return null;
+ try{trs=trs||transfers();if(!trs.length)return d0;
+  const o=ovr;ovr=trNormal(trs);let E0;try{E0=energized()}finally{ovr=o}
   const N=G.N,L0=new Map(),cur=new Map(),C=new Set(comp.keys());
   E0.forEach((p,n)=>{for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&E0.has(e.b))L0.set(p,(L0.get(p)||0)+e.l)});
   C.forEach(n=>{const p=E0.get(n)||src;for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&C.has(e.b))cur.set(p,(cur.get(p)||0)+e.l)});
@@ -454,7 +481,7 @@ function attach(){G=build();const w=[];applyFlows(w);pts.forEach(p=>{p.n=-1});
    a=nearIn(q,ca);b=nearIn(q,cb);if(a<0||b<0)return w.push(p.name+' (enlace): no hay línea de '+(a<0?p.cn:p.cn2)+' a menos de 80 m')}
   else{a=near(q,-1);if(a<0)return w.push(p.name+' sin circuito cercano');b=near(q,G.N[a].c);if(b<0)return w.push(p.name+' sin segundo circuito cercano');p.cn=circ[G.N[a].c].name;p.cn2=circ[G.N[b].c].name;p.au=1;save()}
   p.n=a;p.n2=b;const e={a,b,l:0,tie:p};G.N[a].adj.push(e);G.N[b].adj.push(e)});
- w.forEach(x=>log('⚠ '+x))}
+ w.forEach(x=>QUIET||log('⚠ '+x))}
 const nb=(n,e)=>e.a==n?e.b:e.a,cn=n=>circ[G.N[n].c].name;
 function walk(s,S,p,par){const q=[s];S.set(s,p);while(q.length){const n=q.pop();for(const e of G.N[n].adj){if(e.d||(e.tie&&!st(e.tie)))continue;const m=nb(n,e);if(S.has(m))continue;S.set(m,p);par&&par.set(m,n);const w=G.N[m].sw;if(w&&!st(w))continue;q.push(m)}}}
 /* longitud sin servicio incluyendo los tramos que tocan los anclajes dobles/seccionadores (comparación justa al decidir usar Anclaje Doble) */
@@ -469,7 +496,7 @@ function analyze(q,u){DRU=u;clearPlan();
  attach();ovr=null;const f=locate(q,200);if(!f)return log('⚠ La falla debe marcarse sobre una línea (máx. 200 m)');
  const F=split(f),N=G.N;f.F=F;const pre=energized(),src=pre.get(F);
  if(!src){plan={f,Z:new Set([F]),B:new Set(),isl:[],steps:[['ALERTA','El tramo con falla no está energizado por ningún interruptor cerrado. Verifique que el circuito tenga un interruptor (I) cerrado a menos de 80 m de su línea.']]};return show()}
- const flood=U=>{const Z=new Set([F]),B=new Set(),qq=[F];
+ const trs=transfers(pre),flood=U=>{const Z=new Set([F]),B=new Set(),qq=[F];
  while(qq.length){const n=qq.pop();for(const x of N[n].adj){if(x.d)continue;if(x.tie){if(st(x.tie))B.add(x.tie);continue}
   const m=nb(n,x);if(Z.has(m))continue;const w=N[m].sw;if(w&&!(w.t=='DR'&&st(w)&&!U.has(w))){if(st(w))B.add(w);continue}Z.add(m);qq.push(m)}}return[Z,B]};
  /* Z = zona en falla (entre los anclajes dobles abiertos); Z0 = tramo de línea completo afectado (anclajes dobles sin abrir) */
@@ -485,7 +512,10 @@ function analyze(q,u){DRU=u;clearPlan();
  lost.forEach(s=>{if(seen.has(s))return;const S=new Set([s]),a=[s];seen.add(s);
   while(a.length){const n=a.pop();for(const x of N[n].adj){if(x.d||x.tie)continue;const m=nb(n,x);if(!lost.has(m)||seen.has(m))continue;seen.add(m);S.add(m);a.push(m)}}
   const l=len(S);if(l>0){const cand=[];pts.forEach(p=>{if(p.t!='ENL'||st(p)||p.n<0)return;const a1=S.has(p.n),b1=S.has(p.n2);if(a1==b1)return;const o=a1?p.n2:p.n;
-    if(post.has(o)&&!Z.has(o))cand.push({p,o,d:dist([p.lat,p.lng],f.p)})});cand.sort((x,y)=>x.d-y.d);isl.push({S,l,cand,t:cand[0]})}});
+    if(post.has(o)&&!Z.has(o))cand.push({p,o,d:dist([p.lat,p.lng],f.p)})});
+   /* normalizar una transferencia activa: si el tramo transferido queda sin servicio, se considera regresarlo a su circuito de origen (abrir el enlace y cerrar el seccionamiento) */
+   trs.forEach(T0=>{if(![...T0.S].some(n=>S.has(n)))return;T0.ret.forEach(p=>{const ms=N[p.n].adj.filter(e=>!e.d&&!e.tie).map(e=>nb(p.n,e)),o=ms.find(m=>!S.has(m)&&post.has(m)&&!Z.has(m)&&N[m].c===T0.from);if(o!==undefined&&ms.some(m=>S.has(m)))cand.push({p,o,d:-1,norm:T0})})});
+   cand.sort((x,y)=>x.d-y.d);isl.push({S,l,cand,t:cand[0]})}});
  const Bl=[...B].sort((a,b)=>(rkp(a)-rkp(b))||dist([a.lat,a.lng],f.p)-dist([b.lat,b.lng],f.p)),reclose=!B.has(trip),steps=[];
  steps.push(['VERIF',`Disparó automáticamente ${trip.name} (${cn(trip.n)}). Falla en ${cn(F)}; zona a aislar: ${km(len(Z))} km.`]);
  if(swSkip.length)steps.push(['VERIF',`${swSkip.join(', ')}: en Modo Switch, no opera automáticamente ante esta falla; se usa como seccionador y dispara ${trip.name}.`]);
@@ -493,12 +523,14 @@ function analyze(q,u){DRU=u;clearPlan();
  if(Z0.size>Z.size)steps.push(['VERIF',`Tramo de línea afectado por completo: ${km(len(Z0))} km (antes, en y después de la falla). Se marca como normal hasta que los anclajes dobles estén abiertos y el restaurador/alimentador y el enlace estén cerrados para recuperar las cargas de antes y después del punto de falla.`]);
  Bl.filter(p=>p!=trip).forEach(p=>steps.push(['ABRIR',`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}${p.t=='DR'?' · abrir la línea (ÚLTIMO RECURSO): queda sin servicio el área delante de él':''}`]));
  if(reclose)steps.push(['CERRAR',`${trip.name} · repone ${km(len(up))} km aguas arriba de la falla`]);
- isl.forEach(i=>steps.push(i.t?['CERRAR',`${i.t.p.name} · transfiere ${km(i.l)} km a ${cn(i.t.o)}${i.cand.length>1?' (alternos: '+i.cand.slice(1).map(c=>c.p.name).join(', ')+')':''}. Verifique que ese circuito soporte la carga.`]:['ALERTA',`Sin enlace de respaldo: ${km(i.l)} km quedan sin servicio.`]));
+ isl.forEach(i=>{if(i.t&&i.t.norm){const T0=i.t.norm;T0.ties.filter(e=>!B.has(e)).forEach(e=>steps.push(['ABRIR',`${e.name} · enlace ${cn(e.n)} – ${cn(e.n2)} · normaliza la transferencia`]));
+  steps.push(['CERRAR',`${i.t.p.name} · normaliza la transferencia: regresa ${km(T0.l)} km a ${T0.fromName} (la falla deja sin servicio al tramo que alimentaba ${T0.to}). Verifique que ${T0.fromName} soporte la carga.`])}
+ else steps.push(i.t?['CERRAR',`${i.t.p.name} · transfiere ${km(i.l)} km a ${cn(i.t.o)}${i.cand.length>1?' (alternos: '+i.cand.slice(1).map(c=>c.p.name).join(', ')+')':''}. Verifique que ese circuito soporte la carga.`]:['ALERTA',`Sin enlace de respaldo: ${km(i.l)} km quedan sin servicio.`])});
  /* restablecimiento previsto (por longitud de línea): estado final = aperturas + enlaces elegidos */
- ovr=new Map([...B].map(p=>[p,0]));isl.forEach(i=>i.t&&ovr.set(i.t.p,1));
+ ovr=new Map([...B].map(p=>[p,0]));isl.forEach(i=>{if(i.t){ovr.set(i.t.p,1);i.t.norm&&i.t.norm.ties.forEach(e=>ovr.set(e,0))}});
  const Ef=energized(),tgt=new Map(ovr),aff=len(dn),rest=len(new Set([...dn].filter(n=>Ef.has(n))));
- ovr=null;plan={f,Z,Z0,B,Bl,trip,reclose,isl,steps,dn,aff,rest,src,hd:hostDem(src,comp),Lc:len(new Set(comp.keys())),pct:aff?100*rest/aff:100,tgt,lostKm:isl.reduce((s,i)=>s+i.l,0),noBk:isl.filter(i=>!i.t).reduce((s,i)=>s+i.l,0)};
- Bl.forEach(p=>hl.set(p,'ab'));if(reclose)hl.set(trip,'ce');isl.forEach(i=>i.t&&hl.set(i.t.p,'ce'));
+ ovr=null;plan={f,Z,Z0,B,Bl,trip,reclose,isl,steps,dn,aff,rest,src,hd:hostDem(src,comp,trs),Lc:len(new Set(comp.keys())),pct:aff?100*rest/aff:100,tgt,lostKm:isl.reduce((s,i)=>s+i.l,0),noBk:isl.filter(i=>!i.t).reduce((s,i)=>s+i.l,0)};
+ Bl.forEach(p=>hl.set(p,'ab'));if(reclose)hl.set(trip,'ce');isl.forEach(i=>{if(i.t){hl.set(i.t.p,'ce');i.t.norm&&i.t.norm.ties.forEach(e=>hl.set(e,'ab'))}});
  pts.forEach(mk);plan.un=ex(Z)+isl.filter(i=>!i.t).reduce((t,i)=>t+ex(i.S),0);return plan}
 /* Maniobra 1: restauradores y seccionamiento. Maniobra 2 (recomendada): abrir puentes en Anclajes Dobles para recuperar más carga. */
 function runFault0(q){const P=analyze(q,new Set());if(!plan)return;let rec=null;
@@ -535,7 +567,7 @@ function panel(){const P=plan,rec=P.rec,Q=rec&&rec.Q;let h='';
  $('#pl').innerHTML=h;$('#bx').textContent=P.done==1&&Q?'Ejecutar maniobra 2 · Anclaje Doble':P.done?'Maniobra ejecutada':'Ejecutar maniobra 1'}
 function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:7,opacity:.95};
  if(!P.done){
-  P.isl.forEach(i=>{L.polyline(segs(i.S),{color:'#ffa657',weight:6,dashArray:'8 8'}).addTo(ov);if(i.t)L.polyline([N[i.t.p.n].p,N[i.t.p.n2].p],{color:'#3ddc84',weight:3,dashArray:'4 6'}).addTo(ov)});
+  P.isl.forEach(i=>{L.polyline(segs(i.S),{color:'#ffa657',weight:6,dashArray:'8 8'}).addTo(ov);if(i.t&&i.t.p.t=='ENL')L.polyline([N[i.t.p.n].p,N[i.t.p.n2].p],{color:'#3ddc84',weight:3,dashArray:'4 6'}).addTo(ov)});
   L.polyline(segs(P.Z),RED).addTo(ov)
  }else{
   /* rojo: sin servicio dentro del tramo; naranja: sin servicio por maniobra fuera del tramo; verde: servido por otro circuito (transferencia) */
@@ -549,19 +581,22 @@ function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:
  L.marker(P.f.p,{icon:L.divIcon({className:'',html:'<div class="fl">⚡</div>',iconSize:[30,30],iconAnchor:[15,15]})}).addTo(ov)}
 function exec2(){const P=plan,d=recDiff(P),snap2=pts.map(p=>[p,p.st]);P.rec.S2=recSteps(d);
  d.ab.forEach(p=>{p.st=0;log('ABRIR '+p.name+(p.t=='DR'?' (puentes del Anclaje Doble)':''))});d.ce.forEach(p=>{p.st=1;log('CERRAR '+p.name)});
- {const r=XF.find(x=>x.id==P.xid);if(r){r.chg.push(...stDiff(snap2));d.ce.filter(p=>p.t=='ENL').forEach(p=>r.tr.push({e:p.name,de:p.cn,a:p.cn2,km:0,amb:1}));xfSave();xfList()}}P.done=2;P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pc(P,served(P)))+demL(P,served(P)))}
+ {const r=XF.find(x=>x.id==P.xid);if(r){r.chg.push(...stDiff(snap2));d.ce.filter(p=>p.t=='ENL').forEach(p=>(r.keep||(r.keep=[])).push(p.u));xfSave();xfRefresh()}}P.done=2;P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pc(P,served(P)))+demL(P,served(P)))}
 function doBx(){const P=plan;if(!P||!P.Bl)return log('⚠ Marque primero un punto de falla');
  if(P.done==1){if(P.rec&&P.rec.Q)return exec2();return log('No hay una maniobra adicional recomendada')}
  if(P.done)return log('La maniobra ya fue ejecutada; use Normalizar para volver al estado normal');
  prevSt=pts.map(p=>[p,p.st]);log('DISPARO automático '+P.trip.name);P.Bl.forEach(p=>{p.st=0;log('ABRIR '+p.name)});
  if(P.reclose)log('CERRAR '+P.trip.name+' (reposición aguas arriba)');
- P.isl.forEach(i=>{if(i.t){i.t.p.st=1;log('CERRAR '+i.t.p.name+' · '+km(i.l)+' km transferidos')}});
+ P.isl.forEach(i=>{if(i.t){if(i.t.norm)i.t.norm.ties.forEach(e=>{if(e.st){e.st=0;log('ABRIR '+e.name+' (normaliza la transferencia)')}});i.t.p.st=1;log('CERRAR '+i.t.p.name+' · '+km(i.l)+(i.t.norm?' km · transferencia normalizada':' km transferidos'))}});
  xfAdd(P,prevSt);P.done=1;P.pct1=pc(P,served(P));if(P.rec&&P.rec.Q)P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 1 ejecutada · restablecimiento '+f1(P.pct1)+demL(P,served(P)))}
 $('#dx').onchange=async e=>{if(e.target.files[0])await loadDem(e.target.files[0]);e.target.value=''};
 try{const sv=localStorage.getItem('gc_dem');setDem(sv?JSON.parse(sv):DEM0,false)}catch(e){setDem(DEM0,false)}
 $('#bx').onclick=()=>{try{doBx()}catch(e){log('⚠ Error en la maniobra: '+e.message);console.error(e)}};
-$('#bn').onclick=()=>{if(XF.length){const s=xfAll();prevSt=null;log('Estado normal restablecido: transferencias normalizadas'+(s?' · ⚠ '+s+' equipo(s) ya habían cambiado y se dejaron como están':''))}else if(prevSt){prevSt.forEach(([p,s])=>p.st=s);prevSt=null;log('Estado normal restablecido')}clearPlan();save();xfList()};
-function clearPlan(){plan=null;hl=new Map();ov.clearLayers();$('#pl').innerHTML='';$('#bx').textContent='Ejecutar maniobra 1';pts.forEach(mk)}
+$('#bn').onclick=()=>{/* solo maniobras calculadas: las secciones transferidas no se tocan */
+ if(XF.length){const x=xfAll();prevSt=null;log('Maniobras calculadas normalizadas'+(x.k?' · '+x.k+' equipo(s) de transferencias activas se dejaron como están':'')+(x.s?' · ⚠ '+x.s+' equipo(s) ya habían cambiado y se dejaron como están':''))}
+ else if(prevSt){ensureG();const prot=protPts();prevSt.forEach(([p,s])=>{if(!prot.has(p))p.st=s});prevSt=null;log('Estado normal restablecido (las transferencias activas se dejaron como están)')}
+ clearPlan();save()};
+function clearPlan(){plan=null;hl=new Map();ov.clearLayers();$('#pl').innerHTML='';$('#bx').textContent='Ejecutar maniobra 1';pts.forEach(mk);xfRefresh()}
 list();cnt();
 
 /* ===== Avisos, búsqueda, respaldo e inspección ===== */
