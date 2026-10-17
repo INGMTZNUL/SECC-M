@@ -152,7 +152,7 @@ window.initGM=()=>{try{gR=L.gridLayer.googleMutant({type:'roadmap',maxZoom:21});
 if(L.gridLayer.googleMutant){const g=document.createElement('script');g.src='https://maps.googleapis.com/maps/api/js?key='+GMAPS_KEY+'&callback=initGM';g.async=true;g.onerror=()=>gOff('No cargó Google Maps (¿sin conexión?)');document.head.appendChild(g)}else setTimeout(()=>gOff('No cargó el complemento de Google Maps'),0);
 let tileWarn=0;[calles,carto,sat].forEach(t=>t.on('tileerror',()=>{if(!tileWarn++)log('⚠ No cargan los mosaicos del mapa: revise su conexión o cambie de capa (control arriba a la derecha)')}));
 let circ=[],pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0;
-let XF=[],XT=[],xfPrev=null,xfTm=0,QUIET=0; /* XF: maniobras calculadas activas (se guardan en el dispositivo); XT: transferencias activas detectadas por la topología */
+let XF=[],XT=[],xfPrev=null,xfTm=0,QUIET=0,VJC=new Map(); /* XF: maniobras calculadas activas (se guardan en el dispositivo); XT: transferencias activas detectadas por la topología */
 const ov=L.layerGroup().addTo(map),st=p=>ovr&&ovr.has(p)?ovr.get(p):p.st,km=m=>(m/1000).toFixed(2);
 /* ---------- Usuarios y demandas por circuito (ligados por nombre al interruptor) ---------- */
 const DEM0=[]; /* versión web: la tabla de usuarios y demandas NO va incluida; se carga en cada dispositivo con «Cargar tabla» */
@@ -261,9 +261,9 @@ function pshow(id,v){const p=byId(id);p.vis=v?1:0;pvis(p);save();plist();clearPl
 const byId=id=>pts.find(p=>p.id==id),cnt=()=>{$('#pc').textContent=pts.length;plist()};
 function plist(){dlist();$('#ptl').innerHTML=pts.map(p=>`<div class="r" style="${p.vis===0?'opacity:.5':''}"><input type="checkbox" ${p.vis===0?'':'checked'} onchange="pshow(${p.id},this.checked)" title="Mostrar / ocultar en el mapa"><i style="flex:none;width:11px;height:11px;border-radius:${T[p.t].r}px;background:${T[p.t].c}"></i><input value="${esc(p.name)}" title="${T[p.t].n}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)" style="flex:1;min-width:0;background:#0a1219;color:var(--t);border:1px solid var(--l);border-radius:4px;padding:3px 5px">${T[p.t].sv?'':`<small style="flex:none;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m)" title="Circuito">${esc(p.t=='ENL'?(p.cn||'?')+' ↔ '+(p.cn2||'⏳ pendiente'):p.cn||'sin circuito')}</small>`}<button onclick="goP(${p.id})">⌖</button></div>`).join('')}
 function goP(id){const p=byId(id);if(p.vis===0){p.vis=1;pvis(p);save();plist();clearPlan()}map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}
-const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,u:p.u,...(p.vis===0?{vis:0}:{}),...(p.t=='RES'&&p.md=='SW'?{md:'SW'}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{})});
+const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,u:p.u,...(p.vis===0?{vis:0}:{}),...(p.t=='RES'&&p.md=='SW'?{md:'SW'}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{}),...(p.auto?{auto:1}:{})});
 const save=()=>{try{localStorage.setItem('gc_pts',JSON.stringify(pts.map(ser)))}catch(e){}kvSet('pts',pts.map(ser))};
-function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1,u:o.u||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7))};if(p.t=='RES')p.md=o.md=='SW'?'SW':'RES';if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}pts.push(p);mk(p);return p}
+function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1,u:o.u||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7))};if(p.t=='RES')p.md=o.md=='SW'?'SW':'RES';if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}if(o.auto)p.auto=1;pts.push(p);mk(p);return p}
 /* ---------- Restaurador: Modo Restaurador (opera solo ante falla aguas abajo) / Modo Switch (no opera solo) ---------- */
 const mdPop=p=>`Modo: <select onchange="setMd(${p.id},this.value)"><option value="RES" ${p.md=='SW'?'':'selected'}>Restaurador (opera solo)</option><option value="SW" ${p.md=='SW'?'selected':''}>Switch (no opera solo)</option></select><br>`;
 function setMd(id,v){const p=byId(id);if(!p||p.t!='RES')return;p.md=v=='SW'?'SW':'RES';p.m.closePopup();save();mk(p);clearPlan();log(p.name+' en Modo '+(p.md=='SW'?'Switch (no opera automáticamente)':'Restaurador (opera automáticamente)'))}
@@ -310,7 +310,7 @@ if($('#xl2'))$('#xl2').addEventListener('click',ev=>{const b=ev.target.closest('
 /* maniobras calculadas (las de «Ejecutar maniobra»): se guardan para poder normalizarlas, aun al reabrir la app */
 function xfAdd(P,snap){const r={id:Date.now(),t:Date.now(),fp:P.f.p,eq:P.trip.name,fc:cn(P.f.F),chg:stDiff(snap),keep:P.isl.filter(i=>i.t).flatMap(i=>[i.t.p.u,...(i.t.norm?i.t.norm.ties.map(e=>e.u):[])])};XF.push(r);P.xid=r.id;xfSave();xfRefresh()}
 const protPts=()=>{const s=new Set();try{transfers().forEach(t=>{t.ties.forEach(p=>s.add(p));t.ret.forEach(p=>s.add(p))})}catch(e){}return s};
-function xfRevert(r,prot){let s=0,k=0;const kp=new Set(r.keep||[]);[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(!p)return;if(prot.has(p)||kp.has(c[0])){k++;return}if(p.st===c[2]){p.st=c[1];log((c[1]?'CERRAR ':'ABRIR ')+p.name+' (normalizar)')}else s++});XF=XF.filter(x=>x!==r);return{s,k}}
+function xfRevert(r,prot){let s=0,k=0;const kp=new Set(r.keep||[]);[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(!p)return;if(prot.has(p)||kp.has(c[0])){k++;return}if(p.st===c[2]){p.st=c[1];log((c[1]?'CERRAR ':'ABRIR ')+p.name+' (normalizar)');if(p.auto&&c[1]===1){log('Puentes del ramal restablecidos: '+p.name);rmPt(p)}}else s++});XF=XF.filter(x=>x!==r);return{s,k}}
 function xfAll(){ensureG();const prot=protPts();let s=0,k=0;[...XF].reverse().forEach(r=>{const x=xfRevert(r,prot);s+=x.s;k+=x.k});XF=[];xfSave();return{s,k}}
 /*XF-FIN*/
 /*HD-INI*/
@@ -483,12 +483,31 @@ function attach(){G=build();const w=[];applyFlows(w);pts.forEach(p=>{p.n=-1});
   p.n=a;p.n2=b;const e={a,b,l:0,tie:p};G.N[a].adj.push(e);G.N[b].adj.push(e)});
  w.forEach(x=>QUIET||log('⚠ '+x))}
 const nb=(n,e)=>e.a==n?e.b:e.a,cn=n=>circ[G.N[n].c].name;
-function walk(s,S,p,par){const q=[s];S.set(s,p);while(q.length){const n=q.pop();for(const e of G.N[n].adj){if(e.d||(e.tie&&!st(e.tie)))continue;const m=nb(n,e);if(S.has(m))continue;S.set(m,p);par&&par.set(m,n);const w=G.N[m].sw;if(w&&!st(w))continue;q.push(m)}}}
+function walk(s,S,p,par){const q=[s];S.set(s,p);while(q.length){const n=q.pop();for(const e of G.N[n].adj){if(e.d||(e.tie&&!st(e.tie))||(e.vj&&!st(e.vj)))continue;const m=nb(n,e);if(S.has(m))continue;S.set(m,p);par&&par.set(m,n);const w=G.N[m].sw;if(w&&!st(w))continue;q.push(m)}}}
 /* longitud sin servicio incluyendo los tramos que tocan los anclajes dobles/seccionadores (comparación justa al decidir usar Anclaje Doble) */
 const ex=S=>{const E=new Set();S.forEach(n=>{for(const e of G.N[n].adj)if(!e.d&&!e.tie)E.add(e)});let t=0;E.forEach(e=>t+=e.l);return t};
 const energized=()=>{const S=new Map();pts.forEach(p=>{if(p.t=='INT'&&p.n>=0&&st(p)&&!S.has(p.n))walk(p.n,S,p)});return S};
 const len=S=>{let s=0;S.forEach(n=>{for(const e of G.N[n].adj)if(!e.d&&!e.tie&&e.a==n&&S.has(e.b))s+=e.l});return s};
 const segs=S=>{const r=[],N=G.N;S.forEach(n=>{for(const e of N[n].adj){if(e.d||e.tie)continue;const o=nb(n,e);if(S.has(o)?e.a==n:N[o].sw)r.push([N[n].p,N[o].p])}});return r};
+/* ---------- Conexiones de ramal y subramal como opción para picar puentes (igual que un Anclaje Doble) ----------
+   En cada punto donde un ramal sale de la línea, el ramal es el hijo más corto del árbol de alimentación (el más largo se toma como troncal de ese nivel).
+   Se crea un «Anclaje Doble virtual» por ramal; si la maniobra 2 lo usa, al ejecutarla se registra como un Anclaje Doble real (abierto). */
+function genVJ(src){const N=G.N,par=new Map(),comp=new Map();walk(src.n,comp,src,par);
+ const kids=new Map();par.forEach((a,c)=>(kids.get(a)||kids.set(a,[]).get(a)).push(c));
+ const el=(a,b)=>{for(const e of N[a].adj)if(!e.d&&!e.tie&&!e.v&&e.b!==undefined&&nb(a,e)==b)return e;return null};
+ const order=[src.n];for(let i=0;i<order.length;i++)for(const c of kids.get(order[i])||[])order.push(c);
+ const sub=new Map();for(let i=order.length-1;i>=0;i--){const n=order[i];let s=0;for(const c of kids.get(n)||[]){const e=el(n,c);s+=sub.get(c)+(e?e.l:0)}sub.set(n,s)}
+ kids.forEach((cs,J)=>{if(cs.length<2||N[J].sw)return;
+  const w=cs.map(c=>{const e=el(J,c);return{c,e,s:e?sub.get(c)+e.l:-1}}).filter(x=>x.e).sort((a,b)=>b.s-a.s);
+  w.slice(1).forEach(({c,e,s})=>{if(N[c].sw)return;
+   const k=N[J].c+'|'+N[J].p[0].toFixed(6)+','+N[J].p[1].toFixed(6)+'|'+N[c].p[0].toFixed(6)+','+N[c].p[1].toFixed(6);
+   let o=VJC.get(k);if(!o){o={t:'DR',vj:1,name:'Ramal '+N[J].p[0].toFixed(5)+', '+N[J].p[1].toFixed(5),cn:cn(J),lat:N[J].p[0],lng:N[J].p[1],pos:N[J].p};VJC.set(k,o)}
+   o.st=1;o.n=J;o.bn=c;o.bp=N[c].p;o.sub=s;e.vj=o})})}
+/* al ejecutar la maniobra 2: los puentes picados de una conexión de ramal quedan registrados como Anclaje Doble real (abierto) para que se conserven */
+function vjMat(v){const A=v.pos,B=v.bp,L=dist(A,B),t=Math.min(.5,3/(L||1)),b=[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t],m=[(A[0]+b[0])/2,(A[1]+b[1])/2];
+ const nd=addPt({t:'DR',name:'Puentes ramal '+(pts.filter(x=>x.auto).length+1),lat:m[0],lng:m[1],a:A,b,cn:v.cn,au:0,st:0,auto:1});
+ const r=XF.find(x=>x.id==plan.xid);if(r)r.chg.push([nd.u,1,0]);log('Puentes del ramal abiertos: '+nd.name+' ('+v.cn+')');return nd}
+function rmPt(p){if(typeof mv!=='undefined'&&mv&&mv.p===p)mvCancel(1);p.m.remove();p.g&&p.g.remove();pts=pts.filter(x=>x!=p);cnt()}
 /* ---------- Lógica SCADA de falla ---------- */
 const RK={INT:0,RES:1,SS:2,CCF:3,ENL:3.5,DR:4},rkp=p=>p.t=='RES'&&p.md=='SW'?RK.SS:RK[p.t];let DRU=new Set();
 function analyze(q,u){DRU=u;clearPlan();
@@ -496,8 +515,8 @@ function analyze(q,u){DRU=u;clearPlan();
  attach();ovr=null;const f=locate(q,200);if(!f)return log('⚠ La falla debe marcarse sobre una línea (máx. 200 m)');
  const F=split(f),N=G.N;f.F=F;const pre=energized(),src=pre.get(F);
  if(!src){plan={f,Z:new Set([F]),B:new Set(),isl:[],steps:[['ALERTA','El tramo con falla no está energizado por ningún interruptor cerrado. Verifique que el circuito tenga un interruptor (I) cerrado a menos de 80 m de su línea.']]};return show()}
- const trs=transfers(pre),flood=U=>{const Z=new Set([F]),B=new Set(),qq=[F];
- while(qq.length){const n=qq.pop();for(const x of N[n].adj){if(x.d)continue;if(x.tie){if(st(x.tie))B.add(x.tie);continue}
+ genVJ(src);const trs=transfers(pre),flood=U=>{const Z=new Set([F]),B=new Set(),qq=[F];
+ while(qq.length){const n=qq.pop();for(const x of N[n].adj){if(x.d)continue;if(x.vj&&U.has(x.vj)){B.add(x.vj);continue}if(x.tie){if(st(x.tie))B.add(x.tie);continue}
   const m=nb(n,x);if(Z.has(m))continue;const w=N[m].sw;if(w&&!(w.t=='DR'&&st(w)&&!U.has(w))){if(st(w))B.add(w);continue}Z.add(m);qq.push(m)}}return[Z,B]};
  /* Z = zona en falla (entre los anclajes dobles abiertos); Z0 = tramo de línea completo afectado (anclajes dobles sin abrir) */
  const[Z,B]=flood(DRU),Z0=DRU.size?flood(new Set())[0]:Z;
@@ -533,8 +552,8 @@ function analyze(q,u){DRU=u;clearPlan();
  Bl.forEach(p=>hl.set(p,'ab'));if(reclose)hl.set(trip,'ce');isl.forEach(i=>{if(i.t){hl.set(i.t.p,'ce');i.t.norm&&i.t.norm.ties.forEach(e=>hl.set(e,'ab'))}});
  pts.forEach(mk);plan.un=ex(Z)+isl.filter(i=>!i.t).reduce((t,i)=>t+ex(i.S),0);return plan}
 /* Maniobra 1: restauradores y seccionamiento. Maniobra 2 (recomendada): abrir puentes en Anclajes Dobles para recuperar más carga. */
-function runFault0(q){const P=analyze(q,new Set());if(!plan)return;let rec=null;
- if(P&&P.Bl){const D=pts.filter(p=>p.t=='DR'&&p.st&&p.n>=0);
+function runFault0(q){VJC.clear();const P=analyze(q,new Set());if(!plan)return;let rec=null;
+ if(P&&P.Bl){const D=[...pts.filter(p=>p.t=='DR'&&p.st&&p.n>=0),...VJC.values()].sort((a,b)=>dist([b.lat,b.lng],q)-dist([a.lat,a.lng],q));
   if(D.length){let u=new Set(D),Q=analyze(q,u);
    if(Q&&Q.Bl&&Q.rest>P.rest+1){for(const d of D){if(!Q.B.has(d))continue;const v=new Set(u);v.delete(d);const W=analyze(q,v);if(W&&W.Bl&&W.rest>=Q.rest-1){u=v;Q=W}}
     rec={Q:{Z:Q.Z,tgt:Q.tgt,rest:Q.rest,pct:Q.pct,ads:Q.Bl.filter(p=>p.t=='DR')}}}else rec={none:1};
@@ -544,9 +563,9 @@ function runFault0(q){const P=analyze(q,new Set());if(!plan)return;let rec=null;
 function runFault(q){try{runFault0(q)}catch(e){log('⚠ Error en el análisis: '+e.message);console.error(e)}}
 const served=P=>{const E=energized();return len(new Set([...P.dn].filter(n=>E.has(n))))},pc=(P,x)=>P.aff?100*x/P.aff:100,f1=x=>x.toFixed(1)+' %';
 /* diferencia entre el estado actual (tras la maniobra 1) y el estado que deja la maniobra con Anclaje Doble */
-function recDiff(P){const Q=P.rec&&P.rec.Q;if(!Q)return{ab:[],ce:[]};const pre=new Map(prevSt||pts.map(p=>[p,p.st])),want=p=>Q.tgt.has(p)?Q.tgt.get(p):pre.get(p),sw=pts.filter(p=>!T[p.t].sv&&p.n>=0);
+function recDiff(P){const Q=P.rec&&P.rec.Q;if(!Q)return{ab:[],ce:[]};const pre=new Map(prevSt||pts.map(p=>[p,p.st])),want=p=>Q.tgt.has(p)?Q.tgt.get(p):pre.get(p),sw=[...pts.filter(p=>!T[p.t].sv&&p.n>=0),...[...Q.tgt.keys()].filter(p=>p.vj)];
  return{ab:sw.filter(p=>p.st==1&&want(p)==0).sort((x,y)=>(x.t=='DR'?0:1)-(y.t=='DR'?0:1)||rkp(x)-rkp(y)),ce:sw.filter(p=>p.st==0&&want(p)==1).sort((x,y)=>(x.t=='ENL')-(y.t=='ENL')||rkp(x)-rkp(y))}}
-const recSteps=d=>[...d.ab.map(p=>['ABRIR',p.t=='DR'?`${p.name} · Anclaje Doble · ${p.cn} · abrir puentes: solo queda sin servicio el área entre los anclajes`:`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}`]),
+const recSteps=d=>[...d.ab.map(p=>['ABRIR',p.vj?`${p.name} · conexión de ramal · ${p.cn} · picar los puentes del ramal (${km(p.sub)} km): solo queda sin servicio el ramal`:p.t=='DR'?`${p.name} · Anclaje Doble · ${p.cn} · abrir puentes: solo queda sin servicio el área entre los anclajes`:`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}`]),
  ...d.ce.map(p=>['CERRAR',p.t=='ENL'?`${p.name} · enlace ${cn(p.n)} – ${cn(p.n2)} · transfiere el tramo recuperado`:`${p.name} · ${T[p.t].n} · ${cn(p.n)} · repone el tramo hasta el anclaje doble`])];
 const li=a=>`<ol>${a.map(s=>`<li><em class="${s[0]}">${s[0]}</em> ${esc(s[1])}</li>`).join('')}</ol>`;
 function show(){draw();const P=plan;map.setView(P.f.p,Math.max(map.getZoom(),15));panel()}
@@ -561,11 +580,12 @@ function panel(){const P=plan,rec=P.rec,Q=rec&&rec.Q;let h='';
   else{const sv=served(P);h+=`<div class="sum">${P.done==1?'Maniobra 1 ejecutada':'Maniobra 2 ejecutada'} · Restablecido <span class="pct">${f1(pc(P,sv))}</span> (${km(sv)} de ${km(P.aff)} km afectados)${P.done==2?` · tras la maniobra 1: ${f1(P.pct1)}`:''}</div>`+demTxt(P,sv,'restablecidos')}}
  h+=(P.Bl&&P.done?'<div class="sum">Maniobra 1 · restauradores y seccionamiento</div>':'')+li(P.steps);
  if(P.Bl&&P.done==1){if(Q){const sv=served(P),d=recDiff(P);P.rec.S2=recSteps(d);
-   h+=`<div class="rec"><b>Recomendación: recuperar más carga abriendo puentes en ${Q.ads.map(p=>p.name).sort().join(', ')}</b><br>Restablecimiento ${f1(pc(P,sv))} → <span class="pct">${f1(Q.pct)}</span> (+${(Q.pct-pc(P,sv)).toFixed(1)} puntos · +${km(Q.rest-sv)} km${(d=>d?` · +${fu(d.u*(Q.rest-sv)/P.Lc)} usuarios · +${(d.mw*(Q.rest-sv)/P.Lc).toFixed(2)} MW`:'')(dem(P))}). Anclaje Doble como último recurso: queda sin servicio solo el área entre los anclajes. Pulse «Ejecutar maniobra 2».${li(P.rec.S2)}</div>`}
-  else if(rec&&rec.none)h+='<div class="rec">Anclajes Dobles: ninguno permite recuperar más carga en esta falla.</div>'}
+   h+=`<div class="rec"><b>Recomendación: recuperar más carga abriendo puentes en ${Q.ads.map(p=>p.name).sort().join(', ')}</b><br>Restablecimiento ${f1(pc(P,sv))} → <span class="pct">${f1(Q.pct)}</span> (+${(Q.pct-pc(P,sv)).toFixed(1)} puntos · +${km(Q.rest-sv)} km${(d=>d?` · +${fu(d.u*(Q.rest-sv)/P.Lc)} usuarios · +${(d.mw*(Q.rest-sv)/P.Lc).toFixed(2)} MW`:'')(dem(P))}). Anclaje Doble o conexión de ramal como último recurso: queda sin servicio solo el área entre los puentes picados. Pulse «Ejecutar maniobra 2».${li(P.rec.S2)}</div>`}
+  else if(rec&&rec.none)h+='<div class="rec">Anclajes Dobles y conexiones de ramal: ninguno permite recuperar más carga en esta falla.</div>'}
  if(P.done==2&&rec&&rec.S2)h+=`<div class="rec"><b>Maniobra 2 · Anclaje Doble</b>${li(rec.S2)}</div>`;
  $('#pl').innerHTML=h;$('#bx').textContent=P.done==1&&Q?'Ejecutar maniobra 2 · Anclaje Doble':P.done?'Maniobra ejecutada':'Ejecutar maniobra 1'}
 function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:7,opacity:.95};
+ if(P.rec&&P.rec.Q&&P.done>=1)P.rec.Q.ads.filter(p=>p.vj).forEach(p=>L.circleMarker(p.pos,{radius:9,color:'#ffa657',weight:3,fillColor:'#ffa657',fillOpacity:.3,interactive:false}).addTo(ov));
  if(!P.done){
   P.isl.forEach(i=>{L.polyline(segs(i.S),{color:'#ffa657',weight:6,dashArray:'8 8'}).addTo(ov);if(i.t&&i.t.p.t=='ENL')L.polyline([N[i.t.p.n].p,N[i.t.p.n2].p],{color:'#3ddc84',weight:3,dashArray:'4 6'}).addTo(ov)});
   L.polyline(segs(P.Z),RED).addTo(ov)
@@ -580,7 +600,7 @@ function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:
   L.polyline(segs(rd),RED).addTo(ov)}
  L.marker(P.f.p,{icon:L.divIcon({className:'',html:'<div class="fl">⚡</div>',iconSize:[30,30],iconAnchor:[15,15]})}).addTo(ov)}
 function exec2(){const P=plan,d=recDiff(P),snap2=pts.map(p=>[p,p.st]);P.rec.S2=recSteps(d);
- d.ab.forEach(p=>{p.st=0;log('ABRIR '+p.name+(p.t=='DR'?' (puentes del Anclaje Doble)':''))});d.ce.forEach(p=>{p.st=1;log('CERRAR '+p.name)});
+ d.ab.forEach(p=>{p.st=0;log('ABRIR '+p.name+(p.vj?' (puentes del ramal)':p.t=='DR'?' (puentes del Anclaje Doble)':''))});d.ab.filter(p=>p.vj).forEach(vjMat);d.ce.forEach(p=>{p.st=1;log('CERRAR '+p.name)});
  {const r=XF.find(x=>x.id==P.xid);if(r){r.chg.push(...stDiff(snap2));d.ce.filter(p=>p.t=='ENL').forEach(p=>(r.keep||(r.keep=[])).push(p.u));xfSave();xfRefresh()}}P.done=2;P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pc(P,served(P)))+demL(P,served(P)))}
 function doBx(){const P=plan;if(!P||!P.Bl)return log('⚠ Marque primero un punto de falla');
  if(P.done==1){if(P.rec&&P.rec.Q)return exec2();return log('No hay una maniobra adicional recomendada')}
