@@ -103,29 +103,130 @@ section{margin-bottom:6px}
 #xs .xr{display:flex;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--l)}#xs .xr:first-child{border-top:0}
 #xs .xr>div{flex:1;min-width:0}#xs .xr small{display:block;color:var(--m);margin-top:2px}
 #xs .xr button{flex:none;padding:0 10px;min-height:34px}
+
+/* ===== v8: interfaz profesional y sobria ===== */
+:root{--bg:#0f141a;--p:#141b23;--p2:#19222c;--l:#273341;--t:#e6ecf2;--m:#8b9bad;--a:#4d8bf5;--g:#38b27c;--r:#e0615a;--y:#d6a23e;--fh:'Barlow Semi Condensed','Roboto Condensed','Arial Narrow',system-ui,sans-serif}
+html,body{height:100%}body{display:block;margin:0;height:100dvh;overflow:hidden;background:var(--bg)}
+#map{position:fixed;inset:0;height:100dvh;width:100%;z-index:0;background:#0f141a}
+/* panel a pantalla completa; el mapa ocupa todo cuando está cerrado */
+#side{position:fixed;inset:0;z-index:2000;display:none;overflow:auto;max-height:none;padding:0 0 40px;border:0;border-radius:0;box-shadow:none;transform:none;background:var(--bg);font-size:14px}
+body.sheet #side{display:block}
+#side>section{max-width:780px;width:calc(100% - 24px);margin:0 auto 12px}
+#hd{position:sticky;top:0;z-index:6;margin:0 0 12px;padding:10px 12px 10px;background:var(--p);border-bottom:1px solid var(--l)}
+#hd>*{max-width:756px;margin-left:auto;margin-right:auto}
+.lg{display:flex;align-items:center;gap:10px}.lg>div{flex:1}.lg small{display:block;color:var(--m);font:500 11.5px var(--fp)}
+.lgo{flex:none;width:32px;height:32px;border-radius:9px;background:var(--a);display:grid;place-items:center;color:#fff;font-size:15px}.lgo::after{content:'⚡'}
+.lgt{font:700 19px/1 var(--fp);letter-spacing:.08em;color:var(--t)}
+.ib{min-height:36px;width:36px;padding:0;border-radius:10px;font-size:15px}
+#chs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chp{display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:2px 12px;border-radius:999px;font:600 12px var(--fp);background:var(--p2);border:1px solid var(--l);color:var(--t)}
+button.chp:hover{border-color:#41546a}.chp.on{background:#3a2f12;border-color:var(--y);color:#f0d18a}
+#tabs{display:flex;gap:4px;margin-top:10px;padding:3px;background:var(--bg);border:1px solid var(--l);border-radius:12px}
+#tabs button{flex:1;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;line-height:1;border-radius:9px;background:transparent;border:0;padding:3px;color:var(--m)}
+#tabs button span{font:600 10.5px var(--fp);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+#tabs button.on{background:var(--p2);color:var(--t);box-shadow:inset 0 -2px 0 var(--a)}
+#side>section{display:none}
+#side[data-t=falla]>section[data-tab=falla],#side[data-t=equipos]>section[data-tab=equipos],#side[data-t=datos]>section[data-tab=datos],#side[data-t=mas]>section[data-tab=mas]{display:block}
+section{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:12px;box-shadow:none}
+h2{font:600 12px var(--fp);letter-spacing:.09em;text-transform:uppercase;color:var(--m)}h2.acc::before{color:var(--a)}h2 b{font:600 12px var(--fp);letter-spacing:0;color:var(--m);text-transform:none}
+button,.btn{background:var(--p2);border:1px solid var(--l);border-radius:10px;color:var(--t);font-family:var(--fp)}
+button:hover,.btn:hover{border-color:#41546a;background:#1e2935}button.on{background:var(--a);color:#fff;border-color:var(--a)}
+#bx,#rps,#evr{background:var(--a);color:#fff;font-weight:600;border:0}#bx:hover,#rps:hover,#evr:hover{background:#3f7be0}
+#bn{border-color:#6b5a2a;color:#e9cf91}
+input,select,textarea{background:var(--bg);border:1px solid var(--l);color:var(--t);border-radius:9px;padding:7px 9px;font-family:var(--fp)}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--a)}input[type=checkbox]{accent-color:var(--a)}input[type=range]{width:100%;accent-color:var(--a);padding:0}
+em{display:inline-block;padding:0 9px;border-radius:999px;font:700 11px var(--fp);letter-spacing:.07em;background:rgba(255,255,255,.06)}
+.ABRIR{color:#7bd3a8!important;background:rgba(56,178,124,.12)}.CERRAR{color:#f08b85!important;background:rgba(224,97,90,.13)}.ALERTA{color:#e6c06b!important;background:rgba(214,162,62,.14)}.VERIF{color:#8db8ff!important;background:rgba(77,139,245,.13)}
+.pct{font:700 16px var(--fp);color:var(--g)}
+.rec{background:rgba(214,162,62,.07);border:1px solid #5f4e24;border-radius:10px}.sum{color:#a9b8c8}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.chip{min-height:0;padding:3px 10px;font:600 12px var(--fp);border-radius:999px;display:inline-block;width:auto}
+.seg{display:flex;gap:4px;margin:2px 0 6px}.seg button{flex:1;min-height:34px;font-size:12.5px;border-radius:9px}
+.tm{display:flex;align-items:center;gap:8px;margin:6px 0;color:var(--m);font-size:12px}.tm input{flex:1}
+.wn{display:flex;gap:6px;margin-top:6px;align-items:stretch}.wn>*{min-width:0}.wn input,.wn select{flex:1;margin-top:0}
+.h2l{display:flex;align-items:center;gap:7px;margin-top:8px;color:var(--t);font-size:12.5px;flex-wrap:wrap}.h2l input[type=range]{flex:1 1 100%}
+#es .xr,#xs .xr,#ps .xr{display:flex;gap:6px;align-items:center;padding:7px 0;border-top:1px solid var(--l)}#es .xr:first-child,#xs .xr:first-child{border-top:0}#es .xr>div,#xs .xr>div{flex:1;min-width:0}#es .xr small,#xs .xr small{display:block;color:var(--m);margin-top:2px}#es .xr button,#xs .xr button{flex:none;padding:0 10px;min-height:34px}
+.gs{display:flex;gap:10px;align-items:center;padding:8px 4px;border-top:1px solid var(--l);cursor:pointer}.gs:first-child{border-top:0}
+.gs i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:700 12px var(--fp);font-style:normal;border:1.5px solid var(--m);color:var(--m)}
+.gs.ok i{background:var(--g);color:#06140d;border-color:var(--g)}.gs b{display:block;font:600 13px var(--fp)}.gs small{display:block;color:var(--m);font-size:12px}
+.pt{font-family:var(--fp);font-size:12px;font-weight:600;letter-spacing:.02em;border-radius:7px;box-shadow:0 0 0 1px rgba(255,255,255,.65),0 1px 5px rgba(0,0,0,.55)}
+.pt.ndp{filter:grayscale(1);opacity:.6;text-decoration:line-through}.pt.swm{border-style:dashed}
+.cgw{position:absolute;left:50%;top:-24px;transform:translateX(-50%);background:#f2c230;color:#1a1400;font:700 10px var(--fp);padding:0 5px;border-radius:7px;white-space:nowrap}
+.xtag{position:absolute;transform:translate(-50%,-130%);background:#0d2418;color:#6fd3a0;border:1px solid #2f7d58;border-radius:8px;padding:1px 7px;font:600 11px var(--fp);white-space:nowrap}
+/* barra superior del mapa */
+#tbar{position:fixed;top:calc(10px + env(safe-area-inset-top));left:10px;right:10px;z-index:1100;display:flex;gap:8px;align-items:center;pointer-events:none}
+#tbar>*{pointer-events:auto;margin:0!important;float:none!important}
+#shb{display:inline-flex!important;align-items:center;position:static!important;flex:none;min-height:42px;padding:0 14px;border-radius:12px;background:var(--p)!important;color:var(--t)!important;border:1px solid var(--l)!important;font:600 13px var(--fp);box-shadow:0 2px 10px rgba(0,0,0,.3)}
+#tbar .sq{flex:1;max-width:560px;min-width:0;position:relative;border:1px solid var(--l)!important;border-radius:12px;background:var(--p);box-shadow:0 2px 10px rgba(0,0,0,.3)!important}
+#tbar .sq input{width:100%;height:42px;border:0;background:transparent;color:var(--t);padding:0 14px;font:14px var(--fp);border-radius:12px}
+#tbar .sq input::placeholder{color:var(--m)}
+#sqr{position:absolute;top:46px;left:0;right:0;background:var(--p);border:1px solid var(--l);border-radius:12px;max-height:50dvh;overflow:auto;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+#sqr:empty{display:none}#sqr small{display:block;padding:10px;color:var(--m)}#sqr button{width:100%;text-align:left;border:0;border-top:1px solid var(--l);border-radius:0;background:transparent;min-height:40px}
+#tbar #lb{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:42px;padding:0 14px;border-radius:12px;background:var(--p);color:var(--t);border:1px solid var(--l);font:600 13px var(--fp);box-shadow:0 2px 10px rgba(0,0,0,.3);cursor:pointer}
+#tbar #lb.on{background:var(--a);border-color:var(--a);color:#fff}
+#fab{position:fixed;right:14px;bottom:calc(20px + env(safe-area-inset-bottom));z-index:1250;min-height:50px;padding:0 20px;border-radius:14px;border:0;background:#b4443d;color:#fff;font:700 15px var(--fp);letter-spacing:.04em;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+#fab:hover{background:#c24c44}#fab.on{background:var(--y);color:#1a1400;animation:none}
+#mh{position:fixed;top:calc(64px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:1500;display:none;align-items:center;gap:10px;background:var(--p);border:1px solid var(--a);border-radius:12px;padding:6px 8px 6px 14px;box-shadow:0 8px 24px rgba(0,0,0,.5);font:600 13px var(--fp);max-width:92vw}
+#mh.on{display:flex}#mh button{min-height:28px;width:28px;padding:0;border-radius:8px}
+#simban{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:1600;background:var(--y);color:#1a1400;font:700 12px var(--fp);padding:3px 16px;border-radius:0 0 10px 10px;display:none;letter-spacing:.04em}
+body.simu #simban{display:block}body.simu #map{outline:3px solid var(--y);outline-offset:-3px}
+body.dm .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.92) saturate(.55)}
+.leaflet-bar a{background:var(--p)!important;color:var(--t)!important;border-color:var(--l)!important}.leaflet-bar{border:1px solid var(--l)!important;box-shadow:0 2px 10px rgba(0,0,0,.3)!important}
+.leaflet-control-layers{background:var(--p)!important;color:var(--t)!important;border:1px solid var(--l)!important;box-shadow:0 2px 10px rgba(0,0,0,.3)!important}
+.leaflet-top.leaflet-right{margin-top:60px}.leaflet-bottom.leaflet-right{margin-bottom:76px}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--p);color:var(--t);border:1px solid var(--l)}.leaflet-popup-content{font-family:var(--fp)}.leaflet-popup-content b{color:#fff}
+#toast{background:var(--p);border:1px solid var(--l);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.55)}#toast button{background:var(--a);color:#fff;border:0}
+#mvbar,#ins{bottom:calc(76px + env(safe-area-inset-bottom))}
+@media(max-width:640px){#tbar #lb{width:42px;padding:0;justify-content:center;font-size:0}#tbar #lb::before{content:'◎';font-size:19px}#shb{padding:0 12px}.lg small{display:none}#co{display:none}}
+body.sheet #fab,body.sheet #tbar{display:none}
 </style></head><body>
-<button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button>
+<div id="tbar"><button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button></div>
+<button id="fab" type="button">⚡ Marcar falla</button><div id="mh"><span id="mht"></span><button type="button" id="mhx">✕</button></div><div id="simban">🧪 SIMULACRO · nada se guarda</div>
 <aside id="side">
-<h1>SECC-M<small>Maniobras de Seccionamiento ante Falla en las RGD</small></h1>
-<section><h2>Circuitos KMZ <b id="cc">0/100</b></h2>
+<header id="hd"><div class="lg"><i class="lgo"></i><div><b class="lgt">SECC-M</b><small>Seccionamiento ante falla · RGD</small></div><button id="dmb" class="ib" title="Mapa oscuro / claro">🌙</button><button id="pcl" class="ib" title="Cerrar el panel y ver el mapa" onclick="document.body.classList.remove('sheet');document.getElementById('shb').textContent='☰ Panel'">✕</button></div>
+<div id="chs"><button id="chS" class="chp" title="Carga para la viabilidad de transferencias: toque para cambiar entre Auto, Baja y Alta"></button><span class="chp" id="chX"></span><button id="chM" class="chp" title="Modo simulacro: pruebe sin guardar nada"></button></div>
+<nav id="tabs"><button data-t="falla">⚡<span>Falla</span></button><button data-t="equipos">🛠<span>Equipos</span></button><button data-t="datos">🗂<span>Datos</span></button><button data-t="mas">⚙<span>Más</span></button></nav></header>
+<section id="gd" data-tab="falla"><h2>Guía de inicio <b id="gdn"></b></h2><div id="gdl"></div></section>
+<section data-tab="datos"><h2>Circuitos KMZ <b id="cc">0/100</b></h2>
 <label class="btn">Cargar archivos KMZ / KML<input id="fi" type="file" accept=".kmz,.kml" multiple hidden></label>
-<div id="cl"></div><small class="h">Solo los circuitos marcados participan en el análisis. Los archivos se guardan en el dispositivo y se cargan solos al reabrir.</small>
-<label class="btn" style="margin-top:8px">Cargar KMZ de subestaciones (imágenes / figuras)<input id="fs" type="file" accept=".kmz,.kml" multiple hidden></label><div id="sl"></div></section>
-<section><h2>Puntos del sistema <b id="pc"></b></h2>
+<div id="cl"></div><small class="h">Solo los circuitos marcados participan en el análisis. Los archivos se guardan en el dispositivo y se cargan solos al reabrir.</small></section>
+<section data-tab="equipos"><h2>Puntos del sistema <b id="pc"></b></h2>
 <small class="h"><b>Circuito del equipo</b>: aplica a todo lo que marque (interruptor, restaurador, seccionamiento, cuchilla, enlace, Anclaje Doble y cruces)<select id="dc" style="width:100%;margin-top:3px"></select></small><div class="g" id="tb"></div><h2 style="margin-top:10px">Servicios importantes</h2><div class="g" id="sv"></div>
-<small class="h">Rojo = cerrado, verde = abierto. Elija un tipo y haga clic en el mapa (Esc cancela). Anclaje Doble: se recomienda como segunda maniobra, después de la primera (restauradores y seccionamiento); márquelo con 2 clics (un lado y el otro, en la dirección en que están los puentes de su circuito). Elija arriba el circuito del equipo o déjelo en Automático. Restaurador: en Modo Restaurador se abre solo si la falla queda delante de él (aguas abajo); en Modo Switch no opera solo y se usa como seccionador (cambie el modo en la ventana del equipo). Cruces: con "Trazar flujo en cruce" dibuje por dónde pasa la corriente en cada línea (clic en cada vértice; Enter o "Terminar trazo" para cerrar cada trazo). Haga un trazo por cada línea; la app conecta solo lo que usted trace. Acerque el mapa y haga clic sobre la línea, un poco antes y después del cruce. Para borrar un trazo, haga clic sobre él con la herramienta desactivada. Arrastre un punto para moverlo. Para renombrar, edite el nombre en la lista.</small>
+<button type="button" onclick="lcAuto()" style="width:100%;margin-top:6px">🔗 Ligar servicios al circuito más cercano</button><small class="h">Un servicio ligado a un circuito sigue visible cuando inspecciona ese circuito. También puede ligarlo a uno o varios circuitos tocándolo.</small>
+<label class="h2l"><input type="checkbox" id="rmv" checked onchange="drawRM()"> Resaltar en el mapa las conexiones de ramal (solo información; al acercar el zoom). Al tocar una puede «Abrir puenteo» y queda como punto abierto.</label>
+<small class="h">Rojo = cerrado, verde = abierto. Elija un tipo y haga clic en el mapa (Esc cancela). Punto de puenteo: es solo información en el mapa y nunca se propone como maniobra; márquelo con 2 clics (un lado y el otro, en la dirección en que están los puentes de su circuito). Al tocarlo puede Abrirlo o Cerrarlo, y el análisis respeta si ese punto del circuito quedó desconectado o conectado. Elija arriba el circuito del equipo o déjelo en Automático. Restaurador: en Modo Restaurador se abre solo si la falla queda delante de él (aguas abajo); en Modo Switch no opera solo y se usa como seccionador (cambie el modo en la ventana del equipo). Cruces: con "Trazar flujo en cruce" dibuje por dónde pasa la corriente en cada línea (clic en cada vértice; Enter o "Terminar trazo" para cerrar cada trazo). Haga un trazo por cada línea; la app conecta solo lo que usted trace. Acerque el mapa y haga clic sobre la línea, un poco antes y después del cruce. Para borrar un trazo, haga clic sobre él con la herramienta desactivada. Arrastre un punto para moverlo. Para renombrar, edite el nombre en la lista.</small>
 <div class="g"><button id="be">Terminar trazo (Enter)</button><button id="bu">Deshacer vértice</button></div><div id="ptl"></div><small class="h">Casilla: mostrar u ocultar cada equipo en el mapa (un equipo oculto no participa en el análisis, igual que los circuitos).<br>Tolerancia de unión de líneas (m): <input id="tol" type="number" value="4" min="0.5" max="5" step="0.5" style="width:60px"></small>
 <div class="g"><button id="ex">Exportar puntos</button><label class="btn">Importar puntos<input id="im" type="file" accept=".json" hidden></label></div>
-<div class="g"><button id="bk">💾 Respaldo completo</button><label class="btn">Restaurar respaldo<input id="br" type="file" accept=".json" hidden></label></div><small class="h">El respaldo guarda equipos, cruces y KMZ en un solo archivo: sirve para pasar su información a otro celular.</small><small class="h">🔒 Sus KMZ, tablas y equipos se guardan solo en este dispositivo: la app no sube archivos a ningún servidor.</small></section>
-<section><h2>Usuarios y demandas <b id="dm"></b></h2>
-<small class="h">Cada interruptor toma sus usuarios y su demanda (MW) de la tabla cuando su nombre coincide con el del circuito (sin importar mayúsculas, espacios ni guiones). Se reparten por igual a lo largo de la línea de cada circuito, porque la tabla solo trae totales por circuito.</small>
-<label class="btn">Cargar tabla (.xlsx o .csv)<input id="dx" type="file" accept=".xlsx,.csv" hidden></label><div id="dl"></div></section>
-<section><h2>Falla y maniobra</h2>
-<small class="h" style="margin:0 0 6px">⚡ Para marcar una <b>falla</b>, <b>mantenga pulsado</b> el punto sobre la línea del circuito (o sobre un equipo). Después pulse «Ejecutar maniobra 1».</small><div id="pl"></div>
-<div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn" title="Normaliza solo las maniobras calculadas al marcar una falla; no afecta a las secciones transferidas">Normalizar</button></div></section>
-<section id="xs"><h2>Transferencias activas <b id="xn"></b></h2><div id="xl2"></div><small class="h">Aquí aparece todo tramo que hoy alimenta otro circuito por un enlace cerrado, ya sea por una maniobra calculada o manual (abrir un seccionamiento y cerrar un enlace). Se conserva, también al reabrir la app, aunque marque otra falla en el trayecto restante de su circuito, hasta que pulse «Normalizar» en esa transferencia. Si la falla queda en el circuito huésped y deja sin servicio al tramo transferido, el análisis propone normalizarla (abrir el enlace y cerrar el seccionamiento). El botón «Normalizar» de arriba no toca estas transferencias.</small></section>
-<section><h2>Guardado en este dispositivo</h2><div id="stg" class="stg"></div></section>
-<section><h2>Bitácora</h2><div id="log"></div></section>
+<div class="g"><button id="bk">💾 Respaldo completo</button><label class="btn">Restaurar respaldo<input id="br" type="file" accept=".json" hidden></label></div><small class="h">El respaldo guarda equipos, cruces y KMZ en un solo archivo: sirve para pasar su información a otro celular.</small><small class="h">🔒 Sus KMZ, tablas y equipos se guardan solo en este dispositivo: la app no sube archivos a ningún servidor. Única excepción, solo si usted lo pide: «Detectar» en Mancha urbana consulta OpenStreetMap y le envía el rectángulo geográfico de sus circuitos activos.</small></section>
+<section data-tab="datos"><h2>Usuarios y demandas <b id="dm"></b></h2>
+<div class="seg" id="sg"><button data-s="auto">Auto</button><button data-s="baja">Carga baja</button><button data-s="alta">Carga alta</button></div><small class="h" id="sgt"></small>
+<small class="h">Cada interruptor toma sus usuarios y su demanda (MW) de la tabla cuando su nombre coincide con el del circuito (sin importar mayúsculas, espacios ni guiones). Se reparten por igual a lo largo de la línea de cada circuito, porque la tabla solo trae totales por circuito (o según la mancha urbana, si la activa).<br>Formato de la tabla: <b>Interruptor o equipo (restaurador o seccionamiento), Usuarios, Demanda (MW), Baja A, Baja B, Baja C (amperes por fase, octubre a abril), Alta A, Alta B, Alta C (mayo a septiembre) y Pickup del interruptor (A)</b>. También acepta la tabla anterior (una carga baja y una alta). Con las 3 fases la app revisa cada fase al transferir y avisa cuál limita y el desbalance. La carga baja se usa de octubre a abril y la alta de mayo a septiembre, para calcular si una transferencia es viable contra el pickup del interruptor que recibe la carga. Un restaurador o seccionamiento puede traer la carga que hay aguas abajo de él; así se reparte mejor la carga entre tramos.</small>
+<div class="g"><label class="btn">Cargar tabla (.xlsx o .csv)<input id="dx" type="file" accept=".xlsx,.csv" hidden></label><button type="button" id="dtp">⬇ Plantilla</button></div><div id="dl"></div></section>
+<section data-tab="falla"><h2>Falla y maniobra</h2>
+<small class="h" style="margin:0 0 6px">⚡ Para marcar una <b>falla</b>, pulse el botón <b>Marcar falla</b> y toque la línea del circuito (o mantenga pulsado el punto sobre la línea o sobre un equipo). Después pulse «Ejecutar maniobra 1».</small><div id="pl"></div>
+<div class="tm"><span>Hora de la falla</span><input type="time" id="evt0" onchange="setT0(this.value)"></div>
+<label class="h" style="display:flex;gap:6px;align-items:center;margin:6px 0"><input type="checkbox" id="sp" checked> Maniobra paso a paso (confirmar cada equipo)</label><div class="g"><button id="bx">Ejecutar maniobra 1</button><button id="bn" title="Normaliza solo las maniobras calculadas al marcar una falla; no afecta a las secciones transferidas">Normalizar</button></div>
+<button id="evr" type="button" onclick="evEnd()" style="width:100%;margin-top:6px">✅ Registrar restablecimiento</button></section>
+<section data-tab="falla" id="xs"><h2>Transferencias activas <b id="xn"></b></h2><div id="xl2"></div><small class="h">Aquí aparece todo tramo que hoy alimenta otro circuito por un enlace cerrado, ya sea por una maniobra calculada o manual (abrir un seccionamiento y cerrar un enlace). Se conserva, también al reabrir la app, aunque marque otra falla en el trayecto restante de su circuito, hasta que pulse «Normalizar» en esa transferencia. Si la falla queda en el circuito huésped y deja sin servicio al tramo transferido, el análisis propone normalizarla (abrir el enlace y cerrar el seccionamiento). El botón «Normalizar» de arriba no toca estas transferencias.</small></section>
+<section data-tab="datos" id="zs"><h2>Mancha urbana <b id="znn"></b></h2>
+<small class="h">La carga de cada circuito se reparte según la zona: urbana (más usuarios por metro de línea) o rural (menos). Detecte la mancha urbana o dibújela sobre el mapa.</small>
+<div class="g"><button id="zosm" type="button" onclick="zOsm()">🛰 Detectar (OpenStreetMap)</button><button type="button" onclick="zClearOsm()">Borrar detectadas</button></div>
+<div class="wn"><select id="zcl"><option value="U">Urbana</option><option value="A">Comercial o centro</option><option value="P">Periurbana</option><option value="I">Industrial</option><option value="R">Rural (forzar)</option></select><button type="button" onclick="setMode('ZU')">✏ Dibujar zona</button></div>
+<div class="g"><button type="button" onclick="zEnd()">Terminar zona</button><button type="button" onclick="zUndo()">Deshacer punto</button></div>
+<div id="zlst"></div>
+<label class="h2l"><input type="checkbox" id="zon" onchange="zSet()" checked> Usar la mancha urbana para repartir la carga</label>
+<label class="h2l">Densidad rural relativa: <b id="zrv"></b><input type="range" id="zru" min="2" max="60" value="12" oninput="zSet()"></label>
+<label class="h2l"><input type="checkbox" id="zsh" onchange="zDraw()" checked> Mostrar las zonas en el mapa</label>
+<small class="h">Zona dibujada a mano manda sobre la detectada. OpenStreetMap solo trae las zonas que alguien haya mapeado: si en su área hay pocas, complete a mano. Las zonas se guardan en el dispositivo y funcionan sin internet.</small></section>
+<section data-tab="mas" id="es"><h2>Eventos <b id="evn"></b></h2><div id="evl"></div>
+<div class="g"><button id="evx" type="button" onclick="fileOut('eventos_SECC-M_'+stamp()+'.csv',evCsv(),'text/csv')">📄 Exportar CSV</button><button type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText(evSummary()).then(()=>toast('Resumen copiado'))">📋 Copiar resumen</button></div>
+<small class="h">Cada maniobra ejecutada crea un evento con sus horas. Pulse «Registrar restablecimiento» en la pestaña Falla cuando quede en servicio: se calcula la duración y los usuarios-minuto.</small></section>
+<section data-tab="mas" id="cs"><h2>Compartir estado</h2>
+<div class="g"><button id="sts" type="button" onclick="stSend()">📤 Enviar estado</button><label class="btn">📥 Importar estado<input id="sti" type="file" accept=".json" hidden onchange="this.files[0]&&stImport(this.files[0]);this.value=''"></label></div>
+<small class="h">Envía solo el estado de los equipos (abiertos/cerrados y no disponibles), las transferencias y las troncales: un archivo pequeño que su compañero importa en su celular. Los dos celulares deben tener los mismos equipos.</small></section>
+<section data-tab="mas" id="ss"><h2>Simulacro</h2><button id="simb" type="button" onclick="simToggle()">🧪 Entrar en modo simulacro</button>
+<small class="h">En simulacro puede marcar fallas y ejecutar maniobras sin guardar nada; al salir todo vuelve a como estaba. Los avisos de WhatsApp llevan la leyenda SIMULACRO.</small></section>
+<section data-tab="mas"><h2>Guardado en este dispositivo</h2><div id="stg" class="stg"></div></section>
+<section data-tab="mas"><h2>Bitácora</h2><div id="log"></div></section>
 </aside><div id="map"></div>
 <script>
 const $=s=>document.querySelector(s),MAX=100,R=6371000,rad=Math.PI/180;
@@ -134,8 +235,11 @@ const NC='#ff4d5e',NA='#3ddc84',SVG={
 COM:'<svg width="26" height="30" viewBox="0 0 26 30"><path d="M13 2C13 2 3 14 3 20a10 10 0 0020 0C23 14 13 2 13 2z" fill="#1e90ff" stroke="#fff" stroke-width="2"/><path d="M8 20a5 5 0 004 4" stroke="#fff" stroke-width="2" fill="none"/></svg>',
 HOS:'<svg width="26" height="26" viewBox="0 0 26 26"><rect x="1" y="1" width="24" height="24" fill="#e11" stroke="#fff" stroke-width="2"/><path d="M10 5h6v5h5v6h-5v5h-6v-5H5v-6h5z" fill="#fff"/></svg>',
 GOB:'<svg width="28" height="26" viewBox="0 0 28 26"><path d="M14 2L2 9h24z" fill="#ffc233" stroke="#04121c" stroke-width="1.5"/><path d="M4 11h3v9H4zM10 11h3v9h-3zM15 11h3v9h-3zM21 11h3v9h-3z" fill="#ffc233" stroke="#04121c"/><path d="M2 21h24v3H2z" fill="#ffc233" stroke="#04121c" stroke-width="1.5"/></svg>'};
-const T={INT:{n:'Interruptor',k:'INT',c:NC,r:3},ENL:{n:'Enlace (normal abierto)',k:'ENL',c:NA,r:13},RES:{n:'Restaurador',k:'RES',c:NC,r:8},SS:{n:'Seccionamiento',k:'SECC',c:NC,r:8},CCF:{n:'Corto circuito fusible / cuchilla sólida',k:'CCF',c:NC,r:5},DR:{n:'Anclaje Doble (último recurso)',k:'AD',c:NC,r:3},
-COM:{n:'Servicio COMAPA',k:'COMAPA',c:'#1e90ff',r:0,sv:1,svg:SVG.COM},HOS:{n:'Hospital',k:'HOSP',c:'#e11',r:0,sv:1,svg:SVG.HOS},GOB:{n:'Edificio de gobierno',k:'GOB',c:'#ffc233',r:0,sv:1,svg:SVG.GOB}};
+SVG.CG='<svg width="24" height="24" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" fill="#ffd24a" stroke="#04121c" stroke-width="1.6"/><circle cx="12" cy="9" r="3.2" fill="#04121c"/><path d="M5.5 19c.8-3.6 3.4-5 6.5-5s5.7 1.4 6.5 5z" fill="#04121c"/></svg>';
+SVG.SE='<svg width="26" height="26" viewBox="0 0 26 26"><rect x="1.5" y="1.5" width="23" height="23" rx="6" fill="#f2c230" stroke="#3b2f00" stroke-width="1.5"/><path d="M5 8.5h16M9 8.5v3.5M17 8.5v3.5" stroke="#3b2f00" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="9" cy="15" r="2.7" fill="none" stroke="#3b2f00" stroke-width="1.6"/><circle cx="17" cy="15" r="2.7" fill="none" stroke="#3b2f00" stroke-width="1.6"/><path d="M9 17.7v4M17 17.7v4M5.5 21.7h15" stroke="#3b2f00" stroke-width="1.6" stroke-linecap="round"/></svg>';
+SVG.CFE='<svg width="30" height="26" viewBox="0 0 30 26"><rect x="1" y="2" width="28" height="22" rx="6" fill="#1b8a4b" stroke="#0b3d20" stroke-width="1.5"/><text x="15" y="17.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="11" fill="#fff">CFE</text></svg>';
+const T={INT:{n:'Interruptor',k:'INT',c:NC,r:3},ENL:{n:'Enlace (normal abierto)',k:'ENL',c:NA,r:13},RES:{n:'Restaurador',k:'RES',c:NC,r:8},SS:{n:'Seccionamiento',k:'SECC',c:NC,r:8},CCF:{n:'Corto circuito fusible / cuchilla sólida',k:'CCF',c:NC,r:5},DR:{n:'Punto de puenteo',k:'AD',c:NC,r:3},
+COM:{n:'Servicio COMAPA',k:'COMAPA',c:'#1e90ff',r:0,sv:1,svg:SVG.COM},HOS:{n:'Hospital',k:'HOSP',c:'#e11',r:0,sv:1,svg:SVG.HOS},GOB:{n:'Edificio de gobierno',k:'GOB',c:'#ffc233',r:0,sv:1,svg:SVG.GOB},SE:{n:'Subestación',k:'SE',c:'#f2c230',r:0,sv:1,svg:SVG.SE},CFE:{n:'Instalación CFE',k:'CFE',c:'#1b8a4b',r:0,sv:1,svg:SVG.CFE},CG:{n:'Punto de carga (usuarios)',k:'CARGA',c:'#ffd24a',r:0,sv:1,svg:SVG.CG}};
 const COL=['#ff7b72','#79c0ff','#7ee787','#d2a8ff','#ffa657','#56d4dd','#f2cc60','#ff9bce'];
 const map=L.map('map',{preferCanvas:true,keyboard:false}).setView([23.6,-102.5],5);
 const calles=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Esri, HERE, Garmin, OpenStreetMap contributors'}).addTo(map);
@@ -152,7 +256,8 @@ window.initGM=()=>{try{gR=L.gridLayer.googleMutant({type:'roadmap',maxZoom:21});
 if(L.gridLayer.googleMutant){const g=document.createElement('script');g.src='https://maps.googleapis.com/maps/api/js?key='+GMAPS_KEY+'&callback=initGM';g.async=true;g.onerror=()=>gOff('No cargó Google Maps (¿sin conexión?)');document.head.appendChild(g)}else setTimeout(()=>gOff('No cargó el complemento de Google Maps'),0);
 let tileWarn=0;[calles,carto,sat].forEach(t=>t.on('tileerror',()=>{if(!tileWarn++)log('⚠ No cargan los mosaicos del mapa: revise su conexión o cambie de capa (control arriba a la derecha)')}));
 let circ=[],pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0;
-let XF=[],XT=[],xfPrev=null,xfTm=0,QUIET=0,VJC=new Map(); /* XF: maniobras calculadas activas (se guardan en el dispositivo); XT: transferencias activas detectadas por la topología */
+let XF=[],XT=[],xfPrev=null,xfTm=0,QUIET=0,VJC=new Map(),EVT=[],SIM=null,CND=new Set(),TRK={},FORCE=new Set(),LQ=null,NORM=[],FT0=0,ZQ=0,ZG=null,ZN={osm:[],man:[],rural:.12,on:1,t:0},
+ SEAS=(()=>{try{return localStorage.getItem('gc_seas')||'auto'}catch(e){return'auto'}})(); /* XF: maniobras calculadas activas (se guardan en el dispositivo); XT: transferencias activas detectadas por la topología */
 const ov=L.layerGroup().addTo(map),st=p=>ovr&&ovr.has(p)?ovr.get(p):p.st,km=m=>(m/1000).toFixed(2);
 /* ---------- Usuarios y demandas por circuito (ligados por nombre al interruptor) ---------- */
 const DEM0=[]; /* versión web: la tabla de usuarios y demandas NO va incluida; se carga en cada dispositivo con «Cargar tabla» */
@@ -160,12 +265,18 @@ let DEM=new Map(),DEMR=[];
 const dkey=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,''),
  fu=x=>Math.round(x).toLocaleString('es-MX'),
  pn=x=>{if(typeof x=='number')return x;let t=String(x??'').trim().replace(/[^0-9.,\-]/g,'');if(t.includes('.')&&t.includes(','))t=t.replace(/,/g,'');else if(/^\d{1,3}(,\d{3})+$/.test(t))t=t.replace(/,/g,'');else t=t.replace(',','.');return parseFloat(t)};
-function setDem(rows,persist){DEMR=rows;DEM=new Map(rows.map(r=>[dkey(r[0]),{n:r[0],u:r[1],mw:r[2]}]));
- if(persist){try{localStorage.setItem('gc_dem',JSON.stringify(rows))}catch(e){}kvSet('dem',rows)}dlist();if(persist)clearPlan()}
+/* cada fila: [interruptor o equipo, usuarios, demanda MW, carga baja A (oct–abr), carga alta A (may–sep), pickup A]; el interruptor da los totales del circuito y un restaurador o seccionamiento puede traer la carga que hay aguas abajo de él */
+let PHI=-1,RX=null;/* PHI: -1 = fase más cargada; 0,1,2 = fase A,B,C (para calcular cada fase por separado) */
+const normRow=r=>{const n=r[0],u=r[1],f=x=>+x||0;if(r.length>=10)return[n,u,r[2],f(r[3]),f(r[4]),f(r[5]),f(r[6]),f(r[7]),f(r[8]),f(r[9])];if(r.length>=6){const b=f(r[3]),a=f(r[4]);return[n,u,r[2],b,b,b,a,a,a,f(r[5])]}if(r.length==5){const x=Math.max(r[2]||0,isNaN(r[3])?0:r[3]);return[n,u,x,0,0,0,0,0,0,0]}return[n,u,r[2],0,0,0,0,0,0,0]};
+const seasonNow=()=>SEAS=='auto'?([4,5,6,7,8].includes(new Date().getMonth())?'alta':'baja'):SEAS;
+function applySeason(){const s=seasonNow();DEM=new Map(DEMR.map(r=>{const x=normRow(r);return[dkey(x[0]),{n:x[0],u:x[1],mw:x[2],ph:s=='alta'?[x[6],x[7],x[8]]:[x[3],x[4],x[5]],get a(){return PHI<0?Math.max(0,...this.ph):this.ph[PHI]},aB:Math.max(x[3],x[4],x[5]),aA:Math.max(x[6],x[7],x[8]),pk:x[9]}]}))}
+function setDem(rows,persist){DEMR=rows.map(normRow);applySeason();
+ if(persist){try{localStorage.setItem('gc_dem',JSON.stringify(DEMR))}catch(e){}kvSet('dem',DEMR)}dlist();if(persist)clearPlan()}
+function setSeason(v){SEAS=v;try{localStorage.setItem('gc_seas',v)}catch(e){}applySeason();dlist();clearPlan();window.chips&&window.chips();log('Carga para transferencias: '+seasonNow()+(v=='auto'?' (automática según el mes)':' (elegida a mano)'))}
 function dlist(){const ints=pts.filter(p=>p.t=='INT'),ok=ints.filter(p=>DEM.get(dkey(p.name)));
  $('#dm').textContent=DEM.size+' circuitos';if(!DEM.size){$('#dl').innerHTML='<small class="h" style="color:#ffc233">Aún no hay tabla de usuarios y demandas en este dispositivo: pulse «Cargar tabla (.xlsx o .csv)». Se guarda aquí y no hay que repetirlo.</small>';return}
  $('#dl').innerHTML=`<small class="h">${ok.length} de ${ints.length} interruptores con datos · ${new Set(ok.map(p=>dkey(p.name))).size} de ${DEM.size} circuitos de la tabla ya tienen interruptor</small>`+
-  ints.map(p=>{const d=DEM.get(dkey(p.name));return`<div class="r"><span title="${esc(p.name)}">${esc(p.name)}</span><small style="flex:none;color:${d?'var(--m)':'#ffc233'}">${d?fu(d.u)+' usuarios · '+d.mw.toFixed(2)+' MW':'sin coincidencia'}</small></div>`}).join('')}
+  ints.map(p=>{const d=DEM.get(dkey(p.name));return`<div class="r"><span title="${esc(p.name)}">${esc(p.name)}</span><small style="flex:none;color:${d?'var(--m)':'#ffc233'}">${d?fu(d.u)+' usuarios · '+d.mw.toFixed(2)+' MW'+(d.a?' · '+(d.ph.every(x=>x==d.ph[0])?Math.round(d.a)+' A':d.ph.map(x=>Math.round(x)).join('/')+' A (fases A/B/C)')+' ('+seasonNow()+')':'')+(d.pk?' · pickup '+Math.round(d.pk)+' A':''):'sin coincidencia'}</small></div>`}).join('')}
 async function xlsxRows(buf){const z=await JSZip.loadAsync(buf),X=t=>new DOMParser().parseFromString(t,'text/xml'),T2=n=>Array.from(n.getElementsByTagName('t')).map(t=>t.textContent).join('');
  const ss=z.file('xl/sharedStrings.xml')?Array.from(X(await z.file('xl/sharedStrings.xml').async('string')).getElementsByTagName('si')).map(T2):[];
  const sh=Object.keys(z.files).filter(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}))[0];
@@ -173,12 +284,17 @@ async function xlsxRows(buf){const z=await JSZip.loadAsync(buf),X=t=>new DOMPars
  return Array.from(X(await z.file(sh).async('string')).getElementsByTagName('row')).map(r=>{const row=[];
   for(const c of Array.from(r.getElementsByTagName('c'))){const col=[...(c.getAttribute('r')||'A').replace(/[0-9]/g,'')].reduce((a,ch)=>a*26+ch.charCodeAt(0)-64,0)-1,t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0],is=c.getElementsByTagName('is')[0];
    row[col]=t=='s'&&v?ss[+v.textContent]:t=='inlineStr'&&is?T2(is):v?v.textContent:''}return row})}
-const demRows=rows=>rows.map(r=>[String(r[0]??'').replace(/\s+/g,' ').trim(),pn(r[1]),pn(r[2])]).filter(r=>r[0]&&!isNaN(r[1])&&!isNaN(r[2])).map(r=>[r[0],Math.round(r[1]),r[2]]);
+const demRows=rows=>{const f=rows[0]||[],H=rows.length&&String(f[1]??'').trim()!==''&&isNaN(pn(f[1]))?f.map(dkey):null,ix=(...k)=>H?H.findIndex(x=>k.some(y=>x.includes(y))):-1,all=k=>H?H.map((x,i)=>x.includes(k)?i:-1).filter(i=>i>=0):[];
+ let iU=1,iM=2,bs=[3],as=[4],iP=5;
+ if(H){const u=ix('USUARIO','USU'),p=ix('PICKUP');bs=all('BAJA');as=all('ALTA');const m=H.findIndex((x,i)=>i>0&&!bs.includes(i)&&!as.includes(i)&&i!==p&&(x.includes('DEMANDA')||x.includes('MW')||x.includes('KW')));if(u>=0)iU=u;iP=p;iM=m>=0?m:2}
+ else if(Math.max(0,...rows.slice(0,5).map(r=>r.length))>=10){bs=[3,4,5];as=[6,7,8];iP=9}
+ const ph=(r,ids)=>{const v=ids.map(i=>pn(r[i])).map(x=>isNaN(x)?0:x);return v.length>=3?v.slice(0,3):[v[0]||0,v[0]||0,v[0]||0]};
+ return rows.map(r=>{const n=String(r[0]??'').replace(/\s+/g,' ').trim(),g=i=>i>=0?pn(r[i]):NaN,u=g(iU),m=g(iM),p=g(iP);return[n,u,m,...ph(r,bs),...ph(r,as),isNaN(p)?0:p]}).filter(r=>r[0]&&!isNaN(r[1])&&!isNaN(r[2])).map(r=>[r[0],Math.round(r[1]),...r.slice(2)])};
 async function loadDem(f){try{let rows;
   if(/\.csv$/i.test(f.name)){rows=(await f.text()).split(/\r?\n/).map(l=>l.split(l.includes(';')?';':l.includes('\t')?'\t':','))}else rows=await xlsxRows(await f.arrayBuffer());
-  const t=demRows(rows);if(!t.length)return log('⚠ No se encontraron filas con circuito, usuarios y demanda (3 columnas)');
+  const t=demRows(rows);if(!t.length)return log('⚠ No se encontraron filas con interruptor o equipo, usuarios y demanda');
   const dup=t.length-new Set(t.map(r=>dkey(r[0]))).size;setDem(t,true);
-  log('Tabla de usuarios y demandas cargada: '+t.length+' circuitos'+(dup?' (⚠ '+dup+' nombres repetidos; se usó el último)':''))}catch(x){log('⚠ No se pudo leer el archivo: '+x.message)}}
+  log('Tabla cargada: '+t.length+' interruptores o equipos'+(dup?' (⚠ '+dup+' nombres repetidos; se usó el último)':''))}catch(x){log('⚠ No se pudo leer el archivo: '+x.message)}}
 const log=m=>{const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString()+'  '+m;$('#log').prepend(d)};
 const dist=(a,b)=>Math.hypot((b[1]-a[1])*Math.cos((a[0]+b[0])*rad/2),b[0]-a[0])*rad*R;
 /* ---------- Coordenadas (WGS84, mismo formato que Google Maps: lat, lng) ---------- */
@@ -223,16 +339,16 @@ async function subLayer({z,d}){const g=L.featureGroup(),bl={},sty={};
 let subs=[];
 async function ingest(f,k,sv){const nm=sv?sv.name:f.name.replace(/\.(kmz|kml)$/i,''),kmz=sv?sv.kmz:/\.kmz$/i.test(f.name);
  try{const o=await openKml(f,kmz),sg=lines(o.d),c=sv||{id:k+Date.now()+Math.random(),k,kmz,t:Date.now(),name:nm,on:1,blob:f};
-  if(k=='c'&&!sg.length)k=c.k='s';
+  if(k=='c'&&!sg.length){log('⚠ '+nm+': no contiene líneas de circuito');return}
   if(k=='c'){c.color=c.color||COL[circ.length%COL.length];c.segs=sg;c.layer=L.polyline(sg,{color:c.color,weight:3,opacity:.9}).bindTooltip(nm,{sticky:true});circ.push(c);log('Circuito '+nm+': '+sg.length+' tramos')}
   else{c.layer=await subLayer(o);subs.push(c);log('Capa de subestaciones: '+nm)}
   if(c.on)c.layer.addTo(map);if(!sv)dbDo('put',rec(c))}
  catch(x){log('⚠ '+nm+': '+x)}}
-for(const[i,k]of[['fi','c'],['fs','s']])$('#'+i).onchange=async e=>{const fs=[...e.target.files];e.target.value='';for(const f of fs){if(k=='c'&&circ.length>=MAX){log('⚠ Límite de '+MAX+' circuitos');break}await ingest(f,k)}list();if(k=='c')resolveLinks(1);clearPlan();fitAll()};
+for(const[i,k]of[['fi','c']])$('#'+i).onchange=async e=>{const fs=[...e.target.files];e.target.value='';for(const f of fs){if(k=='c'&&circ.length>=MAX){log('⚠ Límite de '+MAX+' circuitos');break}await ingest(f,k)}list();if(k=='c')resolveLinks(1);clearPlan();fitAll()};
 function fitAll(){const b=L.featureGroup([...circ,...subs].map(c=>c.layer)).getBounds();if(b.isValid())map.fitBounds(b)}
-(async()=>{const a=(await dbDo('getAll'))||[];a.sort((x,y)=>x.t-y.t);for(const r of a)await ingest(r.blob,r.k,r);list();resolveLinks();fitAll();if(a.length)log('Cargados automáticamente '+a.length+' archivo(s) guardado(s)')})();
-function list(){const row=(c,i,a)=>`<div class="r"><input type="checkbox" ${c.on?'checked':''} onchange="vis('${a}',${i},this.checked)">${a=='c'?`<input type="color" value="${c.color}" onchange="col(${i},this.value)">`:'<span style="flex:none;width:22px;text-align:center">▲</span>'}<span title="${esc(c.name)}">${esc(c.name)}</span><button onclick="zoom('${a}',${i})">⌖</button><button onclick="rm('${a}',${i})">✕</button></div>`;
- $('#cl').innerHTML=circ.map((c,i)=>row(c,i,'c')).join('');$('#sl').innerHTML=subs.map((c,i)=>row(c,i,'s')).join('');$('#cc').textContent=circ.length+'/'+MAX;fillDc()}
+(async()=>{const a=(await dbDo('getAll'))||[];a.sort((x,y)=>x.t-y.t);for(const r of a){if(r.k=='s'){dbDo('delete',r.id);continue}await ingest(r.blob,r.k,r)}list();resolveLinks();fitAll();if(a.length)log('Cargados automáticamente '+a.length+' archivo(s) guardado(s)')})();
+function list(){const row=(c,i,a)=>`<div class="r"><input type="checkbox" ${c.on?'checked':''} onchange="vis('${a}',${i},this.checked)">${a=='c'?`<input type="color" value="${c.color}" onchange="col(${i},this.value)">`:'<span style="flex:none;width:22px;text-align:center">▲</span>'}<span title="${esc(c.name)}">${esc(c.name)}</span><button onclick="zoom('${a}',${i})">⌖</button>${a=='c'?`<button onclick="cNd(${i})" title="Circuito en licencia o fuera de servicio: no recibe cargas" style="${CND.has(c.name)?'color:#ffc233;border-color:#ffc233':''}">⛔</button>`:''}<button onclick="rm('${a}',${i})">✕</button></div>`;
+ $('#cl').innerHTML=circ.map((c,i)=>row(c,i,'c')).join('');$('#cc').textContent=circ.length+'/'+MAX;fillDc()}
 const arr=a=>a=='c'?circ:subs;
 function vis(a,i,v){const c=arr(a)[i];c.on=v?1:0;v?c.layer.addTo(map):c.layer.remove();dbDo('put',rec(c));if(a=='c')clearPlan()}
 function col(i,v){circ[i].color=v;circ[i].layer.setStyle({color:v});dbDo('put',rec(circ[i]))}
@@ -244,36 +360,58 @@ if(!window.isSecureContext)warnGps();
 const bt=(k,v)=>`<button data-m="${k}" style="--c:${v.c}">${v.n}</button>`,E=Object.entries(T);
 $('#tb').innerHTML=E.filter(([k,v])=>!v.sv).map(([k,v])=>bt(k,v)).join('')+'<button data-m="TRAZO" style="--c:#00e5ff">Trazar flujo en cruce</button>';
 $('#sv').innerHTML=E.filter(([k,v])=>v.sv).map(([k,v])=>bt(k,v)).join('');
-function setMode(m){if(mode=='TRAZO'&&m!='TRAZO')endTrace(0);if(mode=='DR'&&m!='DR')drReset();mode=m;map.doubleClickZoom[m=='TRAZO'?'disable':'enable']();document.querySelectorAll('#tb button,#sv button').forEach(b=>b.classList.toggle('on',b.dataset.m==m));map.getContainer().style.cursor=m?'crosshair':''}
+function setMode(m){if(mode=='TRAZO'&&m!='TRAZO')endTrace(0);if(mode=='DR'&&m!='DR')drReset();if(mode=='ZU'&&m!='ZU')zReset();if(mode=='TR'&&m!='TR')trA=null;mode=m;map.doubleClickZoom[m=='TRAZO'?'disable':'enable']();document.querySelectorAll('#tb button,#sv button').forEach(b=>b.classList.toggle('on',b.dataset.m==m));map.getContainer().style.cursor=m?'crosshair':''}
 document.querySelectorAll('#tb button,#sv button').forEach(b=>b.onclick=()=>setMode(mode==b.dataset.m?null:b.dataset.m));
-addEventListener('keydown',e=>{if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.key=='Escape')setMode(null);if(e.key=='Enter'&&mode=='TRAZO')endTrace(1)});
+addEventListener('keydown',e=>{if(/^(INPUT|TEXTAREA)$/.test(e.target.tagName))return;if(e.key=='Escape')setMode(null);if(e.key=='Enter'&&mode=='TRAZO')endTrace(1);if(e.key=='Enter'&&mode=='ZU')zEnd()});
 addEventListener('error',e=>log('⚠ Error en la aplicación: '+(e.message||'desconocido')));addEventListener('unhandledrejection',e=>log('⚠ Error: '+((e.reason&&e.reason.message)||e.reason)));
-const demPop=p=>p.t!='INT'?'':(d=>d?`Usuarios: <b>${fu(d.u)}</b> · Demanda: <b>${d.mw.toFixed(2)} MW</b><br>`:(DEM.size?`<b style="color:#b8860b">Sin datos</b>: su nombre no coincide con ningún circuito de la tabla<br>`:`<b style="color:#b8860b">Sin tabla</b> de usuarios y demandas cargada en este dispositivo<br>`))(DEM.get(dkey(p.name)));
-const pop=p=>`<b>${esc(p.name)}</b><br>${T[p.t].n}${T[p.t].sv?'':` · <b style="color:${p.st?'#d12':'#1a9c57'}">${p.st?'CERRADO':'ABIERTO'}</b>`}<br>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><input value="${esc(p.name)}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)"><br>${demPop(p)}${cPop(p)}${p.t=='RES'?mdPop(p):''}${T[p.t].sv?'':`<button onclick="tog(${p.id})">${p.st?'Abrir':'Cerrar'}</button> `}${!T[p.t].sv&&p.t!='DR'&&p.cn?`<button onclick="${p.t=='INT'?'insStart':'insMenu'}(${p.id})">🧭 ${p.t=='INT'?'Inspeccionar circuito':'Inspeccionar desde aquí'}</button> `:''}<button onclick="mvArm(${p.id})">📍 Mover ubicación</button> <button onclick="del(${p.id})">Eliminar</button>`;
-function mk(p){const t=T[p.t],dr=p.t=='DR',h=L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],html:t.sv?`<div class="sv">${t.svg}</div>`:`<div class="pt ${p.st?'':'op'} ${hl.get(p)||''}${p.t=='ENL'&&p.cn&&!p.cn2?' pend':''}${p.t=='RES'&&p.md=='SW'?' swm':''}" style="border-radius:${t.r}px${dr?';transform:translate(-50%,calc(-100% - 12px))':''}">${t.svg||''}${esc(p.name)}${p.t=='RES'&&p.md=='SW'?' · SW':''}</div>`});
+const demPop=p=>T[p.t].sv||p.t=='DR'||p.t=='ENL'?'':(d=>d?`Usuarios: <b>${fu(d.u)}</b> · Demanda: <b>${d.mw.toFixed(2)} MW</b>${d.a?` · <b>${Math.round(d.a)} A</b> (carga ${seasonNow()})`:''}${d.pk?` · pickup <b>${Math.round(d.pk)} A</b>`:''}<br>`:(p.t!='INT'?'':DEM.size?`<b style="color:#b8860b">Sin datos</b>: su nombre no coincide con ningún circuito de la tabla<br>`:`<b style="color:#b8860b">Sin tabla</b> de usuarios y demandas cargada en este dispositivo<br>`))(DEM.get(dkey(p.name)));
+const pop=p=>`<b>${esc(p.name)}</b><br>${T[p.t].n}${T[p.t].sv?'':` · <b style="color:${p.st?'#d12':'#1a9c57'}">${p.st?'CERRADO':'ABIERTO'}</b>`}<br>${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}<br><input value="${esc(p.name)}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)"><br>${demPop(p)}${capPop(p)}${p.t=='CG'?cgPop(p):''}${T[p.t].sv?lcPop(p):''}${cPop(p)}${p.t=='RES'?mdPop(p):''}${T[p.t].sv?'':`<button onclick="tog(${p.id})">${p.st?'Abrir':'Cerrar'}</button> `}${!T[p.t].sv&&p.t!='DR'&&p.cn?`<button onclick="${p.t=='INT'?'insStart':'insMenu'}(${p.id})">🧭 ${p.t=='INT'?'Inspeccionar circuito':'Inspeccionar desde aquí'}</button> `:''}${ndPop(p)}<button onclick="mvArm(${p.id})">📍 Mover ubicación</button> <button onclick="del(${p.id})">Eliminar</button>`;
+function mk(p){const t=T[p.t],dr=p.t=='DR',h=L.divIcon({className:'',iconSize:[0,0],iconAnchor:[0,0],html:t.sv?`<div class="sv">${t.svg}${p.t=='CG'?`<span class="cgw">${p.w}</span>`:''}</div>`:`<div class="pt ${p.st?'':'op'} ${hl.get(p)||''}${p.t=='ENL'&&p.cn&&!p.cn2?' pend':''}${p.t=='RES'&&p.md=='SW'?' swm':''}${p.nd?' ndp':''}" style="border-radius:${t.r}px${dr?';transform:translate(-50%,calc(-100% - 12px))':''}">${t.svg||''}${esc(p.name)}${p.t=='RES'&&p.md=='SW'?' · SW':''}${p.nd?' ⛔':''}</div>`});
  if(dr)drMark(p);
- if(p.m){p.m.setIcon(h);if(mv&&mv.p===p){const e=p.m.getElement();e&&e.classList.add('mving')}return pvis(p)}
+ if(p.m){if(p._h===h.options.html&&!(mv&&mv.p===p))return pvis(p);p._h=h.options.html;p.m.setIcon(h);if(mv&&mv.p===p){const e=p.m.getElement();e&&e.classList.add('mving')}return pvis(p)}
  p.m=L.marker([p.lat,p.lng],{icon:h,draggable:false}).addTo(map).bindTooltip(()=>p.name+(p.cn?' · '+p.cn+(p.cn2?' ↔ '+p.cn2:''):'')).bindPopup(()=>pop(p));
  p.m.on('dragend',()=>mvDrag(p));pvis(p)}
 /* casilla del equipo: oculto = no se ve y no participa en el análisis (igual que un circuito desmarcado) */
-function pvis(p){if(p.vis!==0){if(!map.hasLayer(p.m))p.m.addTo(map);if(p.g&&!map.hasLayer(p.g))p.g.addTo(map)}else{p.m.remove();if(p.g)p.g.remove()}}
+let INSH=null;
+const insHidden=p=>!!INSH&&(T[p.t].sv?!(p.lc&&p.lc.includes(INSH.c)):!(p.cn===INSH.c||p.cn2===INSH.c));
+function pvis(p){if(p.vis!==0&&!insHidden(p)){if(!map.hasLayer(p.m))p.m.addTo(map);if(p.g&&!map.hasLayer(p.g))p.g.addTo(map)}else{p.m.remove();if(p.g)p.g.remove()}}
+/* durante una inspección solo se ve el circuito inspeccionado y los equipos ligados a él; al terminar, o al marcar una falla, todo vuelve a verse */
+function insIsolate(c){insRestore();INSH={c,xt:map.hasLayer(xtl)};
+ circ.forEach(x=>{if(x.name!==c&&x.on&&map.hasLayer(x.layer))map.removeLayer(x.layer)});
+ if(INSH.xt)map.removeLayer(xtl);if(typeof rml!=='undefined'&&map.hasLayer(rml))map.removeLayer(rml);
+ pts.forEach(p=>{if(p.m)pvis(p)})}
+function insRestore(){if(!INSH)return;const xt=INSH.xt;INSH=null;
+ circ.forEach(x=>{if(x.on&&!map.hasLayer(x.layer))x.layer.addTo(map)});
+ if(xt&&!map.hasLayer(xtl))xtl.addTo(map);pts.forEach(p=>{if(p.m)pvis(p)});if(typeof updRM==='function')updRM()}
 function pshow(id,v){const p=byId(id);p.vis=v?1:0;pvis(p);save();plist();clearPlan()}
 const byId=id=>pts.find(p=>p.id==id),cnt=()=>{$('#pc').textContent=pts.length;plist()};
 function plist(){dlist();$('#ptl').innerHTML=pts.map(p=>`<div class="r" style="${p.vis===0?'opacity:.5':''}"><input type="checkbox" ${p.vis===0?'':'checked'} onchange="pshow(${p.id},this.checked)" title="Mostrar / ocultar en el mapa"><i style="flex:none;width:11px;height:11px;border-radius:${T[p.t].r}px;background:${T[p.t].c}"></i><input value="${esc(p.name)}" title="${T[p.t].n}" onfocus="this.select()" onkeydown="event.stopPropagation()" onchange="ren(${p.id},this)" style="flex:1;min-width:0;background:#0a1219;color:var(--t);border:1px solid var(--l);border-radius:4px;padding:3px 5px">${T[p.t].sv?'':`<small style="flex:none;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m)" title="Circuito">${esc(p.t=='ENL'?(p.cn||'?')+' ↔ '+(p.cn2||'⏳ pendiente'):p.cn||'sin circuito')}</small>`}<button onclick="goP(${p.id})">⌖</button></div>`).join('')}
 function goP(id){const p=byId(id);if(p.vis===0){p.vis=1;pvis(p);save();plist();clearPlan()}map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}
-const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,u:p.u,...(p.vis===0?{vis:0}:{}),...(p.t=='RES'&&p.md=='SW'?{md:'SW'}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{}),...(p.auto?{auto:1}:{})});
-const save=()=>{try{localStorage.setItem('gc_pts',JSON.stringify(pts.map(ser)))}catch(e){}kvSet('pts',pts.map(ser))};
-function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1,u:o.u||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7))};if(p.t=='RES')p.md=o.md=='SW'?'SW':'RES';if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}if(o.auto)p.auto=1;pts.push(p);mk(p);return p}
+const ser=p=>({t:p.t,name:p.name,lat:p.lat,lng:p.lng,st:p.st,u:p.u,...(p.vis===0?{vis:0}:{}),...(p.t=='RES'&&p.md=='SW'?{md:'SW'}:{}),...(T[p.t].sv?{}:{cn:p.cn,au:p.au}),...(p.t=='ENL'?{cn2:p.cn2}:{}),...(p.t=='DR'?{a:p.a,b:p.b}:{}),...(p.auto?{auto:1}:{}),...(p.nd?{nd:1}:{}),...(p.pk?{pk:p.pk}:{}),...(p.lc&&p.lc.length?{lc:p.lc}:{}),...(p.t=='CG'?{w:p.w}:{})});
+const save=()=>{if(SIM)return;try{localStorage.setItem('gc_pts',JSON.stringify(pts.map(ser)))}catch(e){}kvSet('pts',pts.map(ser))};
+function addPt(o){const p={id:++seq,t:o.t,name:o.name||T[o.t].k+'-'+(pts.filter(x=>x.t==o.t).length+1),lat:+o.lat,lng:+o.lng,st:o.st??(o.t=='ENL'?0:1),vis:o.vis===0?0:1,u:o.u||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7))};if(p.t=='RES')p.md=o.md=='SW'?'SW':'RES';if(!T[p.t].sv){p.cn=o.cn||'';p.au=o.au??(o.cn?0:1)}if(p.t=='ENL')p.cn2=o.cn2||'';if(p.t=='DR'&&o.a&&o.b){p.a=o.a;p.b=o.b}if(o.auto)p.auto=1;if(o.nd)p.nd=1;if(o.pk>0)p.pk=+o.pk;if(Array.isArray(o.lc))p.lc=o.lc.slice(0,60);if(p.t=='CG')p.w=+o.w>0?+o.w:1;pts.push(p);mk(p);return p}
 /* ---------- Restaurador: Modo Restaurador (opera solo ante falla aguas abajo) / Modo Switch (no opera solo) ---------- */
 const mdPop=p=>`Modo: <select onchange="setMd(${p.id},this.value)"><option value="RES" ${p.md=='SW'?'':'selected'}>Restaurador (opera solo)</option><option value="SW" ${p.md=='SW'?'selected':''}>Switch (no opera solo)</option></select><br>`;
 function setMd(id,v){const p=byId(id);if(!p||p.t!='RES')return;p.md=v=='SW'?'SW':'RES';p.m.closePopup();save();mk(p);clearPlan();log(p.name+' en Modo '+(p.md=='SW'?'Switch (no opera automáticamente)':'Restaurador (opera automáticamente)'))}
-function tog(id){const p=byId(id);p.st^=1;log((p.st?'CERRAR ':'ABRIR ')+p.name+' (manual)');p.m.closePopup();save();clearPlan()}
+function tog(id){const p=byId(id),q=LQ,had=!!plan&&!!q;p.st^=1;log((p.st?'CERRAR ':'ABRIR ')+p.name+' (manual)');p.m.closePopup();
+ if(p.t=='DR'){PUENT=PUENT.filter(x=>x!==p.u);if(had&&p.st==0)PUENT.push(p.u)}
+ if(p.t=='DR'&&p.auto&&p.st==1){rmPt(p);log('Puenteo de ramal cerrado: vuelve a ser solo una conexión informativa')}
+ save();clearPlan();if(had&&p.t=='DR')runFault(q)}
 function del(id){const p=byId(id);if(mv&&mv.p===p)mvCancel(1);const o=ser(p);p.m.remove();p.g&&p.g.remove();pts=pts.filter(x=>x!=p);cnt();save();clearPlan();toast('Eliminado: '+p.name,'Deshacer',()=>{const q=addPt(o);cnt();save();clearPlan();log('↩ '+q.name+' restaurado')})}
 function ren(id,el){const p=byId(id);p.name=el.value.trim()||'s/n';el.value=p.name;save();mk(p);dlist();if(!el.closest('#ptl'))plist()}
 function loadPts(a){try{mvCancel(1)}catch(e){}pts.forEach(p=>{p.m&&p.m.remove();p.g&&p.g.remove()});pts=[];a.map(o=>({...o,t:o.t=='SP'?'RES':o.t})).filter(o=>T[o.t]).forEach(addPt);cnt()}
+/* ---------- No disponible · capacidad · puntos de carga ---------- */
+const ndPop=p=>['ENL','RES','SS','CCF','DR'].includes(p.t)?`<button onclick="toggNd(${p.id})">${p.nd?'✅ Marcar disponible':'⛔ Marcar no disponible'}</button> `:'',
+ capPop=p=>p.t=='INT'?`Pickup (A): <input type="number" step="1" min="0" value="${p.pk||''}" placeholder="${(DEM.get(dkey(p.name))||{}).pk||'—'}" onkeydown="event.stopPropagation()" onchange="setCap(${p.id},this.value)" style="width:80px"><br>`:'',
+ cgPop=p=>`Usuarios (peso): <input type="number" min="0" step="1" value="${p.w}" onkeydown="event.stopPropagation()" onchange="setW(${p.id},this.value)" style="width:80px"><br><small>Reparte los usuarios del circuito según estos puntos.</small><br>`;
+function toggNd(id){const p=byId(id);if(!p)return;p.nd=p.nd?0:1;p.m.closePopup();save();mk(p);clearPlan();log(p.name+(p.nd?' marcado NO DISPONIBLE: no se usará en las maniobras':' disponible de nuevo'))}
+function setCap(id,v){const p=byId(id);if(!p)return;const x=parseFloat(v);if(x>0)p.pk=x;else delete p.pk;save();clearPlan();dlist()}
+function setW(id,v){const p=byId(id);if(!p)return;const x=parseFloat(v);p.w=x>=0?x:1;save();mk(p);clearPlan()}
+function cNd(i){const c=circ[i];CND.has(c.name)?CND.delete(c.name):CND.add(c.name);cndSave();list();clearPlan();log('Circuito '+c.name+(CND.has(c.name)?' en licencia / fuera de servicio: no recibirá cargas':' disponible de nuevo'))}
+const cndSave=()=>{if(SIM)return;try{localStorage.setItem('gc_cnd',JSON.stringify([...CND]))}catch(e){}};
 /*XF-INI*/
 /* ---------- Transferencias activas (se detectan por la topología, también las manuales) y maniobras calculadas ---------- */
-const ptU=u=>pts.find(p=>p.u===u),xfSave=()=>{try{localStorage.setItem('gc_xf',JSON.stringify(XF))}catch(e){}kvSet('xf',XF)},
+const ptU=u=>pts.find(p=>p.u===u),xfSave=()=>{if(SIM)return;try{localStorage.setItem('gc_xf',JSON.stringify(XF))}catch(e){}kvSet('xf',XF)},
  stDiff=snap=>snap.map(([p,s])=>p.st!==s?[p.u,s,p.st]:null).filter(Boolean),BOOT=Date.now();
 /* tramo de un circuito que hoy alimenta otro circuito por un enlace cerrado: se detecta solo, sea la maniobra manual o calculada */
 function transfers(E){E=E||energized();const N=G.N,out=[],seen=new Set(),
@@ -288,29 +426,29 @@ function transfers(E){E=E||energized();const N=G.N,out=[],seen=new Set(),
  return out}
 /* estado normal de las transferencias (solo en memoria): enlaces abiertos y seccionamientos de regreso cerrados */
 const trNormal=trs=>{const w=new Map();trs.forEach(t=>{t.ties.forEach(p=>w.set(p,0));t.ret.forEach(p=>w.set(p,1))});return w};
-const ensureG=()=>{if(plan||(typeof ins!=='undefined'&&ins))return;QUIET=1;try{attach()}finally{QUIET=0}};
+const ensureG=()=>{if(plan||(typeof ins!=='undefined'&&ins))return;QUIET=1;try{attachC()}finally{QUIET=0}};
 function xfRefresh(){clearTimeout(xfTm);xfTm=setTimeout(()=>{try{
-  if(!circ.some(c=>c.on)||!pts.length){XT=[];xfList();return}
-  ensureG();XT=transfers();
+  if(!circ.some(c=>c.on)||!pts.length){XT=[];xfList();drawXT();return}
+  const sg=xfSig();if(sg===xfSg&&xfPrev)return;xfSg=sg;ensureG();XT=transfers();
   if(xfPrev&&Date.now()-BOOT>20000){const nw=XT.filter(t=>!xfPrev.has(t.key));
    nw.forEach(t=>log('🔁 Transferencia activa detectada: '+t.fromName+' → '+t.to+' · '+km(t.l)+' km (enlace '+t.ties.map(p=>p.name).join(', ')+')'));
    if(nw.length)toast('🔁 Transferencia activa: '+nw.map(t=>t.fromName+' → '+t.to+' · '+km(t.l)+' km').join('; '))}
-  xfPrev=new Set(XT.map(t=>t.key));xfList()}catch(e){console.error(e)}},300)}
+  xfPrev=new Set(XT.map(t=>t.key));xfList();drawXT();drawTR();drawRM();window.chips&&window.chips()}catch(e){console.error(e)}},300)}
 const xfBoot=setInterval(()=>{if(xfPrev)clearInterval(xfBoot);else xfRefresh()},2500);
-function xfGo(k){const t=XT.find(x=>x.key==k);if(t&&t.at){if(innerWidth<=800){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}map.setView(t.at,Math.max(map.getZoom(),16))}}
+function xfGo(k){const t=XT.find(x=>x.key==k);if(t&&t.at){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel';map.setView(t.at,Math.max(map.getZoom(),16))}}
 /* normalizar una transferencia: abrir su enlace y cerrar el seccionamiento que la regresa a su circuito */
 function trRev(k){ensureG();const t=transfers().find(x=>x.key==k);if(!t)return xfRefresh();
  if(!t.ret.length)return toast('No hay un seccionamiento abierto que regrese ese tramo a su circuito: opere el equipo manualmente');
  t.ties.forEach(p=>{p.st=0;log('ABRIR '+p.name+' (normalizar transferencia)')});t.ret.forEach(p=>{p.st=1;log('CERRAR '+p.name+' (normalizar transferencia)')});
- save();clearPlan();log('Transferencia normalizada: '+t.fromName+' recupera '+km(t.l)+' km')}
+ save();clearPlan();log('Transferencia normalizada: '+t.fromName+' recupera '+km(t.l)+' km');toast('Transferencia normalizada','Avisar por WhatsApp',()=>waText('✅ TRANSFERENCIA NORMALIZADA\n'+t.fromName+' recupera '+km(t.l)+' km\nABRIR '+t.ties.map(p=>p.name).join(', ')+' · CERRAR '+t.ret.map(p=>p.name).join(', ')+'\nHora: '+hm(Date.now())))}
 function xfList(){const e=$('#xl2');if(!e)return;$('#xn').textContent=XT.length||'';
  const m=XF.length?`<small class="h">Maniobras calculadas activas: ${XF.length}. El botón «Normalizar» las deshace; las transferencias no se tocan.</small>`:'';
  e.innerHTML=(XT.length?XT.map(t=>`<div class="xr"><div><b>${esc(t.fromName)} → ${esc(t.to)}</b> · ${km(t.l)} km<small>Enlace ${esc(t.ties.map(p=>p.name).join(', '))}${t.ret.length?' · seccionamiento abierto: '+esc(t.ret.map(p=>p.name).join(', ')):''}</small></div><button data-a="go" data-k="${esc(t.key)}" title="Ir al enlace">⌖</button><button data-a="rev" data-k="${esc(t.key)}">Normalizar</button></div>`).join(''):'<small class="h">Sin transferencias activas: todos los circuitos están en su estado normal.</small>')+m}
 if($('#xl2'))$('#xl2').addEventListener('click',ev=>{const b=ev.target.closest('button[data-a]');if(!b)return;b.dataset.a=='rev'?trRev(b.dataset.k):xfGo(b.dataset.k)});
 /* maniobras calculadas (las de «Ejecutar maniobra»): se guardan para poder normalizarlas, aun al reabrir la app */
-function xfAdd(P,snap){const r={id:Date.now(),t:Date.now(),fp:P.f.p,eq:P.trip.name,fc:cn(P.f.F),chg:stDiff(snap),keep:P.isl.filter(i=>i.t).flatMap(i=>[i.t.p.u,...(i.t.norm?i.t.norm.ties.map(e=>e.u):[])])};XF.push(r);P.xid=r.id;xfSave();xfRefresh()}
+function xfAdd(P,snap){const r={id:Date.now(),t:Date.now(),fp:P.f.p,eq:P.trip.name,fc:cn(P.f.F),chg:stDiff(snap),keep:[...P.isl.filter(i=>i.t).flatMap(i=>[i.t.p.u,...(i.t.norm?i.t.norm.ties.map(e=>e.u):[])]),...(P.xo||[]).map(p=>p.u)]};XF.push(r);P.xid=r.id;xfSave();xfRefresh()}
 const protPts=()=>{const s=new Set();try{transfers().forEach(t=>{t.ties.forEach(p=>s.add(p));t.ret.forEach(p=>s.add(p))})}catch(e){}return s};
-function xfRevert(r,prot){let s=0,k=0;const kp=new Set(r.keep||[]);[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(!p)return;if(prot.has(p)||kp.has(c[0])){k++;return}if(p.st===c[2]){p.st=c[1];log((c[1]?'CERRAR ':'ABRIR ')+p.name+' (normalizar)');if(p.auto&&c[1]===1){log('Puentes del ramal restablecidos: '+p.name);rmPt(p)}}else s++});XF=XF.filter(x=>x!==r);return{s,k}}
+function xfRevert(r,prot){let s=0,k=0;const kp=new Set(r.keep||[]);[...r.chg].reverse().forEach(c=>{const p=ptU(c[0]);if(!p)return;if(prot.has(p)||kp.has(c[0])){k++;return}if(p.st===c[2]){p.st=c[1];NORM.push(p.name);log((c[1]?'CERRAR ':'ABRIR ')+p.name+' (normalizar)');if(p.auto&&c[1]===1){log('Puentes del ramal restablecidos: '+p.name);rmPt(p)}}else s++});XF=XF.filter(x=>x!==r);return{s,k}}
 function xfAll(){ensureG();const prot=protPts();let s=0,k=0;[...XF].reverse().forEach(r=>{const x=xfRevert(r,prot);s+=x.s;k+=x.k});XF=[];xfSave();return{s,k}}
 /*XF-FIN*/
 /*HD-INI*/
@@ -319,20 +457,248 @@ function hostDem(src,comp,trs){const d0=DEM.get(dkey(src.name));if(!d0)return nu
  try{trs=trs||transfers();if(!trs.length)return d0;
   const o=ovr;ovr=trNormal(trs);let E0;try{E0=energized()}finally{ovr=o}
   const N=G.N,L0=new Map(),cur=new Map(),C=new Set(comp.keys());
-  E0.forEach((p,n)=>{for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&E0.has(e.b))L0.set(p,(L0.get(p)||0)+e.l)});
-  C.forEach(n=>{const p=E0.get(n)||src;for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&C.has(e.b))cur.set(p,(cur.get(p)||0)+e.l)});
+  E0.forEach((p,n)=>{for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&E0.has(e.b))L0.set(p,(L0.get(p)||0)+ew(e))});
+  C.forEach(n=>{const p=E0.get(n)||src;for(const e of N[n].adj)if(!e.d&&!e.tie&&e.a==n&&C.has(e.b))cur.set(p,(cur.get(p)||0)+ew(e))});
   if(!(L0.get(src)>0))return d0;
-  let u=0,mw=0,xu=0,xm=0;
-  cur.forEach((l,p)=>{const d=p===src?d0:DEM.get(dkey(p.name)),l0=L0.get(p);if(!d||!(l0>0))return;const k=l/l0;u+=d.u*k;mw+=d.mw*k;if(p!==src){xu+=d.u*k;xm+=d.mw*k}});
-  return{n:d0.n,u,mw,xu,xm}}catch(e){return d0}}
+  let u=0,mw=0,a=0,xu=0,xm=0;
+  cur.forEach((l,p)=>{const d=p===src?d0:DEM.get(dkey(p.name)),l0=L0.get(p);if(!d||!(l0>0))return;const k=l/l0;u+=d.u*k;mw+=d.mw*k;a+=(d.a||0)*k;if(p!==src){xu+=d.u*k;xm+=d.mw*k}});
+  return{n:d0.n,u,mw,a,xu,xm,pk:d0.pk}}catch(e){return d0}}
 /*HD-FIN*/
+
+/* ---------- Mancha urbana: la carga se reparte según la densidad de la zona (urbana / rural) ---------- */
+const ZD={A:1.3,U:1,P:.5,I:.35},ZCL={U:'Urbana',A:'Comercial o centro',P:'Periurbana',I:'Industrial',R:'Rural (forzar)'},
+ bbox=p=>{let a=90,b=180,c=-90,d=-180;for(const[y,x]of p){if(y<a)a=y;if(y>c)c=y;if(x<b)b=x;if(x>d)d=x}return[a,b,c,d]},
+ pip=(p,y,x)=>{let r=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const yi=p[i][0],xi=p[i][1],yj=p[j][0],xj=p[j][1];if((yi>y)!=(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)r=!r}return r};
+function zIndex(){ZG=new Map();const list=[...ZN.osm,...ZN.man];ZN.man.forEach(z=>z.man=1);
+ list.forEach(z=>{const b=z.bb=bbox(z.poly);for(let a=Math.floor(b[0]/.002);a<=Math.floor(b[2]/.002);a++)for(let c=Math.floor(b[1]/.002);c<=Math.floor(b[3]/.002);c++){const k=a+'|'+c;(ZG.get(k)||ZG.set(k,[]).get(k)).push(z)}});
+ ZQ=ZN.on&&list.length>0?1:0}
+function zDens(m){const l=ZG&&ZG.get(Math.floor(m[0]/.002)+'|'+Math.floor(m[1]/.002));
+ if(l){let best=null;for(let i=l.length-1;i>=0;i--){const z=l[i],b=z.bb;if(b[0]<=m[0]&&m[0]<=b[2]&&b[1]<=m[1]&&m[1]<=b[3]&&pip(z.poly,m[0],m[1])){if(z.man){best=z;break}if(!best)best=z}}if(best)return best.c=='R'?ZN.rural:ZD[best.c]}
+ return ZN.rural}
+/* peso de un conjunto de nodos: 1 = puntos de carga, 2 = densidad de zona, 3 = longitud de línea */
+const ew=e=>e.q!==undefined?e.q:e.l;
+function wsum(S,mode){let s=0;if(mode==1){S.forEach(n=>{s+=G.N[n].ld||0});return s}
+ S.forEach(n=>{for(const e of G.N[n].adj)if(!e.d&&!e.tie&&e.a==n&&S.has(e.b))s+=mode==2?ew(e):e.l});return s}
+function wmode(comp){const C=comp instanceof Set?comp:new Set(comp.keys());let ld=0;C.forEach(n=>{ld+=G.N[n].ld||0});
+ if(ld>0)return{mode:1,tot:ld};if(ZQ){const t=wsum(C,2);if(t>0)return{mode:2,tot:t}}return{mode:3,tot:wsum(C,3)}}
+const ud=(P,S)=>{const d=dem(P);if(!d)return null;if(P.al)return udAl(P,S);const t=P.wm&&P.wm.tot>0?P.wm.tot:(P.Lc||1),x=P.wm?wsum(S,P.wm.mode):len(S);return{u:d.u*x/t,mw:d.mw*x/t,a:(d.a||0)*x/t}},
+ pcs=(P,S)=>{const a=wsum(P.dn,P.wm.mode);return a?100*wsum(S,P.wm.mode)/a:0},
+ servedSet=P=>{const E=energized();return new Set([...P.dn].filter(n=>E.has(n)))};
+/* ---------- Carga por equipo: un restaurador o seccionamiento con datos en la tabla reparte la carga de su propio tramo ---------- */
+function wacc(S,mode,own,def){const m=new Map(),add=(n,w)=>{const o=own.get(n)||def;m.set(o,(m.get(o)||0)+w)};
+ if(mode==1)S.forEach(n=>{const w=G.N[n].ld;if(w>0)add(n,w)});
+ else S.forEach(n=>{for(const e of G.N[n].adj)if(!e.d&&!e.tie&&e.a==n&&S.has(e.b))add(n,mode==2?ew(e):e.l)});return m}
+function buildAlloc(comp,par,src,wm,root){const kids=new Map(),own=new Map([[src.n,'r']]),rows=new Map([['r',root]]);par.forEach((a,c)=>(kids.get(a)||kids.set(a,[]).get(a)).push(c));
+ const devs=[];pts.forEach(p=>{if(p===src||p.t=='INT'||T[p.t].sv||p.n<0||!comp.has(p.n)||G.N[p.n].sw!==p)return;const d=DEM.get(dkey(p.name));if(d&&(d.u||d.mw||d.a))devs.push([p,d])});
+ if(!devs.length)return null;const dn=new Set(devs.map(([p])=>p.n)),order=[src.n];for(let i=0;i<order.length;i++)for(const c of kids.get(order[i])||[])order.push(c);
+ order.forEach(n=>{if(n!==src.n)own.set(n,dn.has(n)?'d'+n:own.get(par.get(n)))});
+ const sub=new Map();devs.forEach(([p,d])=>{rows.set('d'+p.n,{u:d.u,mw:d.mw,a:d.a||0});const po=own.get(par.get(p.n))||'r',s=sub.get(po)||{u:0,mw:0,a:0};s.u+=d.u;s.mw+=d.mw;s.a+=d.a||0;sub.set(po,s)});
+ const ex=new Map();rows.forEach((r,k)=>{const s=sub.get(k)||{u:0,mw:0,a:0};ex.set(k,{u:Math.max(0,r.u-s.u),mw:Math.max(0,r.mw-s.mw),a:Math.max(0,r.a-s.a)})});
+ return{own,ex,W:wacc(new Set(comp.keys()),wm.mode,own,'r')}}
+function udAl(P,S){const al=PHI>=0&&P.alp&&P.alp[PHI]?P.alp[PHI]:P.al,acc=wacc(S,P.wm.mode,al.own,'r');let u=0,mw=0,a=0;acc.forEach((w,o)=>{const W=al.W.get(o)||0,e=al.ex.get(o);if(W>0&&e){u+=e.u*w/W;mw+=e.mw*w/W;a+=e.a*w/W}});return{u,mw,a}}
+const pkOf=h=>h.pk>0?h.pk:((DEM.get(dkey(h.name))||{}).pk||0),
+ capTxt=(c,s)=>c.mg==null?'':s?` (${c.pu.toFixed(0)} %)`:` · ${c.host.name}: ${Math.round(c.cur+c.add)} A de ${Math.round(c.cp)} A de pickup (${c.pu.toFixed(0)} %) ${c.pu>100?'🔴':c.pu>=80?'🟡':'🟢'} · carga actual ${Math.round(c.cur)} A + transferida ${Math.round(c.add)} A · margen ${Math.round(c.mg)} A (${(100-c.pu).toFixed(0)} % del pickup)${c.ph&&c.lim!=null?` · fase limitante ${'ABC'[c.lim]} · A/B/C tras transferir ${c.ph.map(y=>Math.round(y.cur+y.add)).join('/')} A · desbalance ${c.unb.toFixed(0)} %${c.unb>=20?' ⚠ alto':''}`:''}${c.pu>100?' · ⛔ sobrecarga: no cierre este enlace':c.pu>=90?' · ⚠ margen bajo (menos de 10 %)':''}`,
+ ovTxt=c=>`${c.p.name}: la transferencia supera el pickup de ${c.host.name} (${c.pu.toFixed(0)} % de ${Math.round(c.cp)} A). Busque otro enlace o transfiera menos carga.`;
+/*NEW-INI*/
+/* ---------- Eventos: horas, usuarios-minuto y reporte ---------- */
+const hm=t=>new Date(t).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}),
+ fd=t=>new Date(t).toLocaleString('es-MX',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),
+ dmin=m=>m>=60?Math.floor(m/60)+' h '+Math.round(m%60)+' min':Math.round(m)+' min',
+ evSave=()=>{if(SIM)return;try{localStorage.setItem('gc_evt',JSON.stringify(EVT))}catch(e){}kvSet('evt',EVT)},
+ trkSave=()=>{if(SIM)return;try{localStorage.setItem('gc_trk',JSON.stringify(TRK))}catch(e){}},
+ znSave=()=>{if(SIM)return;try{localStorage.setItem('gc_zn',JSON.stringify({man:ZN.man.map(z=>({c:z.c,poly:z.poly})),rural:ZN.rural,on:ZN.on}))}catch(e){}kvSet('zon',{osm:ZN.osm.map(z=>({c:z.c,poly:z.poly})),t:ZN.t})};
+function evUM(e,t){if(e.u==null)return null;const st=[[e.t0,e.u]];if(e.m1)st.push([Math.max(e.m1.t,e.t0),e.u-(e.m1.u||0)]);if(e.m2)st.push([Math.max(e.m2.t,e.m1?e.m1.t:e.t0),e.u-(e.m2.u||0)]);
+ let um=0;st.forEach(([a,u],i)=>{const b=i+1<st.length?st[i+1][0]:t;um+=Math.max(0,u)*Math.max(0,(b-a)/60000)});return um}
+function evStart(P){const a=ud(P,P.dn),r=ud(P,servedSet(P)),ab=[...new Set([...P.Bl.map(p=>p.name),...P.isl.filter(i=>i.t&&i.t.norm).flatMap(i=>i.t.norm.ties.map(x=>x.name))])],
+  ce=[...(P.reclose?[P.trip.name]:[]),...P.isl.filter(i=>i.t).map(i=>i.t.p.name)];
+ const e={id:Date.now(),t0:P.t0||Date.now(),q:P.f.p,fc:cn(P.f.F),cr:P.src?(P.src.cn||P.src.name):'',eq:P.trip.name,u:a?a.u:null,mw:a?a.mw:null,se:seasonNow(),pr:'',ca:'',sim:!!SIM,
+  m1:{t:Date.now(),u:r?r.u:0,mw:r?r.mw:0,pct:P.pct1,ab,ce},m2:null,t1:null,um:null};
+ const f=$('#rpp'),g=$('#rpt');if(f)e.pr=f.value;if(g)e.ca=g.value;EVT.push(e);P.eid=e.id;evSave();evList()}
+function evM2(P,d){const e=EVT.find(x=>x.id==P.eid);if(!e)return;const r=ud(P,servedSet(P));e.m2={t:Date.now(),u:r?r.u:0,mw:r?r.mw:0,pct:pcs(P,servedSet(P)),ab:d.ab.map(p=>p.name),ce:d.ce.map(p=>p.name)};evSave();evList()}
+const evMv=e=>{const L=(a,b)=>[a&&a.length?'ABRIR '+a.join(', '):'',b&&b.length?'CERRAR '+b.join(', '):''].filter(Boolean).join(' · ');return[e.m1&&L(e.m1.ab,e.m1.ce),e.m2&&'Man. 2: '+L(e.m2.ab,e.m2.ce)].filter(Boolean).join(' | ')};
+function mvTxt(P){if(!P.Bl)return '—';const e=EVT.find(x=>x.id==P.eid);if(e)return evMv(e)||'—';const ab=P.Bl.filter(p=>p!=P.trip).map(p=>p.name),ce=[...(P.reclose?[P.trip.name]:[]),...P.isl.filter(i=>i.t).map(i=>i.t.p.name)];
+ return [ab.length?'ABRIR '+ab.join(', '):'',ce.length?'CERRAR '+ce.join(', '):''].filter(Boolean).join(' · ')+' (previsto)'}
+const evMsgEnd=e=>`✅ RESTABLECIDO\nCircuito: ${e.cr||e.fc}\nEquipo Operado: ${e.eq}\nDuración: ${dmin((e.t1-e.t0)/60000)}\n${e.u!=null?`Usuarios afectados: ${fu(e.u)}\nUsuarios-minuto: ${fu(e.um)}\n`:''}Hora: ${hm(e.t1)}`;
+function evEnd(id){const e=EVT.find(x=>x.id==id)||EVT.find(x=>x.id==(plan&&plan.eid))||[...EVT].reverse().find(x=>!x.t1);if(!e)return toast('No hay un evento abierto: ejecute primero una maniobra');
+ e.t1=Date.now();e.um=evUM(e,e.t1);evSave();evList();
+ toast('Restablecido · '+dmin((e.t1-e.t0)/60000)+(e.um!=null?' · '+fu(e.um)+' usuarios-minuto':''),'Avisar por WhatsApp',()=>waText(evMsgEnd(e)))}
+function evList(){const el=$('#evl');if(!el)return;$('#evn')&&($('#evn').textContent=EVT.length||'');
+ el.innerHTML=EVT.length?[...EVT].reverse().slice(0,15).map(e=>`<div class="xr"><div><b>${fd(e.t0)} · ${esc(e.cr||e.fc||'')}${e.sim?' 🧪':''}</b><small>${esc(e.eq)}${e.u!=null?' · '+fu(e.u)+' usuarios':''} · ${e.t1?'✅ '+dmin((e.t1-e.t0)/60000)+(e.um!=null?' · '+fu(e.um)+' u-min':''):'⏳ en curso desde '+hm(e.t0)}</small></div>${e.t1?'':`<button data-a="evr" data-k="${e.id}" title="Registrar restablecimiento">✅</button>`}<button data-a="evp" data-k="${e.id}" title="Reporte PDF">📄</button><button data-a="evw" data-k="${e.id}" title="Avisar por WhatsApp">📤</button><button data-a="evd" data-k="${e.id}" title="Borrar">✕</button></div>`).join(''):'<small class="h">Aún no hay eventos: se crean al ejecutar una maniobra.</small>'}
+if($('#evl'))$('#evl').addEventListener('click',x=>{const b=x.target.closest('button[data-a]');if(!b)return;const id=+b.dataset.k,e=EVT.find(v=>v.id==id);if(!e)return;
+ if(b.dataset.a=='evp')repFalla(id);else if(b.dataset.a=='evr')evEnd(id);else if(b.dataset.a=='evw')waText(e.t1?evMsgEnd(e):`⚡ EVENTO EN CURSO\nCircuito: ${e.cr||e.fc}\nEquipo Operado: ${e.eq}\nDesde: ${hm(e.t0)}\nManiobras: ${evMv(e)||'—'}`);
+ else if(b.dataset.a=='evd'&&confirm('¿Borrar este evento?')){EVT=EVT.filter(v=>v!==e);evSave();evList()}});
+function evCsv(){const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"',f=t=>t?new Date(t).toLocaleString('es-MX',{hour12:false}):'';
+ const head=['Fecha y hora de falla','Circuito','Equipo operado','Protección operada','Causa','Usuarios afectados','Demanda afectada (MW)','Carta','Maniobra 1 (hora)','Restablecido tras maniobra 1 (%)','Maniobra 2 (hora)','Restablecido tras maniobra 2 (%)','Maniobras','Restablecimiento total (hora)','Duración (min)','Usuarios-minuto','Simulacro'];
+ const rows=EVT.map(e=>[f(e.t0),e.cr,e.eq,e.pr,e.ca,e.u==null?'':Math.round(e.u),e.mw==null?'':e.mw.toFixed(2),e.se||'',f(e.m1&&e.m1.t),e.m1&&e.m1.pct!=null?e.m1.pct.toFixed(1):'',f(e.m2&&e.m2.t),e.m2&&e.m2.pct!=null?e.m2.pct.toFixed(1):'',evMv(e),f(e.t1),e.t1?Math.round((e.t1-e.t0)/60000):'',e.um==null?'':Math.round(e.um),e.sim?'sí':'']);
+ return '\ufeff'+[head,...rows].map(r=>r.map(q).join(',')).join('\r\n')}
+async function fileOut(name,text,mime){const f=new File([text],name,{type:mime});try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}}catch(e){if(e&&e.name=='AbortError')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+const stamp=()=>new Date().toISOString().slice(0,16).replace(/[-:T]/g,'');
+function evSummary(){const c=EVT.filter(e=>e.t1),um=c.reduce((s,e)=>s+(e.um||0),0),us=EVT.reduce((s,e)=>s+(e.u||0),0);
+ return `SECC-M · ${EVT.length} evento(s), ${c.length} restablecido(s)\nUsuarios afectados (suma): ${fu(us)}\nUsuarios-minuto: ${fu(um)}\nDuración promedio: ${c.length?dmin(c.reduce((s,e)=>s+(e.t1-e.t0)/60000,0)/c.length):'—'}`}
+function syncT0(){const i=$('#evt0');if(i)i.value=plan&&plan.t0?new Date(plan.t0).toTimeString().slice(0,5):''}
+function setT0(v){if(!v||!plan)return;const[a,b]=v.split(':'),d=new Date();d.setHours(+a,+b,0,0);if(d.getTime()>Date.now()+60000)d.setDate(d.getDate()-1);plan.t0=FT0=d.getTime();const e=EVT.find(x=>x.id==plan.eid);if(e){e.t0=plan.t0;evSave();evList()}}
+function forceEnl(u){if(!LQ)return;FORCE.clear();FORCE.add(u);runFault(LQ)}
+
+/* ---------- Compartir estado con compañeros (archivo pequeño por WhatsApp) ---------- */
+const pkey=p=>p.t+'|'+p.name+'|'+p.lat.toFixed(5)+'|'+p.lng.toFixed(5),keyU=u=>{const p=ptU(u);return p?pkey(p):null};
+function stPack(){return{v:1,app:'SECC-M',t:Date.now(),st:pts.filter(p=>!T[p.t].sv).map(p=>[pkey(p),p.st,p.md||'',p.nd?1:0]),auto:pts.filter(p=>p.auto).map(ser),
+ xf:XF.map(r=>({...r,chg:r.chg.map(c=>[keyU(c[0]),c[1],c[2]]).filter(c=>c[0]),keep:(r.keep||[]).map(keyU).filter(Boolean)})),cnd:[...CND],trk:TRK}}
+async function stSend(){const t=JSON.stringify(stPack());await fileOut('estado_SECC-M_'+stamp()+'.json',t,'application/json');log('Estado enviado/guardado ('+Math.round(t.length/1024)+' KB)')}
+async function stImport(file){if(SIM)return toast('Salga del simulacro antes de importar un estado');
+ let d;try{d=JSON.parse(await file.text())}catch(e){return toast('El archivo no es un estado de SECC-M')}
+ if(!d||d.app!='SECC-M'||!Array.isArray(d.st))return toast('El archivo no es un estado de SECC-M');
+ (d.auto||[]).forEach(o=>{if(!pts.some(p=>pkey(p)==o.t+'|'+o.name+'|'+(+o.lat).toFixed(5)+'|'+(+o.lng).toFixed(5)))addPt(o)});
+ const idx=new Map(pts.map(p=>[pkey(p),p])),ch=[];let miss=0;d.st.forEach(([k,s,md,nd])=>{const p=idx.get(k);if(!p){miss++;return}if(p.st!==s||(p.md||'')!==md||!!p.nd!==!!nd)ch.push([p,s,md,nd])});
+ if(!confirm('Estado de '+fd(d.t)+': se cambiarán '+ch.length+' equipo(s)'+(miss?' ('+miss+' no existen en este celular y se omiten)':'')+'. ¿Aplicar?'))return;
+ ch.forEach(([p,s,md,nd])=>{p.st=s;if(p.t=='RES')p.md=md=='SW'?'SW':'RES';p.nd=nd?1:0});
+ const toU=k=>{const p=idx.get(k)||[...idx.values()].find(x=>pkey(x)==k);return p?p.u:null};
+ if(Array.isArray(d.xf))XF=d.xf.map(r=>({...r,chg:r.chg.map(c=>[toU(c[0]),c[1],c[2]]).filter(c=>c[0]),keep:(r.keep||[]).map(toU).filter(Boolean)}));
+ if(Array.isArray(d.cnd))CND=new Set(d.cnd);if(d.trk)TRK=d.trk;
+ save();xfSave();cndSave();trkSave();pts.forEach(mk);cnt();list();clearPlan();xfList();trList();log('Estado importado: '+ch.length+' equipo(s) actualizados')}
+
+/* ---------- Simulacro: todo se puede probar sin guardar nada ---------- */
+const znPack=()=>JSON.stringify({man:ZN.man.map(z=>({c:z.c,poly:z.poly})),rural:ZN.rural,on:ZN.on});
+function simToggle(){
+ if(!SIM){SIM={pts:JSON.stringify(pts.map(ser)),xf:JSON.stringify(XF),evt:JSON.stringify(EVT),cnd:JSON.stringify([...CND]),trk:JSON.stringify(TRK),zn:znPack()};document.body.classList.add('simu');clearPlan();log('🧪 Simulacro iniciado: nada de lo que haga se guarda')}
+ else{const S=SIM;SIM=null;clearPlan();loadPts(JSON.parse(S.pts));XF=JSON.parse(S.xf);EVT=JSON.parse(S.evt);CND=new Set(JSON.parse(S.cnd));TRK=JSON.parse(S.trk);const z=JSON.parse(S.zn);ZN.man=z.man;ZN.rural=z.rural;ZN.on=z.on;zIndex();
+  document.body.classList.remove('simu');cnt();list();xfList();evList();zList();trList();clearPlan();log('Simulacro terminado: se restableció el estado real')}
+ const b=$('#simb');if(b)b.textContent=SIM?'🧪 Salir del simulacro (descartar cambios)':'🧪 Entrar en modo simulacro';window.chips&&window.chips()}
+
+/* ---------- Troncal manual de cada circuito ---------- */
+let trA=null,TRN='';
+function trunkPath(ci,a,b){const N=G.N,s=nearIn(a,ci),t=nearIn(b,ci);if(s<0||t<0)return null;const D=new Map([[s,0]]),pv=new Map(),H=[[0,s]],dn=new Set();
+ const push=x=>{H.push(x);let i=H.length-1;while(i>0){const p=(i-1)>>1;if(H[p][0]<=H[i][0])break;[H[p],H[i]]=[H[i],H[p]];i=p}},
+  pop=()=>{const r=H[0],l=H.pop();if(H.length){H[0]=l;let i=0;for(;;){const x=2*i+1,y=x+1;let m=i;if(x<H.length&&H[x][0]<H[m][0])m=x;if(y<H.length&&H[y][0]<H[m][0])m=y;if(m==i)break;[H[m],H[i]]=[H[i],H[m]];i=m}}return r};
+ while(H.length){const[d,u]=pop();if(dn.has(u))continue;dn.add(u);if(u==t)break;for(const e of N[u].adj){if(e.d||e.tie)continue;const m=nb(u,e);if(N[m].c!==ci)continue;const k=d+e.l;if(k<(D.has(m)?D.get(m):Infinity)){D.set(m,k);pv.set(m,u);push([k,m])}}}
+ if(!dn.has(t))return null;const out=[t];for(let n=t;n!==s;){n=pv.get(n);out.push(n)}return out.reverse()}
+const trunkNodes=()=>{if(!G.tn){G.tn=new Set();Object.entries(TRK).forEach(([nm,t])=>{const ci=circ.findIndex(c=>c.name==nm&&c.on);if(ci<0)return;const p=trunkPath(ci,t.a,t.b);p&&p.forEach(n=>G.tn.add(n))})}return G.tn};
+function trMode(){const n=$('#trs')&&$('#trs').value;if(!n)return toast('Elija el circuito');TRN=n;trA=null;setMode('TR');log('Troncal de '+n+': toque en el mapa el INICIO (normalmente su interruptor) y luego el FINAL de la troncal')}
+function trClick(q){const ci=circ.findIndex(c=>c.name==TRN&&c.on);if(ci<0){setMode(null);return}
+ if(!trA){trA=q;log('Inicio marcado; ahora toque el FINAL de la troncal');return}
+ ensureG();const p=trunkPath(ci,trA,q);if(!p){log('⚠ No hay un camino por la línea entre esos dos puntos dentro de '+TRN+': marque puntos sobre el circuito');trA=null;return}
+ TRK[TRN]={a:trA,b:q};trkSave();trA=null;setMode(null);clearPlan();trList();log('Troncal de '+TRN+' marcada ('+km(p.slice(1).reduce((s,n,i)=>{const e=G.N[p[i]].adj.find(x=>!x.d&&!x.tie&&nb(p[i],x)==n);return s+(e?e.l:0)},0))+' km)')}
+function trList(){const el=$('#trc');if(!el)return;const k=Object.keys(TRK);$('#trn')&&($('#trn').textContent=k.length||'');
+ el.innerHTML=k.map(n=>`<div class="r"><span title="${esc(n)}">${esc(n)}</span><button onclick="trDel('${esc(n).replace(/'/g,"\\'")}')">✕</button></div>`).join('');
+ const s=$('#trs');if(s){const v=s.value;s.innerHTML=circ.filter(c=>c.on).map(c=>`<option ${c.name==v?'selected':''}>${esc(c.name)}</option>`).join('')}}
+function trDel(n){delete TRK[n];trkSave();trList();clearPlan();log('Troncal de '+n+' borrada: se usa la salida más larga')}
+
+/* ---------- Zonas: mancha urbana (OpenStreetMap con permiso, o dibujada a mano) ---------- */
+const xtl=L.layerGroup().addTo(map),trl=L.layerGroup().addTo(map),zl=L.layerGroup().addTo(map),zTmp=L.layerGroup().addTo(map);
+const ZCOL={A:'#ff9f1c',U:'#ff5d73',P:'#ffd166',I:'#8d99ae',R:'#52b788'};let zV=[];
+function zDraw(){zl.clearLayers();if(!$('#zsh')||!$('#zsh').checked)return;[...ZN.osm,...ZN.man].forEach(z=>{try{L.polygon(z.poly,{color:ZCOL[z.c],weight:z.man?2:1,fillColor:ZCOL[z.c],fillOpacity:.16,dashArray:z.man?null:'4 4',interactive:false}).addTo(zl)}catch(e){}})}
+function zReset(){zV=[];zTmp.clearLayers()}
+function zClick(q){zV.push(q);zTmp.clearLayers();L.polyline(zV,{color:'#00e5ff',weight:3,dashArray:'6 6'}).addTo(zTmp);zV.forEach(p=>L.circleMarker(p,{radius:4,color:'#00e5ff',fillOpacity:1}).addTo(zTmp))}
+function zEnd(){if(mode!='ZU')return;if(zV.length<3){log('Marque al menos 3 puntos');return}ZN.man.push({c:$('#zcl').value,poly:zV.slice()});zReset();setMode(null);zIndex();znSave();zDraw();zList();clearPlan();log('Zona '+ZCL[ZN.man[ZN.man.length-1].c]+' agregada')}
+function zUndo(){if(mode=='ZU'&&zV.length){zV.pop();zTmp.clearLayers();if(zV.length)L.polyline(zV,{color:'#00e5ff',weight:3,dashArray:'6 6'}).addTo(zTmp)}}
+function zDel(i){ZN.man.splice(i,1);zIndex();znSave();zDraw();zList();clearPlan()}
+function zList(){const el=$('#zlst');if(!el)return;
+ el.innerHTML=`<small class="h">${ZN.osm.length?`Detectadas en OpenStreetMap: <b>${ZN.osm.length}</b> zonas (${fd(ZN.t)})`:'Aún no hay zonas detectadas.'} · Dibujadas a mano: <b>${ZN.man.length}</b></small>`+ZN.man.map((z,i)=>`<div class="r"><i style="flex:none;width:11px;height:11px;border-radius:3px;background:${ZCOL[z.c]}"></i><span>${ZCL[z.c]}</span><button onclick="zDel(${i})">✕</button></div>`).join('');
+ const o=$('#zon');if(o)o.checked=!!ZN.on;const r=$('#zru');if(r){r.value=Math.round(ZN.rural*100);$('#zrv').textContent=Math.round(ZN.rural*100)+' %'}
+ $('#znn')&&($('#znn').textContent=ZQ?'activa':'')}
+function zSet(){ZN.on=$('#zon').checked?1:0;ZN.rural=Math.max(.02,Math.min(1,(+$('#zru').value||12)/100));zIndex();znSave();zDraw();zList();clearPlan()}
+const OVP=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://overpass.private.coffee/api/interpreter'],
+ LUC={residential:'U',commercial:'A',retail:'A',industrial:'I'};
+async function ovQuery(q){let err='';for(const u of OVP){try{const c=new AbortController(),t=setTimeout(()=>c.abort(),90000),r=await fetch(u+'?data='+encodeURIComponent(q),{signal:c.signal});clearTimeout(t);if(!r.ok){err=u+' → '+r.status;continue}return await r.json()}catch(e){err=u+' → '+(e.name=='AbortError'?'tiempo agotado':e.message)}}throw new Error(err)}
+function stitch(ws){const rings=[],ws2=ws.map(w=>w.slice());while(ws2.length){let r=ws2.pop(),g=1;while(g){g=0;if(r[0][0]==r[r.length-1][0]&&r[0][1]==r[r.length-1][1])break;for(let i=0;i<ws2.length;i++){const w=ws2[i],a=r[r.length-1],b=r[0],eq=(p,q)=>p[0]==q[0]&&p[1]==q[1];
+  if(eq(a,w[0])){r=r.concat(w.slice(1))}else if(eq(a,w[w.length-1])){r=r.concat(w.slice(0,-1).reverse())}else if(eq(b,w[w.length-1])){r=w.slice(0,-1).concat(r)}else if(eq(b,w[0])){r=w.slice(1).reverse().concat(r)}else continue;ws2.splice(i,1);g=1;break}}rings.push(r)}return rings}
+async function zOsm(){const on=circ.filter(c=>c.on);if(!on.length)return toast('Active al menos un circuito');
+ if(!confirm('Para detectar la mancha urbana, la app consultará OpenStreetMap por internet. Solo se envía el rectángulo geográfico que cubren sus circuitos activos (no sus archivos ni los nombres de los circuitos). ¿Continuar?'))return;
+ let a=90,b=180,c=-90,d=-180;on.forEach(x=>x.segs.forEach(s=>s.forEach(([y,xx])=>{if(y<a)a=y;if(y>c)c=y;if(xx<b)b=xx;if(xx>d)d=xx})));a-=.004;b-=.004;c+=.004;d+=.004;
+ const S=.12,tiles=[];for(let y=a;y<c;y+=S)for(let x=b;x<d;x+=S)tiles.push([y,x,Math.min(y+S,c),Math.min(x+S,d)]);
+ const out=[],seen=new Set();let k=0;const btn=$('#zosm');if(btn)btn.disabled=true;
+ try{for(const[s,w,n,e]of tiles){k++;log('Mancha urbana: consultando bloque '+k+' de '+tiles.length+'…');toast('Detectando mancha urbana… '+k+'/'+tiles.length);
+   const q=`[out:json][timeout:80];(way["landuse"~"^(residential|commercial|retail|industrial)$"](${s},${w},${n},${e});relation["landuse"~"^(residential|commercial|retail|industrial)$"](${s},${w},${n},${e}););out geom;`;
+   const j=await ovQuery(q);
+   for(const el of j.elements||[]){const key=el.type+el.id;if(seen.has(key))continue;seen.add(key);const cl=LUC[(el.tags||{}).landuse];if(!cl)continue;
+    if(el.type=='way'&&el.geometry&&el.geometry.length>3)out.push({c:cl,poly:el.geometry.map(p=>[p.lat,p.lon])});
+    else if(el.type=='relation')stitch((el.members||[]).filter(m=>m.role=='outer'&&m.geometry&&m.geometry.length>1).map(m=>m.geometry.map(p=>[p.lat,p.lon]))).forEach(r=>{if(r.length>3)out.push({c:cl,poly:r})})}}
+  ZN.osm=out;ZN.t=Date.now();zIndex();znSave();zDraw();zList();clearPlan();
+  if(out.length)toast('Mancha urbana detectada: '+out.length+' zonas');else toast('OpenStreetMap no tiene zonas urbanas mapeadas aquí: dibújelas a mano en «Zonas»')}
+ catch(e){log('⚠ No se pudo consultar OpenStreetMap: '+e.message);toast('No se pudo detectar la mancha urbana (¿sin internet?). Puede dibujar las zonas a mano.')}
+ finally{if(btn)btn.disabled=false}}
+function zClearOsm(){ZN.osm=[];ZN.t=0;zIndex();znSave();zDraw();zList();clearPlan()}
+
+/* ---------- Mapa: transferencias visibles ---------- */
+function drawXT(){xtl.clearLayers();
+ XT.forEach(t=>{try{L.polyline(segs(t.S),{color:'#3ddc84',weight:7,opacity:.85,dashArray:'3 9',lineCap:'round',interactive:false}).addTo(xtl);L.marker(t.at,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],html:`<div class="xtag">${esc(t.fromName)} → ${esc(t.to)}</div>`})}).addTo(xtl)}catch(e){}})}
+function drawTR(){trl.clearLayers();Object.entries(TRK).forEach(([nm,t])=>{try{const ci=circ.findIndex(c=>c.name==nm&&c.on);if(ci<0)return;const p=trunkPath(ci,t.a,t.b);if(p)L.polyline(p.map(n=>G.N[n].p),{color:'#00e5ff',weight:3,opacity:.85,dashArray:'1 7',interactive:false}).addTo(trl)}catch(e){}})}
+const xfSig=()=>pts.map(p=>p.id+':'+p.st+(p.nd?'n':'')+':'+p.lat.toFixed(5)+p.lng.toFixed(5)).join(',')+'#'+circ.map(c=>c.id+(c.on?1:0)).join(',')+'#'+JSON.stringify(TRK)+'#'+ZQ;let xfSg='';
+/*NEW-FIN*/
+
+/* ---------- Servicios ligados a circuitos: siguen visibles cuando se inspecciona alguno de ellos ---------- */
+const lcPop=p=>{const L0=p.lc||[],all=[...new Set(circ.map(c=>c.name))].filter(n=>!L0.includes(n)).sort();
+ return `Ligado a: ${L0.length?L0.map(n=>`<span class="chip">${esc(n)} <a href="#" onclick="lcDel(${p.id},decodeURIComponent('${encodeURIComponent(n)}'));return false">✕</a></span>`).join(' '):'<small>ningún circuito (se oculta durante la inspección)</small>'}<br><select onchange="lcAdd(${p.id},this.value)" style="max-width:150px"><option value="">+ Circuito…</option>${all.map(n=>`<option>${esc(n)}</option>`).join('')}</select> <button onclick="lcNear(${p.id})">📍 Más cercano</button><br>`};
+function lcSet(p,list){const m=p.m;p.lc=list;save();if(m){m.closePopup();m.openPopup()}}
+function lcAdd(id,v){const p=byId(id);if(!p||!v)return;lcSet(p,[...new Set([...(p.lc||[]),v])])}
+function lcDel(id,v){const p=byId(id);if(!p)return;lcSet(p,(p.lc||[]).filter(x=>x!==v))}
+const lcFind=p=>{ensureG();const f=locate([p.lat,p.lng],300);return f?circ[G.N[f.e.a].c].name:null};
+function lcNear(id){const p=byId(id);if(!p)return;const n=lcFind(p);if(!n)return toast('No hay un circuito a menos de 300 m');lcAdd(id,n);log(p.name+' ligado al circuito '+n)}
+function lcAuto(){let k=0,s=0;pts.forEach(p=>{if(!T[p.t].sv||p.t=='CG'||(p.lc&&p.lc.length))return;s++;const n=lcFind(p);if(n){p.lc=[n];k++}});if(k)save();toast(k?'Servicios ligados a su circuito más cercano: '+k+(s-k?' ('+(s-k)+' sin circuito a menos de 300 m)':''):s?'Ningún servicio tiene un circuito a menos de 300 m':'Todos los servicios ya están ligados')}
+
+
+/* ---------- Conexiones de ramal y subramal: se resaltan en el mapa solo como información ---------- */
+const rml=L.layerGroup(),updRM=()=>{const on=!INSH&&map.getZoom()>=15&&$('#rmv')&&$('#rmv').checked;if(on&&!map.hasLayer(rml))rml.addTo(map);if(!on&&map.hasLayer(rml))map.removeLayer(rml)};
+function drawRM(){rml.clearLayers();VJC.clear();if(!G)return;pts.filter(p=>p.t=='INT'&&p.n>=0).forEach(p=>{try{genVJ(p)}catch(e){}});
+ (G.vje||[]).forEach(x=>{delete x.vj});G.vje=[];
+ VJC.forEach((v,k)=>L.circleMarker(v.pos,{radius:5,color:'#8da2b8',weight:2,fillColor:'#0f1720',fillOpacity:.95}).bindPopup(`<b>Conexión de ramal</b><br>${esc(v.cn||'')} · ramal de ${km(v.sub)} km<br><small>Solo información. Si pica los puentes aquí, el punto queda abierto en el circuito y el análisis recalcula la maniobra.</small><br><button onclick="openPuenteo('${k}')">Abrir puenteo</button> <button onclick="ramalExtra('${k}')">Abrir como maniobra extra</button>`).addTo(rml));updRM()}
+map.on('zoomend',updRM);
+function openPuenteo(k){const v=VJC.get(k);if(!v)return;map.closePopup();const q=LQ,had=!!plan&&!!q;const nd=vjMat(v);if(had)PUENT.push(nd.u);save();clearPlan();if(had)runFault(q)}
+
+
+/* ---------- Aviso de usuarios y demanda recuperados al ejecutar una maniobra ---------- */
+function recMsg(P){const a=ud(P,P.dn),S=servedSet(P),r=ud(P,S),p=pcs(P,S);
+ return '✅ MANIOBRA EJECUTADA\nCircuito: '+(P.src?(P.src.cn||P.src.name):'—')+'\nEquipo Operado: '+(P.trip?P.trip.name:'—')+'\n'
+  +(r&&a?'Usuarios recuperados: '+fu(r.u)+' de '+fu(a.u)+'\nDemanda recuperada: '+r.mw.toFixed(2)+' MW de '+a.mw.toFixed(2)+' MW\nSin servicio: '+fu(a.u-r.u)+' usuarios · '+(a.mw-r.mw).toFixed(2)+' MW\n':'')
+  +'Restablecimiento: '+f1(p)+'\nManiobras: '+mvTxt(P)+'\nHora: '+hm(Date.now())}
+function recNotify(P){const r=ud(P,servedSet(P));if(!r)return;toast('Recuperados '+fu(r.u)+' usuarios · '+r.mw.toFixed(2)+' MW','Compartir por WhatsApp',()=>waText(recMsg(P)))}
+function shareRec(){if(plan&&plan.done)waText(recMsg(plan))}
+
+
+/* ---------- Cerrar uno o más enlaces para recuperar la mayor carga posible ---------- */
+let SPLIT=[],SPLITM=0,PUENT=[];
+const PU=()=>new Set(PUENT.map(ptU).filter(Boolean));
+const XOs=()=>new Set(SPLIT.map(ptU).filter(Boolean));
+/* Si un solo enlace no cabe en el pickup del circuito que recibe la carga, se busca (con un seccionamiento intermedio) transferir la sección completa a dos circuitos distintos o, si no alcanza, la parte que sí cabe */
+function splitOpts(P){const out=[];if(!P||!P.isl)return out;const N=G.N,hostA=h0=>{const c=new Map();walk(h0.n,c,h0);const d=hostDem(h0,c,null);return d&&d.a>0?d.a:null};
+ P.isl.forEach((i,ii)=>{const cs=i.cand.filter(c=>!c.norm&&c.host);if(!cs.length)return;const inside=c=>i.S.has(c.p.n)?c.p.n:c.p.n2,single=i.nv?-1:(i.t&&i.t.mg!=null?i.t.mg:null),whole=ud(P,i.S);
+  [...i.S].forEach(n=>{const w=N[n].sw;if(!w||w.t=='INT'||w.t=='DR'||w.nd||!st(w))return;
+   const nbs=N[n].adj.filter(e=>!e.d&&!e.tie).map(e=>nb(n,e)).filter(m=>i.S.has(m));if(nbs.length!=2)return;
+   const parts=[],seen=new Set([n]);nbs.forEach(s0=>{if(seen.has(s0))return;const C=new Set([s0]),q=[s0];seen.add(s0);while(q.length){const x=q.pop();for(const e of N[x].adj){if(e.d||e.tie)continue;const m=nb(x,e);if(!i.S.has(m)||seen.has(m))continue;seen.add(m);C.add(m);q.push(m)}}parts.push(C)});
+   if(parts.length!=2)return;
+   const ev=(C,c)=>{const cp=pkOf(c.host),ld=ud(P,C);let mg=null;if(cp>0)for(let k=0;k<3;k++){PHI=k;try{const cur=hostA(c.host),l2=ud(P,C),ad=l2?l2.a:null;if(cur!=null&&ad>0){const m=cp-cur-ad;mg=mg==null?m:Math.min(mg,m)}}finally{PHI=-1}}return{mg,mw:ld?ld.mw:0,u:ld?ld.u:0}};
+   const A=cs.filter(c=>parts[0].has(inside(c))),B=cs.filter(c=>parts[1].has(inside(c))),opts=[];
+   A.forEach(a=>{const ea=ev(parts[0],a);B.forEach(b=>{if(a.p===b.p||a.host===b.host)return;const eb=ev(parts[1],b);opts.push({kind:'split',c:[a,b],mg:ea.mg!=null&&eb.mg!=null?Math.min(ea.mg,eb.mg):null,mw:ea.mw+eb.mw,u:ea.u+eb.u})});if(ea.mg!=null&&ea.mg>=0)opts.push({kind:'part',c:[a],mg:ea.mg,mw:ea.mw,u:ea.u})});
+   B.forEach(b=>{const eb=ev(parts[1],b);if(eb.mg!=null&&eb.mg>=0)opts.push({kind:'part',c:[b],mg:eb.mg,mw:eb.mw,u:eb.u})});
+   const ok=o=>o.kind=='split'?(o.mg==null?1:o.mg>=0?2:0):2;
+   opts.sort((x,y)=>(ok(y)-ok(x))||(y.mw-x.mw)||((y.mg??-1e9)-(x.mg??-1e9)));const best=opts[0];
+   if(best&&ok(best)>0){best.w=w;best.ii=ii;best.tot=whole?whole.mw:0;best.auto=!!(single!=null&&single<0&&best.mg!=null&&best.mg>=0);out.push(best)}})});
+ return out.sort((a,b)=>(b.auto-a.auto)||(b.mw-a.mw))}
+function forceSplit(w,a,b){SPLIT=[w];SPLITM=1;FORCE.clear();FORCE.add(a);if(b)FORCE.add(b);runFault(LQ)}
+function unSplit(){SPLIT=[];SPLITM=0;FORCE.clear();runFault(LQ)}
+const SPLITUI=P=>{const so=P.sopts||[];let s='';if(SPLIT.length)s+='<div class="r" style="flex-wrap:wrap"><small>Se abre un seccionamiento intermedio para repartir o recuperar la sección.</small> <button class="chip" onclick="unSplit()">↩ Quitar</button></div>';
+ if(so.length&&!SPLITM)s+='<div class="r" style="flex-wrap:wrap"><small>Más carga recuperable con un seccionamiento intermedio:</small> '+so.slice(0,4).map(o=>`<button class="chip" onclick="forceSplit('${o.w.u}','${o.c[0].p.u}','${o.c[1]?o.c[1].p.u:''}')">✂ ${esc(o.w.name)} · ${o.kind=='split'?esc(o.c[0].p.name)+' + '+esc(o.c[1].p.name)+' (toda la sección)':esc(o.c[0].p.name)+' (solo '+fu(o.u)+' usuarios · '+o.mw.toFixed(2)+' MW)'}${o.mg==null?'':' · margen '+Math.round(o.mg)+' A'}</button>`).join('')+'</div>';return s};
+
+/* ---------- Velocidad: la red se construye una vez y se reutiliza mientras no cambie nada estructural ---------- */
+const gsig=()=>circ.map(c=>c.id+(c.on?1:0)+':'+c.segs.length).join(',')+'#'+pts.map(p=>p.id+p.t+p.lat.toFixed(6)+p.lng.toFixed(6)+(p.cn||'')+(p.cn2||'')+p.vis+(p.w||'')).join('|')+'#'+JSON.stringify(flows).length+'#'+(+$('#tol').value||4)+'#'+ZQ+ZN.man.length+'/'+ZN.osm.length+ZN.rural+ZN.on;
+function undoFSplit(){const s=G&&G.fsp;if(!s)return;const N=G.N,{e,a,b,n}=s;
+ if(N.length-1===n&&G.E[G.E.length-1]===b&&G.E[G.E.length-2]===a){delete e.d;N[e.a].adj.splice(N[e.a].adj.lastIndexOf(a),1);N[e.b].adj.splice(N[e.b].adj.lastIndexOf(b),1);a.d=b.d=1;N.pop();G.E.length-=2;G.fx=(G.fx||0)+1}else G.bad=1;
+ G.fsp=null;delete G.tn;(G.vje||[]).forEach(x=>{delete x.vj});G.vje=[]}
+function attachC(){if(G&&G.sig&&!G.bad&&(G.fx||0)<150&&G.sig===gsig()){undoFSplit();if(!G.bad)return}attach()}
+
+
 try{loadPts(JSON.parse(localStorage.getItem('gc_pts')||'[]'))}catch(e){}
 try{XF=JSON.parse(localStorage.getItem('gc_xf')||'[]');if(!Array.isArray(XF))XF=[]}catch(e){XF=[]}
-if(pts.length)save();xfList();
+try{EVT=JSON.parse(localStorage.getItem('gc_evt')||'[]');if(!Array.isArray(EVT))EVT=[]}catch(e){EVT=[]}
+try{CND=new Set(JSON.parse(localStorage.getItem('gc_cnd')||'[]'))}catch(e){CND=new Set()}
+try{TRK=JSON.parse(localStorage.getItem('gc_trk')||'{}')||{}}catch(e){TRK={}}
+try{const z=JSON.parse(localStorage.getItem('gc_zn')||'null');if(z){ZN.man=z.man||[];ZN.rural=z.rural||.12;ZN.on=z.on===0?0:1}}catch(e){}
+zIndex();kvDo('get','zon').then(r=>{if(r&&r.v&&Array.isArray(r.v.osm)&&r.v.osm.length){ZN.osm=r.v.osm;ZN.t=r.v.t||0;zIndex();zDraw();zList();clearPlan()}}).catch(()=>{});
+if(pts.length)save();xfList();evList();trList();zList();
 $('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({puntos:pts.map(ser),flujos:flows},null,1)],{type:'application/json'}));a.download='puntos_secc-m.json';a.click()};
 $('#im').onchange=async e=>{try{const j=JSON.parse(await e.target.files[0].text());loadPts(Array.isArray(j)?j:j.puntos||[]);if(j.flujos){flows=j.flujos;fseq=Math.max(0,...flows.map(f=>f.id));saveF();redrawF()}save();clearPlan();log('Importados '+pts.length+' puntos')}catch(x){log('⚠ JSON inválido')}e.target.value=''};
 map.on('click',e=>{const q=[e.latlng.lat,e.latlng.lng];
- if(mode=='TRAZO')addV(q);else if(mode=='DR')drClick(q);else if(T[mode]){if(T[mode].sv){addPt({t:mode,lat:q[0],lng:q[1]});cnt();save();clearPlan()}else addEq(mode,q)}});
+ if(mode=='TRAZO')addV(q);else if(mode=='DR')drClick(q);else if(mode=='TR')trClick(q);else if(mode=='ZU')zClick(q);else if(mode=='FA'){setMode(null);window.faultAt(q)}else if(T[mode]){if(T[mode].sv){addPt({t:mode,lat:q[0],lng:q[1]});cnt();save();clearPlan()}else addEq(mode,q)}});
 /* ---------- Anclaje Doble: marca de un lado a otro, ligada a UN circuito ---------- */
 let drA=null,drRe=null,drRub=null;const drTmp=L.layerGroup().addTo(map);
 function fillDc(){const d=$('#dc'),v=d.value;d.innerHTML='<option value="">Automático (el circuito más cercano)</option>'+circ.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');d.value=circ.some(c=>c.name==v)?v:''}
@@ -411,14 +777,14 @@ function reDR(id){const p=byId(id);p.m.closePopup();setMode('DR');drRe=id;log('M
 function drReset(){drA=null;drRe=null;drRub=null;drTmp.clearLayers()}
 function drClick(q){
  if(!drA){drA=q;drTmp.clearLayers();L.circleMarker(q,{pane:'ad',radius:6,color:'#fff',weight:2,fillColor:'#ffc233',fillOpacity:1,interactive:false}).addTo(drTmp);
-  drRub=L.polyline([q,q],{pane:'ad',color:'#ffc233',weight:4,dashArray:'4 6',interactive:false}).addTo(drTmp);log('Anclaje Doble: marque el otro extremo, en la dirección de los puentes');return}
+  drRub=L.polyline([q,q],{pane:'ad',color:'#ffc233',weight:4,dashArray:'4 6',interactive:false}).addTo(drTmp);log('Punto de puenteo: marque el otro extremo, en la dirección de los puentes');return}
  const a=drA,b=q,m=[(a[0]+b[0])/2,(a[1]+b[1])/2],re=drRe?byId(drRe):null,sel=re?(re.au?'':re.cn):$('#dc').value;
  drA=null;drRe=null;drRub=null;drTmp.clearLayers();
- if(dist(a,b)<2)return log('⚠ Marque dos puntos distintos (un lado y el otro del anclaje)');
+ if(dist(a,b)<2)return log('⚠ Marque dos puntos distintos (un lado y el otro del punto de puenteo)');
  let ci,amb=[];if(sel){ci=circ.findIndex(c=>c.name==sel&&c.on);if(ci>=0&&nearC(circ[ci],m).d>80){log('⚠ La marca está a más de 80 m de la línea de '+sel);return}}else{const r=pickCirc(a,b);ci=r.ci;amb=r.amb}
  if(ci<0)return log('⚠ No hay un circuito activo a menos de 80 m de la marca'+(sel?' ('+sel+')':''));
  let p=re;if(re){re.a=a;re.b=b;re.lat=m[0];re.lng=m[1];re.cn=circ[ci].name;re.m.setLatLng(m)}else p=addPt({t:'DR',lat:m[0],lng:m[1],a,b,cn:circ[ci].name,au:sel?0:1});
- log(p.name+' ligado al circuito '+p.cn+(amb.length?' ⚠ por ese punto también pasa: '+amb.join(', ')+'. Si no es el correcto, cámbielo en la ventana del Anclaje Doble o elija el circuito en el menú antes de marcar.':''));
+ log(p.name+' ligado al circuito '+p.cn+(amb.length?' ⚠ por ese punto también pasa: '+amb.join(', ')+'. Si no es el correcto, cámbielo en la ventana del punto de puenteo o elija el circuito en el menú antes de marcar.':''));
  cnt();save();clearPlan()}
 map.on('mousemove',e=>{if(drRub)drRub.setLatLngs([drA,[e.latlng.lat,e.latlng.lng]])});
 /* ---------- Trazos de flujo en cruces: definen la conectividad real ---------- */
@@ -454,16 +820,18 @@ function build(){const N=[],E=[],grid=new Map(),K=5e-5,TL=Math.min(5,Math.max(.5
  const node=(c,p,sid)=>{const x=xs.some(q=>dist(q,p)<15)?sid:-1,i=Math.floor(p[0]/K),j=Math.floor(p[1]/K);
   for(let a=i-1;a<=i+1;a++)for(let b=j-1;b<=j+1;b++){const l=grid.get(c+'|'+a+'|'+b);if(l)for(const n of l)if(N[n].x===x&&dist(N[n].p,p)<TL)return n}
   const n=N.length,k=c+'|'+i+'|'+j;N.push({p,c,x,adj:[],sw:null});(grid.get(k)||grid.set(k,[]).get(k)).push(n);return n};
+ const gx=new Map(),KG=5e-4,gadd=e=>{const A=N[e.a].p,B=N[e.b].p;for(let i=Math.floor(Math.min(A[0],B[0])/KG);i<=Math.floor(Math.max(A[0],B[0])/KG);i++)for(let j=Math.floor(Math.min(A[1],B[1])/KG);j<=Math.floor(Math.max(A[1],B[1])/KG);j++){const k=i+'|'+j;(gx.get(k)||gx.set(k,[]).get(k)).push(e)}};
  circ.forEach((c,ci)=>{if(!c.on)return;for(const[si,s]of c.segs.entries())for(let i=1;i<s.length;i++){const a=node(ci,s[i-1],si),b=node(ci,s[i],si);if(a==b)continue;
-  const e={a,b,l:dist(N[a].p,N[b].p)};E.push(e);N[a].adj.push(e);N[b].adj.push(e)}});
- return{N,E}}
-function locate(q,max,only){let best=null,d=max;const k=Math.cos(q[0]*rad);
- G.E.forEach(e=>{if(e.d||only>=0&&G.N[e.a].c!==only)return;const A=G.N[e.a].p,B=G.N[e.b].p,ax=(A[1]-q[1])*k,ay=A[0]-q[0],dx=(B[1]-A[1])*k,dy=B[0]-A[0];
+  const e={a,b,l:dist(N[a].p,N[b].p)};if(ZQ)e.q=e.l*zDens([(N[a].p[0]+N[b].p[0])/2,(N[a].p[1]+N[b].p[1])/2]);E.push(e);gadd(e);N[a].adj.push(e);N[b].adj.push(e)}});
+ return{N,E,gx,gadd,vs:0}}
+function locate(q,max,only){let best=null,d=max;const k=Math.cos(q[0]*rad),vs=++G.vs,dl=max/(R*rad),dn=dl/Math.max(k,.2),cand=[];
+ for(let i=Math.floor((q[0]-dl)/5e-4);i<=Math.floor((q[0]+dl)/5e-4);i++)for(let j=Math.floor((q[1]-dn)/5e-4);j<=Math.floor((q[1]+dn)/5e-4);j++){const l=G.gx.get(i+'|'+j);if(l)for(const e of l)if(e._v!==vs){e._v=vs;cand.push(e)}}
+ cand.forEach(e=>{if(e.d||only>=0&&G.N[e.a].c!==only)return;const A=G.N[e.a].p,B=G.N[e.b].p,ax=(A[1]-q[1])*k,ay=A[0]-q[0],dx=(B[1]-A[1])*k,dy=B[0]-A[0];
   const t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/(dx*dx+dy*dy||1))),dd=Math.hypot(ax+t*dx,ay+t*dy)*rad*R;
   if(dd<d){d=dd;best={e,t,p:[A[0]+t*dy,A[1]+t*(B[1]-A[1])]}}});
  if(best)best.p[0]=G.N[best.e.a].p[0]+best.t*(G.N[best.e.b].p[0]-G.N[best.e.a].p[0]);return best}
 function split(f){const{e}=f,N=G.N,n=N.length;N.push({p:f.p,c:N[e.a].c,adj:[],sw:null});
- const a={a:e.a,b:n,l:e.l*f.t},b={a:n,b:e.b,l:e.l*(1-f.t)};e.d=1;N[e.a].adj.push(a);N[n].adj.push(a,b);N[e.b].adj.push(b);G.E.push(a,b);return n}
+ const a={a:e.a,b:n,l:e.l*f.t},b={a:n,b:e.b,l:e.l*(1-f.t)};if(e.q!==undefined){a.q=e.q*f.t;b.q=e.q*(1-f.t)}e.d=1;N[e.a].adj.push(a);N[n].adj.push(a,b);N[e.b].adj.push(b);G.E.push(a,b);G.gadd&&(G.gadd(a),G.gadd(b));G.last={e,a,b,n};return n}
 const nearIn=(q,x)=>{let b=-1,d=80;G.N.forEach((n,i)=>{if(n.c!==x)return;const k=dist(n.p,q);if(k<d){d=k;b=i}});return b};
 const near=(q,x)=>{let b=-1,d=80;G.N.forEach((n,i)=>{if(n.c===x)return;const k=dist(n.p,q);if(k<d){d=k;b=i}});return b};
 function attach(){G=build();const w=[];applyFlows(w);pts.forEach(p=>{p.n=-1});
@@ -481,6 +849,8 @@ function attach(){G=build();const w=[];applyFlows(w);pts.forEach(p=>{p.n=-1});
    a=nearIn(q,ca);b=nearIn(q,cb);if(a<0||b<0)return w.push(p.name+' (enlace): no hay línea de '+(a<0?p.cn:p.cn2)+' a menos de 80 m')}
   else{a=near(q,-1);if(a<0)return w.push(p.name+' sin circuito cercano');b=near(q,G.N[a].c);if(b<0)return w.push(p.name+' sin segundo circuito cercano');p.cn=circ[G.N[a].c].name;p.cn2=circ[G.N[b].c].name;p.au=1;save()}
   p.n=a;p.n2=b;const e={a,b,l:0,tie:p};G.N[a].adj.push(e);G.N[b].adj.push(e)});
+ pts.filter(p=>p.t=='CG'&&p.vis!==0).forEach(p=>{const f=locate([p.lat,p.lng],80);if(f){p.n=split(f);G.N[p.n].ld=(G.N[p.n].ld||0)+(+p.w||1)}});
+ G.sig=gsig();
  w.forEach(x=>QUIET||log('⚠ '+x))}
 const nb=(n,e)=>e.a==n?e.b:e.a,cn=n=>circ[G.N[n].c].name;
 function walk(s,S,p,par){const q=[s];S.set(s,p);while(q.length){const n=q.pop();for(const e of G.N[n].adj){if(e.d||(e.tie&&!st(e.tie))||(e.vj&&!st(e.vj)))continue;const m=nb(n,e);if(S.has(m))continue;S.set(m,p);par&&par.set(m,n);const w=G.N[m].sw;if(w&&!st(w))continue;q.push(m)}}}
@@ -492,98 +862,114 @@ const segs=S=>{const r=[],N=G.N;S.forEach(n=>{for(const e of N[n].adj){if(e.d||e
 /* ---------- Conexiones de ramal y subramal como opción para picar puentes (igual que un Anclaje Doble) ----------
    En cada punto donde un ramal sale de la línea, el ramal es el hijo más corto del árbol de alimentación (el más largo se toma como troncal de ese nivel).
    Se crea un «Anclaje Doble virtual» por ramal; si la maniobra 2 lo usa, al ejecutarla se registra como un Anclaje Doble real (abierto). */
-function genVJ(src){const N=G.N,par=new Map(),comp=new Map();walk(src.n,comp,src,par);
+function genVJ(src){const N=G.N,par=new Map(),comp=new Map(),TN=trunkNodes();walk(src.n,comp,src,par);
  const kids=new Map();par.forEach((a,c)=>(kids.get(a)||kids.set(a,[]).get(a)).push(c));
  const el=(a,b)=>{for(const e of N[a].adj)if(!e.d&&!e.tie&&!e.v&&e.b!==undefined&&nb(a,e)==b)return e;return null};
  const order=[src.n];for(let i=0;i<order.length;i++)for(const c of kids.get(order[i])||[])order.push(c);
  const sub=new Map();for(let i=order.length-1;i>=0;i--){const n=order[i];let s=0;for(const c of kids.get(n)||[]){const e=el(n,c);s+=sub.get(c)+(e?e.l:0)}sub.set(n,s)}
  kids.forEach((cs,J)=>{if(cs.length<2||N[J].sw)return;
-  const w=cs.map(c=>{const e=el(J,c);return{c,e,s:e?sub.get(c)+e.l:-1}}).filter(x=>x.e).sort((a,b)=>b.s-a.s);
+  let w=cs.map(c=>{const e=el(J,c);return{c,e,s:e?sub.get(c)+e.l:-1}}).filter(x=>x.e).sort((a,b)=>b.s-a.s);
+  if(TN.has(J)){const ti=w.findIndex(x=>TN.has(x.c));if(ti>0)w=[w[ti],...w.filter((_,i)=>i!==ti)]}
   w.slice(1).forEach(({c,e,s})=>{if(N[c].sw)return;
    const k=N[J].c+'|'+N[J].p[0].toFixed(6)+','+N[J].p[1].toFixed(6)+'|'+N[c].p[0].toFixed(6)+','+N[c].p[1].toFixed(6);
    let o=VJC.get(k);if(!o){o={t:'DR',vj:1,name:'Ramal '+N[J].p[0].toFixed(5)+', '+N[J].p[1].toFixed(5),cn:cn(J),lat:N[J].p[0],lng:N[J].p[1],pos:N[J].p};VJC.set(k,o)}
-   o.st=1;o.n=J;o.bn=c;o.bp=N[c].p;o.sub=s;e.vj=o})})}
+   o.st=1;o.n=J;o.bn=c;o.bp=N[c].p;o.sub=s;e.vj=o;(G.vje||(G.vje=[])).push(e)})})}
 /* al ejecutar la maniobra 2: los puentes picados de una conexión de ramal quedan registrados como Anclaje Doble real (abierto) para que se conserven */
 function vjMat(v){const A=v.pos,B=v.bp,L=dist(A,B),t=Math.min(.5,3/(L||1)),b=[A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t],m=[(A[0]+b[0])/2,(A[1]+b[1])/2];
- const nd=addPt({t:'DR',name:'Puentes ramal '+(pts.filter(x=>x.auto).length+1),lat:m[0],lng:m[1],a:A,b,cn:v.cn,au:0,st:0,auto:1});
- const r=XF.find(x=>x.id==plan.xid);if(r)r.chg.push([nd.u,1,0]);log('Puentes del ramal abiertos: '+nd.name+' ('+v.cn+')');return nd}
+ const nd=addPt({t:'DR',name:'Puenteo ramal '+(pts.filter(x=>x.auto).length+1),lat:m[0],lng:m[1],a:A,b,cn:v.cn,au:0,st:0,auto:1});
+ log('Puenteo de ramal abierto: '+nd.name+' ('+v.cn+'): queda como punto abierto del circuito');return nd}
 function rmPt(p){if(typeof mv!=='undefined'&&mv&&mv.p===p)mvCancel(1);p.m.remove();p.g&&p.g.remove();pts=pts.filter(x=>x!=p);cnt()}
 /* ---------- Lógica SCADA de falla ---------- */
 const RK={INT:0,RES:1,SS:2,CCF:3,ENL:3.5,DR:4},rkp=p=>p.t=='RES'&&p.md=='SW'?RK.SS:RK[p.t];let DRU=new Set();
-function analyze(q,u){DRU=u;clearPlan();
+function analyze(q,u,xo){DRU=u;clearPlan();
  if(!circ.some(c=>c.on))return log('⚠ Cargue y active al menos un circuito');
- attach();ovr=null;const f=locate(q,200);if(!f)return log('⚠ La falla debe marcarse sobre una línea (máx. 200 m)');
- const F=split(f),N=G.N;f.F=F;const pre=energized(),src=pre.get(F);
- if(!src){plan={f,Z:new Set([F]),B:new Set(),isl:[],steps:[['ALERTA','El tramo con falla no está energizado por ningún interruptor cerrado. Verifique que el circuito tenga un interruptor (I) cerrado a menos de 80 m de su línea.']]};return show()}
- genVJ(src);const trs=transfers(pre),flood=U=>{const Z=new Set([F]),B=new Set(),qq=[F];
+ attachC();ovr=null;const f=locate(q,200);if(!f)return log('⚠ La falla debe marcarse sobre una línea (máx. 200 m)');
+ const F=split(f),N=G.N;G.fsp=G.last;f.F=F;if(u&&u.size)ovr=new Map([...u].map(p=>[p,1]));const pre=energized(),src=pre.get(F);
+ if(!src){ovr=null;plan={f,Z:new Set([F]),B:new Set(),isl:[],steps:[['ALERTA','El tramo con falla no está energizado por ningún interruptor cerrado. Verifique que el circuito tenga un interruptor (I) cerrado a menos de 80 m de su línea.']]};return show()}
+ const trs=transfers(pre),flood=U=>{const Z=new Set([F]),B=new Set(),qq=[F];
  while(qq.length){const n=qq.pop();for(const x of N[n].adj){if(x.d)continue;if(x.vj&&U.has(x.vj)){B.add(x.vj);continue}if(x.tie){if(st(x.tie))B.add(x.tie);continue}
-  const m=nb(n,x);if(Z.has(m))continue;const w=N[m].sw;if(w&&!(w.t=='DR'&&st(w)&&!U.has(w))){if(st(w))B.add(w);continue}Z.add(m);qq.push(m)}}return[Z,B]};
+  const m=nb(n,x);if(Z.has(m))continue;const w=N[m].sw;if(w&&!(w.t=='DR'&&st(w)&&!U.has(w))&&!(w.nd&&w.t!='INT'&&st(w))){if(st(w))B.add(w);continue}Z.add(m);qq.push(m)}}return[Z,B]};
  /* Z = zona en falla (entre los anclajes dobles abiertos); Z0 = tramo de línea completo afectado (anclajes dobles sin abrir) */
  const[Z,B]=flood(DRU),Z0=DRU.size?flood(new Set())[0]:Z;
  const comp=new Map(),par=new Map();walk(src.n,comp,src,par);
- let trip=null;const swSkip=[];for(let n=F;n!==undefined;n=par.get(n)){const w=N[n].sw;if(w&&(w.t=='INT'||w.t=='RES')&&st(w)){if(w.t=='RES'&&w.md=='SW'){swSkip.push(w.name);continue}trip=w;break}}
+ const wm=wmode(comp),Lc0=len(new Set(comp.keys())),hd0=hostDem(src,comp,trs),LMs=[0,1,2,3].map(()=>new Map()),Lhs=[0,1,2,3].map(()=>new Map()),hdp=[0,1,2].map(k=>{PHI=k;try{return hostDem(src,comp,trs)}finally{PHI=-1}}),
+  al=hd0?buildAlloc(comp,par,src,wm,{u:hd0.u,mw:hd0.mw,a:hd0.a||0}):null,alp=[0,1,2].map(k=>{const h=hdp[k];if(!h)return null;PHI=k;try{return buildAlloc(comp,par,src,wm,{u:h.u,mw:h.mw,a:h.a||0})}finally{PHI=-1}}),PP={src,hd:hd0,hdp,wm,al,alp,Lc:Lc0},
+  loadA=h=>{const X=PHI+1,LM=LMs[X],Lh=Lhs[X];if(!LM.has(h)){const c=new Map();walk(h.n,c,h);const d=hostDem(h,c,trs);LM.set(h,d&&d.a>0?d.a:null)}const b=LM.get(h);return b==null?null:b+(Lh.get(h)||0)},
+  isA=S=>{const r=ud(PP,S);return r&&r.a>0?r.a:null};
+ let trip=null;const swSkip=[];for(let n=F;n!==undefined;n=par.get(n)){const w=N[n].sw;if(w&&(w.t=='INT'||w.t=='RES')&&st(w)){if(w.t=='RES'&&(w.md=='SW'||w.nd)){swSkip.push(w.name+(w.md!='SW'?' (no disponible)':''));continue}trip=w;break}}
  trip=trip||src;const kids=new Map();par.forEach((a,c)=>(kids.get(a)||kids.set(a,[]).get(a)).push(c));
  const dn=new Set([trip.n]),qd=[trip.n];while(qd.length)for(const c of kids.get(qd.pop())||[]){dn.add(c);qd.push(c)}
- ovr=new Map([...B].map(p=>[p,0]));
+ ovr=new Map([...B,...(xo||[])].map(p=>[p,0]));
  const post=energized(),lost=new Set(),up=new Set();
  comp.forEach((_,n)=>{const w=N[n].sw;if(!dn.has(n)||Z.has(n)||(w&&!st(w)))return;(post.has(n)?up:lost).add(n)});
  const isl=[],seen=new Set();
  lost.forEach(s=>{if(seen.has(s))return;const S=new Set([s]),a=[s];seen.add(s);
   while(a.length){const n=a.pop();for(const x of N[n].adj){if(x.d||x.tie)continue;const m=nb(n,x);if(!lost.has(m)||seen.has(m))continue;seen.add(m);S.add(m);a.push(m)}}
-  const l=len(S);if(l>0){const cand=[];pts.forEach(p=>{if(p.t!='ENL'||st(p)||p.n<0)return;const a1=S.has(p.n),b1=S.has(p.n2);if(a1==b1)return;const o=a1?p.n2:p.n;
-    if(post.has(o)&&!Z.has(o))cand.push({p,o,d:dist([p.lat,p.lng],f.p)})});
+  const l=len(S);if(l>0){const cand=[];pts.forEach(p=>{if(p.t!='ENL'||st(p)||p.n<0||p.nd)return;const a1=S.has(p.n),b1=S.has(p.n2);if(a1==b1)return;const o=a1?p.n2:p.n;
+    if(post.has(o)&&!Z.has(o)&&!CND.has(cn(o)))cand.push({p,o,d:dist([p.lat,p.lng],f.p)})});
    /* normalizar una transferencia activa: si el tramo transferido queda sin servicio, se considera regresarlo a su circuito de origen (abrir el enlace y cerrar el seccionamiento) */
-   trs.forEach(T0=>{if(![...T0.S].some(n=>S.has(n)))return;T0.ret.forEach(p=>{const ms=N[p.n].adj.filter(e=>!e.d&&!e.tie).map(e=>nb(p.n,e)),o=ms.find(m=>!S.has(m)&&post.has(m)&&!Z.has(m)&&N[m].c===T0.from);if(o!==undefined&&ms.some(m=>S.has(m)))cand.push({p,o,d:-1,norm:T0})})});
-   cand.sort((x,y)=>x.d-y.d);isl.push({S,l,cand,t:cand[0]})}});
- const Bl=[...B].sort((a,b)=>(rkp(a)-rkp(b))||dist([a.lat,a.lng],f.p)-dist([b.lat,b.lng],f.p)),reclose=!B.has(trip),steps=[];
+   trs.forEach(T0=>{if(![...T0.S].some(n=>S.has(n))||T0.ties.some(e=>e.nd)||CND.has(T0.fromName))return;T0.ret.forEach(p=>{if(p.nd)return;const ms=N[p.n].adj.filter(e=>!e.d&&!e.tie).map(e=>nb(p.n,e)),o=ms.find(m=>!S.has(m)&&post.has(m)&&!Z.has(m)&&N[m].c===T0.from);if(o!==undefined&&ms.some(m=>S.has(m)))cand.push({p,o,d:-1,norm:T0})})});
+   const rk=c=>FORCE.has(c.p.u)?-2:c.d<0?-1:c.mg==null?1:c.mg>=0?0:2;
+   cand.forEach(c=>{const h0=post.get(c.o),cp=h0?pkOf(h0):0;c.host=h0;c.mg=null;if(!(h0&&cp>0))return;
+    const R=[0,1,2].map(k=>{PHI=k;try{const cur=loadA(h0),add=isA(S);return cur!=null&&add!=null?{cur,add}:null}finally{PHI=-1}}),ok=R.every(Boolean),X=ok?R.map(y=>y.cur+y.add):null;
+    if(ok&&X.some(v=>Math.abs(v-X[0])>1e-6)){const mx=Math.max(...X),k=X.indexOf(mx),av=(X[0]+X[1]+X[2])/3;c.cur=R[k].cur;c.add=R[k].add;c.cp=cp;c.mg=cp-mx;c.pu=100*mx/cp;c.ph=R;c.lim=k;c.unb=av>0?100*(mx-av)/av:0}
+    else{const cur=loadA(h0),add=isA(S);if(cur!=null&&add!=null){c.cur=cur;c.add=add;c.cp=cp;c.mg=cp-cur-add;c.pu=100*(cur+add)/cp}}});
+   cand.sort((a,b)=>(rk(a)-rk(b))||((rk(a)==0||rk(a)==2)?b.mg-a.mg:a.d-b.d));const t0=cand[0],nv=!!(t0&&!t0.norm&&t0.mg!=null&&t0.mg<0&&!FORCE.has(t0.p.u)),tt=nv?null:t0;if(tt&&tt.add!=null&&tt.host){const H=tt.host;Lhs[0].set(H,(Lhs[0].get(H)||0)+tt.add);for(let i=0;i<3;i++)Lhs[i+1].set(H,(Lhs[i+1].get(H)||0)+(tt.ph?tt.ph[i].add:tt.add))}isl.push({S,l,cand,t:tt,nv})}});
+ /* un seccionamiento de la frontera solo se abre si sirve: si aguas abajo la carga seccionada no tiene enlace por el cual recuperarla, abrirlo no recupera nada y se deja cerrado */
+ const nodeIsl=new Map();isl.forEach(i=>i.S.forEach(n=>nodeIsl.set(n,i)));
+ const needB=w=>{if(w===trip||w.vj||w.t=='ENL'||w.n===undefined||w.n<0||!N[w.n])return true;const M=[];for(const x of N[w.n].adj){if(x.d||x.tie)continue;const m=nb(w.n,x);if(!Z.has(m))M.push(m)}if(!M.length)return true;return M.some(m=>{const i=nodeIsl.get(m);return !i||i.t})},
+  Bk=new Set([...B].filter(needB)),drop=[...B].filter(w=>!Bk.has(w));
+ const Bl=[...Bk,...(xo||[])].sort((a,b)=>(rkp(a)-rkp(b))||dist([a.lat,a.lng],f.p)-dist([b.lat,b.lng],f.p)),reclose=!B.has(trip),steps=[];
  steps.push(['VERIF',`Disparó automáticamente ${trip.name} (${cn(trip.n)}). Falla en ${cn(F)}; zona a aislar: ${km(len(Z))} km.`]);
- if(swSkip.length)steps.push(['VERIF',`${swSkip.join(', ')}: en Modo Switch, no opera automáticamente ante esta falla; se usa como seccionador y dispara ${trip.name}.`]);
+ if(drop.length)steps.push(['VERIF',`No se abre ${drop.map(p=>p.name).join(', ')}: aguas abajo no hay enlace con respaldo para recuperar esa carga, así que abrirlo no recupera nada y se deja cerrado.`]);
+  if(swSkip.length)steps.push(['VERIF',`${swSkip.join(', ')}: no opera automáticamente ante esta falla (Modo Switch o no disponible); se usa como seccionador y dispara ${trip.name}.`]);
  {const fo=circ[N[F].c].name,ho=src.cn||src.name;if(fo!=ho)steps.push(['VERIF',`El tramo con falla es de ${fo}, pero hoy lo alimenta ${ho} (transferencia vigente): se analiza como parte del circuito huésped ${ho}.`])}
  if(Z0.size>Z.size)steps.push(['VERIF',`Tramo de línea afectado por completo: ${km(len(Z0))} km (antes, en y después de la falla). Se marca como normal hasta que los anclajes dobles estén abiertos y el restaurador/alimentador y el enlace estén cerrados para recuperar las cargas de antes y después del punto de falla.`]);
- Bl.filter(p=>p!=trip).forEach(p=>steps.push(['ABRIR',`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}${p.t=='DR'?' · abrir la línea (ÚLTIMO RECURSO): queda sin servicio el área delante de él':''}`]));
+ Bl.filter(p=>p!=trip).forEach(p=>steps.push(['ABRIR',`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}${xo&&xo.has&&xo.has(p)?' · divide la sección para transferir cada parte a un circuito distinto':''}${PUENT.includes(p.u)?' · puenteo que usted ya abrió':''}`]));
  if(reclose)steps.push(['CERRAR',`${trip.name} · repone ${km(len(up))} km aguas arriba de la falla`]);
  isl.forEach(i=>{if(i.t&&i.t.norm){const T0=i.t.norm;T0.ties.filter(e=>!B.has(e)).forEach(e=>steps.push(['ABRIR',`${e.name} · enlace ${cn(e.n)} – ${cn(e.n2)} · normaliza la transferencia`]));
-  steps.push(['CERRAR',`${i.t.p.name} · normaliza la transferencia: regresa ${km(T0.l)} km a ${T0.fromName} (la falla deja sin servicio al tramo que alimentaba ${T0.to}). Verifique que ${T0.fromName} soporte la carga.`])}
- else steps.push(i.t?['CERRAR',`${i.t.p.name} · transfiere ${km(i.l)} km a ${cn(i.t.o)}${i.cand.length>1?' (alternos: '+i.cand.slice(1).map(c=>c.p.name).join(', ')+')':''}. Verifique que ese circuito soporte la carga.`]:['ALERTA',`Sin enlace de respaldo: ${km(i.l)} km quedan sin servicio.`])});
+  steps.push(['CERRAR',`${i.t.p.name} · normaliza la transferencia: regresa ${km(T0.l)} km a ${T0.fromName} (la falla deja sin servicio al tramo que alimentaba ${T0.to}).${i.t.mg==null?' Verifique que '+T0.fromName+' soporte la carga.':capTxt(i.t)}`]);if(i.t.mg!=null&&i.t.mg<0)steps.push(['ALERTA',ovTxt(i.t)])}
+ else steps.push(i.t?['CERRAR',`${i.t.p.name} · transfiere ${km(i.l)} km a ${cn(i.t.o)}${capTxt(i.t)}${i.cand.length>1?' (alternos: '+i.cand.slice(1).map(c=>c.p.name+capTxt(c,1)).join(', ')+')':''}.${i.t.mg==null?' Verifique que ese circuito soporte la carga.':''}`]:['ALERTA',i.nv?`Ningún enlace cabe en el pickup: ${i.cand[0].p.name} llevaría a ${i.cand[0].host.name} a ${Math.round(i.cand[0].cur+i.cand[0].add)} A de ${Math.round(i.cand[0].cp)} A (${i.cand[0].pu.toFixed(0)} %), por eso no se cierra; ${km(i.l)} km quedan sin servicio. Si decide cerrarlo, elíjalo en «Enlaces disponibles».`:`Sin enlace de respaldo: ${km(i.l)} km quedan sin servicio.`]);if(i.t&&!i.t.norm&&i.t.mg!=null&&i.t.mg<0)steps.push(['ALERTA',ovTxt(i.t)])});
  /* restablecimiento previsto (por longitud de línea): estado final = aperturas + enlaces elegidos */
- ovr=new Map([...B].map(p=>[p,0]));isl.forEach(i=>{if(i.t){ovr.set(i.t.p,1);i.t.norm&&i.t.norm.ties.forEach(e=>ovr.set(e,0))}});
- const Ef=energized(),tgt=new Map(ovr),aff=len(dn),rest=len(new Set([...dn].filter(n=>Ef.has(n))));
- ovr=null;plan={f,Z,Z0,B,Bl,trip,reclose,isl,steps,dn,aff,rest,src,hd:hostDem(src,comp,trs),Lc:len(new Set(comp.keys())),pct:aff?100*rest/aff:100,tgt,lostKm:isl.reduce((s,i)=>s+i.l,0),noBk:isl.filter(i=>!i.t).reduce((s,i)=>s+i.l,0)};
+ ovr=new Map([...Bk,...(xo||[])].map(p=>[p,0]));isl.forEach(i=>{if(i.t){ovr.set(i.t.p,1);i.t.norm&&i.t.norm.ties.forEach(e=>ovr.set(e,0))}});
+ const Ef=energized(),tgt=new Map(ovr),aff=len(dn),restS=new Set([...dn].filter(n=>Ef.has(n))),rest=len(restS);
+ ovr=null;plan={f,Z,Z0,B,Bl,trip,reclose,isl,steps,dn,aff,rest,src,xo:[...(xo||[])],hd:hd0,hdp,wm,al,alp,restS,Lc:Lc0,pct:(a=>a?100*wsum(restS,wm.mode)/a:100)(wsum(dn,wm.mode)),tgt,lostKm:isl.reduce((s,i)=>s+i.l,0),noBk:isl.filter(i=>!i.t).reduce((s,i)=>s+i.l,0)};
  Bl.forEach(p=>hl.set(p,'ab'));if(reclose)hl.set(trip,'ce');isl.forEach(i=>{if(i.t){hl.set(i.t.p,'ce');i.t.norm&&i.t.norm.ties.forEach(e=>hl.set(e,'ab'))}});
  pts.forEach(mk);plan.un=ex(Z)+isl.filter(i=>!i.t).reduce((t,i)=>t+ex(i.S),0);return plan}
-/* Maniobra 1: restauradores y seccionamiento. Maniobra 2 (recomendada): abrir puentes en Anclajes Dobles para recuperar más carga. */
-function runFault0(q){VJC.clear();const P=analyze(q,new Set());if(!plan)return;let rec=null;
- if(P&&P.Bl){const D=[...pts.filter(p=>p.t=='DR'&&p.st&&p.n>=0),...VJC.values()].sort((a,b)=>dist([b.lat,b.lng],q)-dist([a.lat,a.lng],q));
-  if(D.length){let u=new Set(D),Q=analyze(q,u);
-   if(Q&&Q.Bl&&Q.rest>P.rest+1){for(const d of D){if(!Q.B.has(d))continue;const v=new Set(u);v.delete(d);const W=analyze(q,v);if(W&&W.Bl&&W.rest>=Q.rest-1){u=v;Q=W}}
-    rec={Q:{Z:Q.Z,tgt:Q.tgt,rest:Q.rest,pct:Q.pct,ads:Q.Bl.filter(p=>p.t=='DR')}}}else rec={none:1};
-   analyze(q,new Set())}
-  plan.rec=rec}
- show();if(plan.Bl)log('Falla analizada en '+cn(plan.f.F)+': maniobra 1 con '+plan.Bl.length+' apertura(s) y '+plan.isl.filter(i=>i.t).length+' transferencia(s); restablecimiento previsto '+plan.pct.toFixed(1)+' %'+demL(plan,plan.rest))}
+/* Maniobra 1: restauradores y seccionamiento. Los puntos de puenteo ya no se recomiendan como maniobra: solo se respeta su estado abierto/cerrado. */
+function runFault0(q){LQ=q;let P=analyze(q,PU(),XOs());if(!plan)return;
+ if(P&&P.Bl){
+  /* si una sola transferencia sobrecarga al circuito que la recibe, se prueba dividir la sección con un seccionamiento intermedio y mandar cada parte a un circuito distinto */
+  for(let it=0;it<4&&!SPLITM;it++){const au=[],sI=new Set();splitOpts(P).forEach(o=>{if(o.auto&&!sI.has(o.ii)&&!SPLIT.includes(o.w.u)){sI.add(o.ii);au.push(o)}});if(!au.length)break;
+   au.forEach(o=>{SPLIT.push(o.w.u);o.c.forEach(c=>FORCE.add(c.p.u))});P=analyze(q,PU(),XOs());if(!P||!P.Bl)break;
+   log('Para no pasar el pickup, se abre '+au.map(o=>o.w.name).join(', ')+' y se '+(au.some(o=>o.kind=='part')?'transfiere la parte que cabe':'reparte la carga entre dos circuitos'))}
+  if(plan&&plan.isl)plan.sopts=splitOpts(plan);plan.rec=null}
+ plan.t0=FT0||Date.now();show();if(plan.Bl)log('Falla analizada en '+cn(plan.f.F)+': maniobra 1 con '+plan.Bl.length+' apertura(s) y '+plan.isl.filter(i=>i.t).length+' transferencia(s); restablecimiento previsto '+plan.pct.toFixed(1)+' %'+demL(plan,plan.restS))}
 function runFault(q){try{runFault0(q)}catch(e){log('⚠ Error en el análisis: '+e.message);console.error(e)}}
 const served=P=>{const E=energized();return len(new Set([...P.dn].filter(n=>E.has(n))))},pc=(P,x)=>P.aff?100*x/P.aff:100,f1=x=>x.toFixed(1)+' %';
 /* diferencia entre el estado actual (tras la maniobra 1) y el estado que deja la maniobra con Anclaje Doble */
 function recDiff(P){const Q=P.rec&&P.rec.Q;if(!Q)return{ab:[],ce:[]};const pre=new Map(prevSt||pts.map(p=>[p,p.st])),want=p=>Q.tgt.has(p)?Q.tgt.get(p):pre.get(p),sw=[...pts.filter(p=>!T[p.t].sv&&p.n>=0),...[...Q.tgt.keys()].filter(p=>p.vj)];
  return{ab:sw.filter(p=>p.st==1&&want(p)==0).sort((x,y)=>(x.t=='DR'?0:1)-(y.t=='DR'?0:1)||rkp(x)-rkp(y)),ce:sw.filter(p=>p.st==0&&want(p)==1).sort((x,y)=>(x.t=='ENL')-(y.t=='ENL')||rkp(x)-rkp(y))}}
 const recSteps=d=>[...d.ab.map(p=>['ABRIR',p.vj?`${p.name} · conexión de ramal · ${p.cn} · picar los puentes del ramal (${km(p.sub)} km): solo queda sin servicio el ramal`:p.t=='DR'?`${p.name} · Anclaje Doble · ${p.cn} · abrir puentes: solo queda sin servicio el área entre los anclajes`:`${p.name} · ${T[p.t].n}${p.t=='ENL'?'':' · '+cn(p.n)}`]),
- ...d.ce.map(p=>['CERRAR',p.t=='ENL'?`${p.name} · enlace ${cn(p.n)} – ${cn(p.n2)} · transfiere el tramo recuperado`:`${p.name} · ${T[p.t].n} · ${cn(p.n)} · repone el tramo hasta el anclaje doble`])];
+ ...d.ce.map(p=>['CERRAR',p.t=='ENL'?`${p.name} · enlace ${cn(p.n)} – ${cn(p.n2)} · transfiere el tramo recuperado`:`${p.name} · ${T[p.t].n} · ${cn(p.n)} · repone el tramo que queda sano`])];
 const li=a=>`<ol>${a.map(s=>`<li><em class="${s[0]}">${s[0]}</em> ${esc(s[1])}</li>`).join('')}</ol>`;
 function show(){draw();const P=plan;map.setView(P.f.p,Math.max(map.getZoom(),15));panel()}
-const dem=P=>P&&P.src&&P.Lc?(P.hd||DEM.get(dkey(P.src.name))||null):null,
- demL=(P,x)=>{const d=dem(P);return d?` · ${fu(d.u*x/P.Lc)} usuarios · ${(d.mw*x/P.Lc).toFixed(2)} MW`:''};
+const dem=P=>P&&P.src&&P.Lc?((PHI>=0&&P.hdp&&P.hdp[PHI])||P.hd||DEM.get(dkey(P.src.name))||null):null,
+ demL=(P,S)=>{const d=ud(P,S);return d?` · ${fu(d.u)} usuarios · ${d.mw.toFixed(2)} MW`:''};
 function demTxt(P,rest,lbl){if(!P.src)return'';const d=dem(P);
  if(!d)return`<div class="sum" style="color:#ffc233">⚠ El interruptor «${esc(P.src.name)}» no coincide con ningún circuito de la tabla de usuarios y demandas; renómbrelo igual que en la tabla para calcular usuarios y demanda.</div>`;
- const k=x=>d.u*x/P.Lc,m=x=>d.mw*x/P.Lc;
- return`<div class="sum">Circuito «${esc(d.n)}» (${fu(d.u)} usuarios · ${d.mw.toFixed(2)} MW${d.xu>0?', incluye '+fu(d.xu)+' usuarios y '+d.xm.toFixed(2)+' MW transferidos de otro circuito':''}): afectados <b>${fu(k(P.aff))} usuarios · ${m(P.aff).toFixed(2)} MW</b> · ${lbl} <b class="pct">${fu(k(rest))} usuarios · ${m(rest).toFixed(2)} MW</b> · sin servicio <b>${fu(k(P.aff)-k(rest))} usuarios · ${(m(P.aff)-m(rest)).toFixed(2)} MW</b></div>`}
+ const A=ud(P,P.dn),R=ud(P,rest);
+ return`<div class="sum">Circuito «${esc(d.n)}» · carga ${seasonNow()} (${fu(d.u)} usuarios · ${d.mw.toFixed(2)} MW${d.xu>0?', incluye '+fu(d.xu)+' usuarios y '+d.xm.toFixed(2)+' MW transferidos de otro circuito':''}): afectados <b>${fu(A.u)} usuarios · ${A.mw.toFixed(2)} MW</b> · ${lbl} <b class="pct">${fu(R.u)} usuarios · ${R.mw.toFixed(2)} MW</b> · sin servicio <b>${fu(A.u-R.u)} usuarios · ${(A.mw-R.mw).toFixed(2)} MW</b></div>`}
 function panel(){const P=plan,rec=P.rec,Q=rec&&rec.Q;let h='';
- if(P.Bl){if(!P.done)h+=`<div class="sum">Restablecimiento previsto con la maniobra 1: <span class="pct">${f1(P.pct)}</span> (${km(P.rest)} de ${km(P.aff)} km afectados, por longitud de línea) · Zona en falla ${km(len(P.Z))} km · Sin servicio por maniobra ${km(P.lostKm)} km · Sin respaldo ${km(P.noBk)} km</div>`+demTxt(P,P.rest,'se restablecerían con la maniobra 1');
-  else{const sv=served(P);h+=`<div class="sum">${P.done==1?'Maniobra 1 ejecutada':'Maniobra 2 ejecutada'} · Restablecido <span class="pct">${f1(pc(P,sv))}</span> (${km(sv)} de ${km(P.aff)} km afectados)${P.done==2?` · tras la maniobra 1: ${f1(P.pct1)}`:''}</div>`+demTxt(P,sv,'restablecidos')}}
+ if(P.Bl){if(!P.done)h+=`<div class="sum">Restablecimiento previsto con la maniobra 1: <span class="pct">${f1(P.pct)}</span> (${km(P.rest)} de ${km(P.aff)} km afectados; porcentaje ${P.wm&&P.wm.mode<3?'por carga estimada ('+(P.wm.mode==2?'mancha urbana':'puntos de carga')+')':'por longitud de línea'}) · Zona en falla ${km(len(P.Z))} km · Sin servicio por maniobra ${km(P.lostKm)} km · Sin respaldo ${km(P.noBk)} km</div>`+demTxt(P,P.restS,'se restablecerían con la maniobra 1');
+  else{const sv=served(P);h+=`<div class="sum">${P.done==1?'Maniobra 1 ejecutada':'Maniobra 2 ejecutada'} · Restablecido <span class="pct">${f1(pcs(P,servedSet(P)))}</span> (${km(sv)} de ${km(P.aff)} km afectados)${P.done==2?` · tras la maniobra 1: ${f1(P.pct1)}`:''}</div>`+demTxt(P,servedSet(P),'restablecidos')+'<button class="chip" onclick="shareRec()">📤 Compartir usuarios y demanda recuperados</button><button class="chip" onclick="repFalla()">📄 Reporte PDF de la falla</button>'}}
  h+=(P.Bl&&P.done?'<div class="sum">Maniobra 1 · restauradores y seccionamiento</div>':'')+li(P.steps);
- if(P.Bl&&P.done==1){if(Q){const sv=served(P),d=recDiff(P);P.rec.S2=recSteps(d);
-   h+=`<div class="rec"><b>Recomendación: recuperar más carga abriendo puentes en ${Q.ads.map(p=>p.name).sort().join(', ')}</b><br>Restablecimiento ${f1(pc(P,sv))} → <span class="pct">${f1(Q.pct)}</span> (+${(Q.pct-pc(P,sv)).toFixed(1)} puntos · +${km(Q.rest-sv)} km${(d=>d?` · +${fu(d.u*(Q.rest-sv)/P.Lc)} usuarios · +${(d.mw*(Q.rest-sv)/P.Lc).toFixed(2)} MW`:'')(dem(P))}). Anclaje Doble o conexión de ramal como último recurso: queda sin servicio solo el área entre los puentes picados. Pulse «Ejecutar maniobra 2».${li(P.rec.S2)}</div>`}
+ if(P.Bl&&P.done==1){if(Q){const sv=served(P),svS=servedSet(P),d=recDiff(P);P.rec.S2=recSteps(d);
+   h+=`<div class="rec"><b>Maniobra manual extra: recuperar más carga abriendo puentes en ${Q.ads.map(p=>p.name).sort().join(', ')}</b><br>Restablecimiento ${f1(pcs(P,svS))} → <span class="pct">${f1(Q.pct)}</span> (+${(Q.pct-pcs(P,svS)).toFixed(1)} puntos · +${km(Q.rest-sv)} km${(()=>{const a=ud(P,Q.restS),b=ud(P,svS);return a&&b?` · +${fu(a.u-b.u)} usuarios · +${(a.mw-b.mw).toFixed(2)} MW`:''})()}). Anclaje Doble o conexión de ramal como último recurso: queda sin servicio solo el área entre los puentes picados. Pulse «Ejecutar maniobra 2».${li(P.rec.S2)}</div>`}
   else if(rec&&rec.none)h+='<div class="rec">Anclajes Dobles y conexiones de ramal: ninguno permite recuperar más carga en esta falla.</div>'}
  if(P.done==2&&rec&&rec.S2)h+=`<div class="rec"><b>Maniobra 2 · Anclaje Doble</b>${li(rec.S2)}</div>`;
- $('#pl').innerHTML=h;$('#bx').textContent=P.done==1&&Q?'Ejecutar maniobra 2 · Anclaje Doble':P.done?'Maniobra ejecutada':'Ejecutar maniobra 1'}
+ if(!P.done){const alt=P.isl.filter(i=>i.cand.length>1||i.nv);if(alt.length||(P.sopts||[]).length||SPLIT.length)h+='<div class="rec"><b>Enlaces disponibles</b>'+SPLITUI(P)+alt.map(i=>`<div class="r" style="flex-wrap:wrap"><small>${km(i.l)} km:</small> ${i.cand.map(c=>`<button class="chip" onclick="forceEnl('${c.p.u}')">${i.t&&i.t.p===c.p?'✔ ':''}${esc(c.p.name)}${c.mg==null?'':' · '+c.pu.toFixed(0)+' %'}</button>`).join('')}</div>`).join('')+'</div>'}
+ if(P.Bl&&P.done==1)h+=ramalUi(P);$('#pl').innerHTML=h;syncT0();$('#bx').textContent=P.done==1&&Q?'Ejecutar maniobra 2 · ramal / Anclaje Doble':P.done?'Maniobra ejecutada':'Ejecutar maniobra 1'}
 function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:7,opacity:.95};
  if(P.rec&&P.rec.Q&&P.done>=1)P.rec.Q.ads.filter(p=>p.vj).forEach(p=>L.circleMarker(p.pos,{radius:9,color:'#ffa657',weight:3,fillColor:'#ffa657',fillOpacity:.3,interactive:false}).addTo(ov));
  if(!P.done){
@@ -600,42 +986,96 @@ function draw(){ov.clearLayers();const P=plan,N=G.N,RED={color:'#ff4d5e',weight:
   L.polyline(segs(rd),RED).addTo(ov)}
  L.marker(P.f.p,{icon:L.divIcon({className:'',html:'<div class="fl">⚡</div>',iconSize:[30,30],iconAnchor:[15,15]})}).addTo(ov)}
 function exec2(){const P=plan,d=recDiff(P),snap2=pts.map(p=>[p,p.st]);P.rec.S2=recSteps(d);
- d.ab.forEach(p=>{p.st=0;log('ABRIR '+p.name+(p.vj?' (puentes del ramal)':p.t=='DR'?' (puentes del Anclaje Doble)':''))});d.ab.filter(p=>p.vj).forEach(vjMat);d.ce.forEach(p=>{p.st=1;log('CERRAR '+p.name)});
- {const r=XF.find(x=>x.id==P.xid);if(r){r.chg.push(...stDiff(snap2));d.ce.filter(p=>p.t=='ENL').forEach(p=>(r.keep||(r.keep=[])).push(p.u));xfSave();xfRefresh()}}P.done=2;P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pc(P,served(P)))+demL(P,served(P)))}
+ if(SR)return;const A=[...d.ab.map(p=>({p,s:0,t:p.name+(p.vj?' (puentes del ramal)':p.t=='DR'?' (puentes del Anclaje Doble)':''),post:p.vj?()=>vjMat(p):null})),...d.ce.map(p=>({p,s:1,t:p.name}))];
+ stepRun('Maniobra 2',A,h=>{{const r=XF.find(x=>x.id==P.xid);if(r){r.chg.push(...stDiff(snap2));d.ce.filter(p=>p.t=='ENL').forEach(p=>(r.keep||(r.keep=[])).push(p.u));xfSave();xfRefresh()}}P.done=2;evM2(P,d);evSteps(P,h);P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 2 ejecutada · restablecimiento '+f1(pcs(P,servedSet(P)))+demL(P,servedSet(P)))})}
 function doBx(){const P=plan;if(!P||!P.Bl)return log('⚠ Marque primero un punto de falla');
  if(P.done==1){if(P.rec&&P.rec.Q)return exec2();return log('No hay una maniobra adicional recomendada')}
  if(P.done)return log('La maniobra ya fue ejecutada; use Normalizar para volver al estado normal');
- prevSt=pts.map(p=>[p,p.st]);log('DISPARO automático '+P.trip.name);P.Bl.forEach(p=>{p.st=0;log('ABRIR '+p.name)});
+ if(SR)return;const pv=prevSt;prevSt=pts.map(p=>[p,p.st]);log('DISPARO automático '+P.trip.name);const A=[];P.Bl.forEach(p=>A.push({p,s:0,t:p.name}));
  if(P.reclose)log('CERRAR '+P.trip.name+' (reposición aguas arriba)');
- P.isl.forEach(i=>{if(i.t){if(i.t.norm)i.t.norm.ties.forEach(e=>{if(e.st){e.st=0;log('ABRIR '+e.name+' (normaliza la transferencia)')}});i.t.p.st=1;log('CERRAR '+i.t.p.name+' · '+km(i.l)+(i.t.norm?' km · transferencia normalizada':' km transferidos'))}});
- xfAdd(P,prevSt);P.done=1;P.pct1=pc(P,served(P));if(P.rec&&P.rec.Q)P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 1 ejecutada · restablecimiento '+f1(P.pct1)+demL(P,served(P)))}
+ P.isl.forEach(i=>{if(i.t){if(i.t.norm)i.t.norm.ties.forEach(e=>{if(e.st)A.push({p:e,s:0,t:e.name+' (normaliza la transferencia)'})});A.push({p:i.t.p,s:1,t:i.t.p.name+' · '+km(i.l)+(i.t.norm?' km · transferencia normalizada':' km transferidos')})}});
+ stepRun('Maniobra 1',A,h=>{xfAdd(P,prevSt);P.done=1;P.pct1=pcs(P,servedSet(P));evStart(P);evSteps(P,h);recNotify(P);if(P.rec&&P.rec.Q)P.rec.Q.ads.forEach(p=>hl.set(p,'ab'));draw();pts.forEach(mk);save();panel();log('Maniobra 1 ejecutada · restablecimiento '+f1(P.pct1)+demL(P,servedSet(P)))},()=>{prevSt=pv})}
 $('#dx').onchange=async e=>{if(e.target.files[0])await loadDem(e.target.files[0]);e.target.value=''};
 try{const sv=localStorage.getItem('gc_dem');setDem(sv?JSON.parse(sv):DEM0,false)}catch(e){setDem(DEM0,false)}
 $('#bx').onclick=()=>{try{doBx()}catch(e){log('⚠ Error en la maniobra: '+e.message);console.error(e)}};
 $('#bn').onclick=()=>{/* solo maniobras calculadas: las secciones transferidas no se tocan */
- if(XF.length){const x=xfAll();prevSt=null;log('Maniobras calculadas normalizadas'+(x.k?' · '+x.k+' equipo(s) de transferencias activas se dejaron como están':'')+(x.s?' · ⚠ '+x.s+' equipo(s) ya habían cambiado y se dejaron como están':''))}
+ if(XF.length){NORM=[];const x=xfAll();prevSt=null;log('Maniobras calculadas normalizadas'+(x.k?' · '+x.k+' equipo(s) de transferencias activas se dejaron como están':'')+(x.s?' · ⚠ '+x.s+' equipo(s) ya habían cambiado y se dejaron como están':''))}
  else if(prevSt){ensureG();const prot=protPts();prevSt.forEach(([p,s])=>{if(!prot.has(p))p.st=s});prevSt=null;log('Estado normal restablecido (las transferencias activas se dejaron como están)')}
- clearPlan();save()};
-function clearPlan(){plan=null;hl=new Map();ov.clearLayers();$('#pl').innerHTML='';$('#bx').textContent='Ejecutar maniobra 1';pts.forEach(mk);xfRefresh()}
+ clearPlan();save();if(NORM.length)toast('Maniobras normalizadas: '+NORM.join(', '),'Avisar por WhatsApp',()=>waText('✅ NORMALIZADO\nManiobras normalizadas: '+NORM.join(', ')+'\nHora: '+hm(Date.now())))};
+function clearPlan(){if(RX){RX.v.st=1;delete RX.e.vj;RX=null}plan=null;hl=new Map();ov.clearLayers();$('#pl').innerHTML='';$('#bx').textContent='Ejecutar maniobra 1';pts.forEach(mk);xfRefresh();syncT0()}
+/* ===== Maniobra paso a paso, registro por equipo y reporte PDF ===== */
+let SR=null;
+document.head.insertAdjacentHTML('beforeend','<style>#srm{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:3100;display:none}#srm.on{display:block}#srm .srb{max-width:520px;margin:auto;background:var(--p);border:1px solid var(--l);border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.6);padding:12px;color:var(--t)}#srm .sra{font-size:15px;margin:8px 0;font-weight:600}#srm .srt{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0}#srm .srt span{min-width:22px;text-align:center;font-size:11px;padding:2px 4px;border-radius:6px;border:1px solid var(--l);color:var(--m)}#srm .srt .ok{background:rgba(61,220,132,.2);color:var(--g)}#srm .srt .cur{border-color:var(--a);color:var(--t)}#srm .srr{display:flex;gap:6px;margin-top:8px}#srm .srr button{flex:1}#srm small{color:var(--m)}</style>');
+try{if(localStorage.getItem('gc_sp')=='0')$('#sp').checked=false}catch(e){}
+$('#sp').onchange=e=>{try{localStorage.setItem('gc_sp',e.target.checked?'1':'0')}catch(x){}};
+const SPon=()=>{const c=$('#sp');return !c||c.checked};
+function applyA(a,h){h.push({p:a.p,prev:a.p.st,s:a.s,t:Date.now(),nu:!!a.post});a.p.st=a.s;pts.includes(a.p)&&mk(a.p);log((a.s?'CERRAR ':'ABRIR ')+a.t)}
+function stepRun(ttl,A,fin,can){
+ if(!A.length||!SPon()){const h=[];A.filter(a=>!a.s).forEach(a=>applyA(a,h));A.filter(a=>a.post).forEach(a=>a.post());A.filter(a=>a.s).forEach(a=>applyA(a,h));return fin(h)}
+ SR={ttl,A,i:0,h:[],fin,can};stepUi()}
+function stepUi(){let m=$('#srm');if(!m){m=document.createElement('div');m.id='srm';document.body.appendChild(m)}
+ const S=SR;if(!S){m.className='';return}
+ const a=S.A[S.i],last=S.h[S.h.length-1];if(a.p.pos)map.setView(a.p.pos,Math.max(map.getZoom(),16));m.className='on';
+ m.innerHTML=`<div class="srb"><b>${esc(S.ttl)} · paso ${S.i+1} de ${S.A.length}</b><div class="sra"><em class="${a.s?'CERRAR':'ABRIR'}">${a.s?'CERRAR':'ABRIR'}</em> ${esc(a.t)}</div><div class="srt">${S.A.map((x,j)=>`<span class="${j<S.i?'ok':j==S.i?'cur':''}">${j+1}</span>`).join('')}</div><small>Confirme solo cuando el equipo ya esté operado en campo.${last&&last.nu?' El paso anterior (puentes del ramal) no se puede deshacer.':''}</small><div class="srr"><button id="sru" ${S.i&&!(last&&last.nu)?'':'disabled'}>↶ Deshacer</button><button id="srx">Cancelar</button><button id="srk">Confirmar ✔</button></div></div>`;
+ $('#srk').onclick=()=>{try{applyA(a,S.h);if(a.post)a.post();S.i++;if(S.i>=S.A.length){SR=null;stepUi();S.fin(S.h)}else stepUi()}catch(e){log('⚠ Error en el paso: '+e.message);console.error(e)}};
+ $('#sru').onclick=()=>{const x=S.h.pop();if(!x)return;x.p.st=x.prev;pts.includes(x.p)&&mk(x.p);S.i--;log('DESHACER '+x.p.name);stepUi()};
+ $('#srx').onclick=()=>{if(S.h.some(x=>x.nu)&&!confirm('Ya se picaron puentes de ramal y eso no se puede deshacer. ¿Cancelar de todos modos?'))return;while(S.h.length){const x=S.h.pop();x.p.st=x.prev;pts.includes(x.p)&&mk(x.p)}SR=null;stepUi();S.can&&S.can();log('Maniobra cancelada: ningún equipo quedó cambiado')}}
+const evSteps=(P,h)=>{const e=EVT.find(x=>x.id==P.eid);if(!e||!h)return;e.sp=(e.sp||[]).concat(h.map(x=>({t:x.t,s:x.s,n:x.p.name,m:P.done})));evSave()};
+function repSvg(P){try{const ll=q=>Array.isArray(q)?q:[q.lat,q.lng],nz=S=>S.map(s=>s.map(ll)),s1=nz(segs(P.Z)),s2=nz(P.isl.flatMap(i=>segs(i.S))),all=[...s1,...s2];if(!all.length)return'';let a=90,b=180,c=-90,d=-180;all.forEach(s=>s.forEach(q=>{a=Math.min(a,q[0]);c=Math.max(c,q[0]);b=Math.min(b,q[1]);d=Math.max(d,q[1])}));
+ const W=640,H=340,k=Math.cos((a+c)/2*Math.PI/180),sc=Math.min((W-24)/(((d-b)*k)||1e-9),(H-24)/((c-a)||1e-9)),X=q=>(12+(q[1]-b)*k*sc).toFixed(1),Y=q=>(H-12-(q[0]-a)*sc).toFixed(1),ln=(S,col,w)=>S.map(s=>`<line x1="${X(s[0])}" y1="${Y(s[0])}" x2="${X(s[1])}" y2="${Y(s[1])}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`).join(''),f=ll(P.f.p);
+ return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;border:1px solid #ccc;background:#f6f8fa">${ln(s2,'#e8890c',3)}${ln(s1,'#d62839',4)}<circle cx="${X(f)}" cy="${Y(f)}" r="7" fill="#fff" stroke="#d62839" stroke-width="3"/></svg><div style="font-size:11px;color:#555">Rojo: tramo en falla · Naranja: tramos sin servicio por la maniobra · círculo: punto de falla</div>`}catch(e){return''}}
+function repFalla(id){const e=(id&&EVT.find(x=>x.id==id))||(plan&&EVT.find(x=>x.id==plan.eid))||EVT[EVT.length-1];if(!e)return toast('Ejecute primero una maniobra para generar el reporte');
+ const P=plan&&plan.eid==e.id?plan:null,f=t=>t?new Date(t).toLocaleString('es-MX',{hour12:false}):'—',mm=m=>m?f(m.t)+' · '+(m.pct!=null?f1(m.pct)+' · ':'')+fu(m.u)+' usuarios'+(m.mw!=null?' · '+m.mw.toFixed(2)+' MW':'')+' servidos':'—',
+ rows=(e.sp||[]).map(x=>`<tr><td>${f(x.t)}</td><td>Maniobra ${x.m}</td><td><b style="color:${x.s?'#d62839':'#1a8f4c'}">${x.s?'CERRAR':'ABRIR'}</b></td><td>${esc(x.n)}</td></tr>`).join('')||`<tr><td colspan="4">${esc(evMv(e)||'—')}</td></tr>`,
+ h=`<!doctype html><meta charset="utf-8"><title>Reporte de falla</title><style>body{font:13px Arial,sans-serif;margin:24px;color:#111}h1{font-size:20px;margin:0 0 4px}table{border-collapse:collapse;width:100%;margin:8px 0}td,th{border:1px solid #bbb;padding:4px 6px;text-align:left}th{background:#eef1f4}.k td:first-child{width:36%;font-weight:700;background:#f6f8fa}</style><h1>SECC-M · Reporte de falla</h1><div>${f(e.t0)}${e.sim?' · SIMULACRO':''}</div><table class="k"><tr><td>Circuito</td><td>${esc(e.cr||e.fc||'—')}</td></tr><tr><td>Equipo operado</td><td>${esc(e.eq||'—')}</td></tr><tr><td>Protección operada</td><td>${esc(e.pr||'—')}</td></tr><tr><td>Causa</td><td>${esc(e.ca||'—')}</td></tr><tr><td>Afectados</td><td>${e.u!=null?fu(e.u)+' usuarios · '+e.mw.toFixed(2)+' MW (carga '+esc(e.se||'')+')':'—'}</td></tr><tr><td>Tras maniobra 1</td><td>${mm(e.m1)}</td></tr><tr><td>Tras maniobra 2</td><td>${mm(e.m2)}</td></tr><tr><td>Restablecimiento total</td><td>${e.t1?f(e.t1)+' · '+dmin((e.t1-e.t0)/60000)+(e.um!=null?' · '+fu(e.um)+' usuarios-minuto':''):'En curso'}</td></tr></table>${P?repSvg(P):''}<h3>Maniobras y registro de horas</h3><table><tr><th>Hora</th><th>Maniobra</th><th>Acción</th><th>Equipo</th></tr>${rows}</table>`;
+ const w=open('','_blank');if(!w)return fileOut('reporte_falla_'+stamp()+'.html',h,'text/html');w.document.write(h);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(x){}},500)}
+
+/* ===== Maniobra manual extra: abrir un ramal para dejar sin servicio solo el ramal y recuperar el resto ===== */
+function ramalUi(P){const f=P.f.p,c=[];VJC.forEach((v,k)=>{if(P.dn.has(v.n))c.push([dist(v.pos,f),v,k])});c.sort((a,b)=>a[0]-b[0]);if(!c.length)return'';
+ const ad=P.rec&&P.rec.Q?P.rec.Q.ads:[];
+ return`<div class="rec"><b>Maniobra manual extra · abrir un ramal</b><br><small>Elija el ramal donde está la falla: se pican sus puentes, queda sin servicio solo ese ramal y se calculan los usuarios y la demanda que se recuperan al reducirse el área afectada.</small>${c.slice(0,6).map(([d,v,k])=>`<div class="r" style="flex-wrap:wrap"><small>${Math.round(d)} m de la falla · ramal de ${km(v.sub)} km:</small> <button class="chip" onclick="ramalExtra('${k}')">${ad.includes(v)?'✔ ':''}Abrir ${esc(v.name)}</button></div>`).join('')}</div>`}
+function ramalExtra(k){map.closePopup();const P=plan,v=VJC.get(k);if(!P||!P.Bl||P.done!=1||!v)return toast('Marque una falla y ejecute la maniobra 1; después elija el ramal a abrir');
+ const N=G.N,J=v.n,e=N[J]&&(N[J].adj.find(x=>!x.d&&!x.tie&&nb(J,x)==v.bn)||N[J].adj.find(x=>!x.d&&!x.tie&&nb(J,x)==P.f.F));
+ if(!e)return toast('No se pudo evaluar este ramal; elija otro');
+ if(RX&&RX.e!==e){delete RX.e.vj;RX.v.st=1}e.vj=v;RX={v,e};
+ const F=P.f.F,S1=servedSet(P),w1=wsum(S1,P.wm.mode),cs=P.Bl.filter(p=>p.t!='ENL'&&p.t!='DR'&&!p.vj&&p.st==0);let best=null;
+ v.st=0;try{cs.forEach(b=>{b.st=1;try{const E=energized();if(E.has(F))return;const S2=new Set([...P.dn].filter(n=>E.has(n))),w2=wsum(S2,P.wm.mode);if(w2>w1+1e-9&&(!best||w2>best.w))best={b,S2,w:w2}}finally{b.st=0}})}finally{v.st=1}
+ if(!best){P.rec=null;panel();return toast('Abrir '+v.name+' no recupera carga: la falla no queda aislada en ese ramal o no hay equipo que cerrar')}
+ const S2=best.S2,Q={tgt:new Map([...P.tgt,[v,0],[best.b,1]]),ads:[v],Z:new Set([...P.Z].filter(n=>!S2.has(n))),rest:len(S2),restS:S2,pct:pcs(P,S2)};
+ P.rec={Q};const a=ud(P,S1),b=ud(P,S2);hl.set(v,'ab');draw();panel();
+ toast('Abrir '+v.name+' y cerrar '+best.b.name+': '+(a&&b?'+'+fu(b.u-a.u)+' usuarios · +'+(b.mw-a.mw).toFixed(2)+' MW · ':'')+'área afectada '+km(P.aff-len(S1))+' → '+km(P.aff-len(S2))+' km')}
+
+/* ===== Falla recibida por enlace (WhatsApp) o pegada en la barra de búsqueda ===== */
+const APPURL='https://ingmtznul.github.io/SECC-M/';
+function parseLL(t){const m=String(t||'').match(/(-?\d{1,3}\.\d+)\s*[,;\s]\s*(-?\d{1,3}\.\d+)/);if(!m)return null;const a=+m[1],b=+m[2];return Math.abs(a)<=90&&Math.abs(b)<=180?[a,b]:null}
+let FALLA_IV=null;
+function fallaHash(){const m=/[#&]falla=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/.exec(location.hash);if(!m)return;const q=parseLL(m[1]+','+m[2]);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(!q)return;
+ map.setView(q,17);toast('Falla recibida: '+q[0].toFixed(5)+', '+q[1].toFixed(5)+' · esperando a que carguen los circuitos');clearInterval(FALLA_IV);let n=0,last=-1,ok=0;
+ FALLA_IV=setInterval(()=>{n++;const c=circ.length;if(circ.some(x=>x.on)&&c===last)ok++;else ok=0;last=c;
+  if(ok>=2){clearInterval(FALLA_IV);map.setView(q,17);window.faultAt(q)}
+  else if(n>60){clearInterval(FALLA_IV);toast('Este dispositivo no tiene circuitos cargados: cargue los KMZ y abra de nuevo el enlace')}},500)}
+setTimeout(fallaHash,300);addEventListener('hashchange',fallaHash);
+
 list();cnt();
 
 /* ===== Avisos, búsqueda, respaldo e inspección ===== */
 let tt;function toast(m,b,f){let t=$('#toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}t.innerHTML=`<span>${esc(m)}</span>${b?`<button>${b}</button>`:''}`;t.classList.add('on');if(b)t.querySelector('button').onclick=()=>{t.classList.remove('on');f()};clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),7000)}
-document.addEventListener('click',e=>{if(innerWidth<=800&&e.target.closest&&e.target.closest('#tb button,#sv button')){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}});
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#tb button,#sv button')){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}});
 addEventListener('resize',()=>map.invalidateSize());setTimeout(()=>map.invalidateSize(),300);
 /* búsqueda de equipos y circuitos */
 const sq=L.control({position:'topleft'});sq.onAdd=()=>{const d=L.DomUtil.create('div','leaflet-bar sq');d.innerHTML='<input id="sqi" placeholder="🔎 Buscar equipo o circuito" autocomplete="off"><div id="sqr"></div>';L.DomEvent.disableClickPropagation(d);return d};sq.addTo(map);
 $('#sqi').oninput=function(){const v=this.value.trim().toLowerCase(),r=$('#sqr');r.innerHTML='';if(!v)return;
+ const ll=parseLL(this.value);if(ll){[['📍 Ir a '+ll[0].toFixed(5)+', '+ll[1].toFixed(5),()=>map.setView(ll,17)],['⚡ Marcar falla aquí',()=>{map.setView(ll,17);window.faultAt(ll)}]].forEach(([t,f])=>{const b=document.createElement('button');b.innerHTML='<b>'+t+'</b>';b.onclick=()=>{f();r.innerHTML='';this.value=''};r.appendChild(b)});return}
  const a=[...pts.filter(p=>p.vis!==0&&p.name.toLowerCase().includes(v)).map(p=>({n:p.name,s:T[p.t].n+(p.cn?' · '+p.cn:''),f:()=>{map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}})),...circ.filter(c=>c.name.toLowerCase().includes(v)).map(c=>({n:c.name,s:'Circuito',f:()=>map.fitBounds(c.layer.getBounds())}))].slice(0,7);
  a.forEach(x=>{const b=document.createElement('button');b.innerHTML=`<b>${esc(x.n)}</b> <small style="display:inline;padding:0">${esc(x.s)}</small>`;b.onclick=()=>{x.f();r.innerHTML='';this.value=''};r.appendChild(b)});if(!a.length)r.innerHTML='<small>Sin resultados</small>'};
 /* respaldo completo en un archivo */
 const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 $('#bk').onclick=async()=>{try{const files=[];for(const k of['c','s'])for(const c of arr(k))if(c.blob)files.push({k,name:c.name,kmz:c.kmz,b:await b64(c.blob)});
- const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files,dem:DEMR,xf:XF})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files,dem:DEMR,xf:XF,evt:EVT,cnd:[...CND],trk:TRK,zn:{man:ZN.man.map(z=>({c:z.c,poly:z.poly})),rural:ZN.rural,on:ZN.on}})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
  try{localStorage.setItem('gc_bk',Date.now())}catch(e){}toast('Respaldo guardado: '+pts.length+' equipos y '+files.length+' KMZ')}catch(e){log('⚠ No se pudo crear el respaldo')}};
 $('#br').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let d;try{d=JSON.parse(await f.text());if(!d.gridctrl)throw 0}catch(x){return log('⚠ El archivo no es un respaldo de SECC-M')}
  if(!confirm('Restaurar reemplazará los equipos y cruces actuales. ¿Continuar?'))return;
- loadPts(d.pts||[]);save();XF=Array.isArray(d.xf)?d.xf:[];xfSave();xfList();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();if(Array.isArray(d.dem)&&d.dem.length)setDem(d.dem,true);
+ loadPts(d.pts||[]);save();XF=Array.isArray(d.xf)?d.xf:[];xfSave();xfList();if(Array.isArray(d.evt)){EVT=d.evt;evSave();evList()}if(Array.isArray(d.cnd)){CND=new Set(d.cnd);cndSave()}if(d.trk){TRK=d.trk;trkSave()}if(d.zn){ZN.man=d.zn.man||[];ZN.rural=d.zn.rural||.12;ZN.on=d.zn.on===0?0:1;zIndex();znSave();zDraw();zList()}list();trList();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();if(Array.isArray(d.dem)&&d.dem.length)setDem(d.dem,true);
  for(const x of d.files||[]){if(arr(x.k).some(c=>c.name==x.name))continue;await ingest(new File([Uint8Array.from(atob(x.b),ch=>ch.charCodeAt(0))],x.name+(x.kmz?'.kmz':'.kml')),x.k)}
  list();resolveLinks(1);clearPlan();fitAll();toast('Respaldo restaurado')};
 setTimeout(()=>{try{if(pts.length&&Date.now()-(+localStorage.getItem('gc_bk')||0)>7*864e5)toast('💾 Sin respaldo reciente de sus datos','Respaldar',()=>$('#bk').click())}catch(e){}},6000);
@@ -646,18 +1086,17 @@ if('serviceWorker' in navigator&&location.protocol=='https:')navigator.serviceWo
 /* ===== Panel compacto: secciones plegables (en el celular solo se abre una a la vez) ===== */
 var ins=null; /* estado de la inspección (se declara aquí para que exista siempre) */
 (function(){
- const mob=()=>innerWidth<=800,secs=()=>[...document.querySelectorAll('#side>section')].filter(s=>s.querySelector(':scope>h2')),key=s=>s.querySelector('h2').firstChild.textContent.trim();
+ const mob=()=>true,secs=()=>[...document.querySelectorAll('#side>section')].filter(s=>s.querySelector(':scope>h2')),key=s=>s.querySelector('h2').firstChild.textContent.trim();
  let st={};try{st=JSON.parse(localStorage.getItem('gc_sec')||'{}')}catch(e){}
- secs().forEach(s=>{const h=s.querySelector('h2');h.classList.add('acc');if(mob()||st[key(s)])s.classList.add('cl');
-  h.addEventListener('click',()=>{const c=!s.classList.contains('cl');if(!c&&mob())secs().forEach(o=>{if(o!==s)o.classList.add('cl')});s.classList.toggle('cl',c);
-   if(!mob()){st[key(s)]=c?1:0;try{localStorage.setItem('gc_sec',JSON.stringify(st))}catch(e){}}})});
+ secs().forEach(s=>{const h=s.querySelector('h2');h.classList.add('acc');if(st[key(s)])s.classList.add('cl');
+  h.addEventListener('click',()=>{const c=!s.classList.contains('cl');s.classList.toggle('cl',c);st[key(s)]=c?1:0;try{localStorage.setItem('gc_sec',JSON.stringify(st))}catch(e){}})});
  /* tocar el mapa cierra el panel en el celular */
  map.on('click',()=>{if(mob()&&document.body.classList.contains('sheet')){document.body.classList.remove('sheet');$('#shb').textContent='☰ Panel'}});
  /* abre el panel en la sección cuyo título contiene «sub» */
  window.openSec=sub=>{const s=secs().find(s=>s.querySelector('h2').textContent.includes(sub));if(!s)return;
-  if(mob()){secs().forEach(o=>{if(o!==s)o.classList.add('cl')});document.body.classList.add('sheet');$('#shb').textContent='✕ Cerrar'}
+  window.goTab&&window.goTab(s.dataset.tab);if(mob()){document.body.classList.add('sheet');$('#shb').textContent='✕ Cerrar'}
   s.classList.remove('cl');
-  setTimeout(()=>{try{s.scrollIntoView({block:'start',behavior:'smooth'})}catch(e){}if(mob()&&typeof plan!=='undefined'&&plan)map.panBy([0,Math.round($('#side').offsetHeight/2)])},350)};
+  setTimeout(()=>{try{s.scrollIntoView({block:'start',behavior:'smooth'})}catch(e){}0},350)};
 })();
 </script>
 <script>
@@ -685,7 +1124,7 @@ var ins=null; /* estado de la inspección (se declara aquí para que exista siem
  /* punto de falla: se busca la línea de circuito más cercana (máx. 200 m) y se calcula la maniobra */
  window.faultAt=function(q,pp){
   if(!circ.some(c=>c.on)){toast('Cargue y active al menos un circuito para marcar una falla');return}
-  const go=()=>{runFault(q);if(!plan){toast('No hay una línea de circuito a menos de 200 m de ese punto: mantenga pulsado sobre la línea');return}
+  insRestore();FT0=Date.now();FORCE.clear();SPLIT=[];SPLITM=0;PUENT=[];const go=()=>{runFault(q);if(!plan){toast('No hay una línea de circuito a menos de 200 m de ese punto: mantenga pulsado sobre la línea');return}
    window.openSec&&window.openSec('Falla')};
   if(plan&&plan.done)log('La transferencia anterior sigue activa: pulse Normalizar cuando el circuito vuelva a su estado normal');
   go()};
@@ -697,6 +1136,7 @@ var ins=null; /* estado de la inspección (se declara aquí para que exista siem
 /* ===== Inspección guiada por calles: desde un interruptor, restaurador, seccionamiento, fusible/cuchilla o enlace ===== */
 const insb=(()=>{const d=document.createElement('div');d.id='ins';map.getContainer().appendChild(d);L.DomEvent.disableClickPropagation(d);L.DomEvent.disableScrollPropagation(d);return d})();
 const insSay=t=>{if(!ins||ins.mute||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='es-MX';speechSynthesis.speak(u)}catch(e){}};
+const tn=p=>p.wp?'Recorrido':T[p.t].n,dn=p=>p.wp?'el siguiente punto del recorrido':T[p.t].n+' '+p.name;
 const insFm=m=>m>=950?(m/1000).toFixed(1).replace('.',',')+' kilómetros':Math.max(10,Math.round(m/10)*10)+' metros';
 const insFk=m=>m>=950?(m/1000).toFixed(1)+' km':Math.round(m/10)*10+' m';
 const insFt=s=>s<90?'1 min':s<5400?Math.round(s/60)+' min':Math.floor(s/3600)+' h '+Math.round(s%3600/60)+' min';
@@ -715,8 +1155,30 @@ function insBuild(ip,c,dir){if(typeof plan!=='undefined'&&plan)clearPlan();attac
   if(src){const par=new Map([[src.n,-1]]),q=[src.n];for(let k=0;k<q.length;k++){const n=q[k];for(const e of N[n].adj){if(e.d||e.tie)continue;const m=nb(n,e);if(!par.has(m)){par.set(m,n);q.push(m)}}}
    const sub=n=>{for(let x=n;x!=null&&x>=0;x=par.get(x))if(x==o)return true;return false};
    keep=eq.filter(x=>x.p===ip||(dir=='down'?sub(x.n):!sub(x.n)))}}
- const out=[{p:ip,n:o,d:0}],rest=new Set(keep.filter(x=>x.p!==ip));let D=D0;
- while(rest.size){let b=null,bd=Infinity;rest.forEach(x=>{if(D[x.n]<bd){bd=D[x.n];b=x}});if(!b)break;rest.delete(b);out.push({p:b.p,n:b.n,d:bd});D=insDij(b.n)}
+ /* recorrido completo: troncal y todos los ramales, hasta cada punta; las ramas cortas primero y la más larga al final (sin regresar) */
+ const reach=n=>D0[n]<Infinity&&cn(n)==c,scope=new Set();
+ if(dir&&dir!='all'){const src=pts.find(p=>p.t=='INT'&&p.cn==c&&p.n>=0&&cn(p.n)==c);
+  if(src){const par=new Map([[src.n,-1]]),q=[src.n];for(let k=0;k<q.length;k++){const n=q[k];for(const e of N[n].adj){if(e.d||e.tie)continue;const m=nb(n,e);if(!par.has(m)){par.set(m,n);q.push(m)}}}
+   const sub=n=>{for(let x=n;x!=null&&x>=0;x=par.get(x))if(x==o)return true;return false};
+   for(let n=0;n<N.length;n++)if(reach(n)&&(dir=='down'?sub(n):!sub(n)))scope.add(n)}}
+ if(!scope.size)for(let n=0;n<N.length;n++)if(reach(n))scope.add(n);scope.add(o);
+ const eqAt=new Map();keep.forEach(x=>{if(x.p!==ip&&scope.has(x.n))(eqAt.get(x.n)||eqAt.set(x.n,[]).get(x.n)).push(x)});
+ return insTourList(ip,o,scope,eqAt)}
+function insTour(o,scope){const N=G.N,par=new Map([[o,-1]]),kids=new Map(),q=[o];
+ for(let k=0;k<q.length;k++){const n=q[k];for(const e of N[n].adj){if(e.d||e.tie||e.v)continue;const m=nb(n,e);if(!scope.has(m)||par.has(m))continue;par.set(m,n);(kids.get(n)||kids.set(n,[]).get(n)).push({m,l:e.l});q.push(m)}}
+ const hg=new Map();for(let k=q.length-1;k>=0;k--){const n=q[k];let b=0;(kids.get(n)||[]).forEach(c=>{b=Math.max(b,c.l+(hg.get(c.m)||0))});hg.set(n,b)}
+ const ks=n=>(kids.get(n)||[]).slice().sort((a,b)=>(a.l+hg.get(a.m))-(b.l+hg.get(b.m))),seq=[o],st=[{n:o,k:ks(o),i:0,last:true}];
+ while(st.length){const f=st[st.length-1];if(f.i>=f.k.length){const done=st.pop();if(st.length&&!done.last)seq.push(st[st.length-1].n);continue}
+  const c=f.k[f.i++];seq.push(c.m);st.push({n:c.m,k:ks(c.m),i:0,last:f.last&&f.i==f.k.length})}
+ return seq}
+function insTourList(ip,o,scope,eqAt){const N=G.N,seq=insTour(o,scope),bear=(a,b)=>Math.atan2((b[1]-a[1])*Math.cos(a[0]*rad),b[0]-a[0]);let out=[];
+ for(const S of [150,250,400,700]){out=[{p:ip,n:o,d:0}];const seen=new Set([o]);let acc=0,w=0;
+  for(let k=1;k<seq.length;k++){const n=seq[k],P=N[n].p;acc+=dist(N[seq[k-1]].p,P);const first=!seen.has(n);seen.add(n);
+   const deg=N[n].adj.filter(e=>!e.d&&!e.tie).length;let key=deg!=2||k==seq.length-1;
+   if(!key&&first&&k+1<seq.length){let d=Math.abs(bear(N[seq[k-1]].p,P)-bear(P,N[seq[k+1]].p));if(d>Math.PI)d=2*Math.PI-d;key=d>.7&&acc>=60}
+   const eqs=first?(eqAt.get(n)||[]):[];eqs.forEach(x=>{out.push({p:x.p,n,d:acc});acc=0});
+   if(!eqs.length&&((deg==1||k==seq.length-1)&&acc>=5||(key&&acc>=25)||(first&&acc>=S))){out.push({p:{wp:1,t:'WP',name:'Tramo '+(++w),lat:P[0],lng:P[1],st:1},n,d:acc});acc=0}}
+  if(out.length<=450)break}
  return out}
 /* ventana para elegir desde un equipo que no es interruptor */
 function insMenu(id){const p=byId(id);if(!p)return;map.closePopup();insStop();
@@ -733,7 +1195,7 @@ function insStart(id,dir,cnn){const ip=byId(id);if(!ip)return;const c=cnn||ip.cn
  if(list.length<2)return toast(dir&&dir!='all'?'No hay más equipos en esa dirección':'No hay otros equipos alcanzables en '+c);
  insStop();ins={cn:c,list,i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0};map.closePopup();
  navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>ins?ins.wl=w:w.release()).catch(()=>{});
- insGo(0);ins.tm=setInterval(insTick,2000)}
+ insIsolate(c);insGo(0);ins.tm=setInterval(insTick,2000)}
 /* ---------- rutas por calles (OSRM, mapa de OpenStreetMap) ---------- */
 async function insRoute(a,b,prof){const co=a[1].toFixed(6)+','+a[0].toFixed(6)+';'+b[1].toFixed(6)+','+b[0].toFixed(6),q='?overview=full&geometries=geojson&steps=true&alternatives=false',
  us=prof=='foot'?['https://routing.openstreetmap.de/routed-foot/route/v1/driving/'+co+q]:['https://routing.openstreetmap.de/routed-car/route/v1/driving/'+co+q,'https://router.project-osrm.org/route/v1/driving/'+co+q];
@@ -750,7 +1212,7 @@ async function insFetch(){if(!ins||ins.ld)return;const x=ins.list[ins.i];if(!x)r
  if(!ins||tok!==ins.tok)return;ins.ld=0;
  if(!r){ins.err='Sin conexión con el servicio de rutas';ins.fb=[from,to];if(ins.intro)insSay(ins.intro);ins.intro='';insDraw(1);insUpd();return}
  ins.rt=r;ins.pr=null;ins.err='';ins.fb=null;ins.ann={};
- insSay((ins.intro?ins.intro+'. ':'')+'Ruta de '+insFm(r.dist)+'. '+insCap(insStepTxt(r.steps[0],'')));ins.intro='';
+ if(!p.wp)insSay((ins.intro?ins.intro+'. ':'')+'Ruta de '+insFm(r.dist)+'. '+insCap(insStepTxt(r.steps[0],'')));ins.intro='';
  insDraw(1);insUi()}
 function insRetry(){if(ins&&ins.err){ins.err='';ins.try=0;insFetch()}}
 /* ---------- textos de las indicaciones ---------- */
@@ -775,13 +1237,14 @@ function insStepTxt(s,eq){const m=s.m||{},t=m.type,md=m.modifier,nm=s.nm,on=nm?'
 const insIco=s=>s.m.type=='arrive'?'🏁':s.m.type=='depart'?'🧭':(INS_ARW[s.m.modifier]||'↑');
 /* ---------- recorrido ---------- */
 function insGo(i){ins.i=i;ins.say={};ins.ann={};ins.rt=null;ins.pr=null;ins.err='';ins.msg='';ins.fb=null;ins.ld=0;ins.offc=0;ins.near=null;ins.tok++;const x=ins.list[i];if(!x)return insEnd();const p=x.p;
- ins.intro=(i?'Siguiente: ':'Iniciando inspección del circuito '+ins.cn+'. Primer equipo: ')+T[p.t].n+' '+p.name;
- if(!me&&!ins.prev){insSay(ins.intro);ins.intro='';map.setView([p.lat,p.lng],Math.max(map.getZoom(),16))}
+ ins.intro=p.wp?'':(i?'Siguiente: ':'Iniciando inspección del circuito '+ins.cn+'. Primer equipo: ')+T[p.t].n+' '+p.name;
+ if(!me&&!ins.prev){if(ins.intro)insSay(ins.intro);ins.intro='';map.setView([p.lat,p.lng],Math.max(map.getZoom(),16))}
  insDraw();insUi();insFetch()}
 function insTick(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p;ins.near=null;
  if(!ins.rt&&!ins.ld&&(me||ins.prev)&&(ins.msg||Date.now()-(ins.try||0)>12000))insFetch();
  if(me){const d=map.distance(me.getLatLng(),[p.lat,p.lng]),s=ins.say;ins.near=d;insFollow();
-  if(d<=30&&!s.h){s.h=1;insSay('Llegó a '+T[p.t].n+' '+p.name+(p.st?', cerrado':', abierto')+'. Confirme la revisión.')}
+  if(p.wp){if(d<=Math.max(70,(ins.rt?ins.rt.snap||0:0)+40)||(ins.pr&&ins.pr.tot<=25)){ins.ok.add(p);ins.prev=[p.lat,p.lng];insGo(ins.i+1);return}}
+  else if(d<=30&&!s.h){s.h=1;insSay('Llegó a '+T[p.t].n+' '+p.name+(p.st?', cerrado':', abierto')+'. Confirme la revisión.')}
   else if(!ins.rt&&!ins.ld){if(d<=100&&d>30&&!s.m){s.m=1;insSay('En cien metros, '+T[p.t].n+' '+p.name)}else if(d>100&&d<=300&&!s.f){s.f=1;insSay('En '+insFm(d)+', '+T[p.t].n+' '+p.name)}}}
  insUpd()}
 /* posición sobre la ruta, avisos de maniobra y recálculo si se sale de la ruta */
@@ -794,29 +1257,29 @@ function insFollow(){const r=ins.rt;if(!r||!me||ins.ld)return;const ll=me.getLat
  const nx=r.steps[b.si+1];if(!nx||ins.say.h)return;const rm=Math.round(rem),TH=[25,80,250],t=TH.find(x=>rm<=x),A=ins.ann[b.si];
  if(t===undefined||(nx.m.type=='arrive'&&rm<=25))return;
  if((!A||(t<A.t&&(A.r-rm>=40||(t==25&&A.r>40))))&&Date.now()-(ins.ls||0)>3500){ins.ann[b.si]={t,r:rm};ins.ls=Date.now();
-  const e=ins.list[ins.i].p,tx=insStepTxt(nx,T[e.t].n+' '+e.name);insSay(t==25&&nx.m.type!='arrive'?insCap(tx):'En '+insFm(rm)+', '+tx)}}
+  const e=ins.list[ins.i].p,tx=insStepTxt(nx,dn(e));insSay(t==25&&nx.m.type!='arrive'?insCap(tx):'En '+insFm(rm)+', '+tx)}}
 /* ---------- mapa ---------- */
 function insDraw(fit){if(!ins)return;if(!ins.lg)ins.lg=L.layerGroup().addTo(map);ins.lg.clearLayers();const x=ins.list[ins.i];if(!x)return;const p=x.p,g=ins.lg,r=ins.rt,to=[p.lat,p.lng];
- L.circleMarker(to,{radius:22,color:'#ffc233',weight:3,fillColor:'#ffc233',fillOpacity:.15,interactive:false}).addTo(g);
+ L.circleMarker(to,{radius:p.wp?10:22,color:'#ffc233',weight:3,fillColor:'#ffc233',fillOpacity:.15,interactive:false}).addTo(g);if(ins.list.length>1)L.polyline(ins.list.slice(ins.i).map(y=>[y.p.lat,y.p.lng]),{color:'#ffc233',weight:2.5,opacity:.85,dashArray:'2 7',interactive:false}).addTo(g);
  if(r){L.polyline(r.rp,{color:'#fff',weight:10,opacity:.9,interactive:false,lineCap:'round'}).addTo(g);L.polyline(r.rp,{color:'#2f80ff',weight:6,opacity:1,interactive:false,lineCap:'round'}).addTo(g);
   if(r.end&&r.snap>6)L.polyline([r.end,to],{color:'#2f80ff',weight:3,dashArray:'3 7',interactive:false}).addTo(g);
   if(fit){if(me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');map.setView(me.getLatLng(),Math.max(map.getZoom(),16))}else map.fitBounds(L.latLngBounds(r.rp).extend(to),{padding:[50,50],maxZoom:17})}}
  else if(ins.fb){L.polyline(ins.fb,{color:'#9aa7b3',weight:3,dashArray:'6 8',interactive:false}).addTo(g);if(fit)map.fitBounds(L.latLngBounds(ins.fb),{padding:[50,50],maxZoom:17})}}
 /* ---------- barra inferior ---------- */
-function insBanner(){const x=ins.list[ins.i],r=ins.rt,eq=T[x.p.t].n+' '+x.p.name;
+function insBanner(){const x=ins.list[ins.i],r=ins.rt,eq=dn(x.p);
  if(ins.ld)return{i:'⏳',t:'Calculando la ruta por calles…'};
  if(ins.err)return{i:'⚠',t:esc(ins.err)+': no se puede guiar por calles. Se reintenta solo (toque aquí para reintentar).'};
  if(ins.msg)return{i:'📍',t:esc(ins.msg)};
  if(!r)return{i:'📍',t:'Preparando…'};
  if(ins.pr){const nx=r.steps[ins.pr.si+1];return nx?{i:insIco(nx),t:'<b>'+insFk(ins.pr.rem)+'</b> · '+esc(insCap(insStepTxt(nx,eq)))}:{i:'🏁',t:'Llegando a su destino'}}
  return{i:'🧭',t:'Ruta: <b>'+insFk(r.dist)+'</b> · '+insFt(r.dur)+' · '+esc(insCap(insStepTxt(r.steps[0],'')))}}
-const insInfo=x=>T[x.p.t].n+(ins.rt?' · '+insFk(ins.rt.dist)+' · '+insFt(ins.rt.dur):'')+(ins.near!=null?' · a '+Math.round(ins.near)+' m de usted':'');
+const insInfo=x=>tn(x.p)+(ins.rt?' · '+insFk(ins.rt.dist)+' · '+insFt(ins.rt.dur):'')+(ins.near!=null?' · a '+Math.round(ins.near)+' m de usted':'');
 function insListHtml(){const r=ins.rt;if(!r||!ins.open)return'';const cur=ins.pr?ins.pr.si+1:-1;
  return'<div class="sl">'+r.steps.map((s,i)=>`<div class="${i==cur?'cur':''}"><span style="flex:none;width:18px">${insIco(s)}</span><span style="flex:1">${esc(insCap(insStepTxt(s,'')))}</span><small style="flex:none;color:var(--m)">${insFk(s.d)}</small></div>`).join('')+'</div>'}
 function insUi(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p,n=ins.list.length,k=ins.ok.size+ins.sk.size,b=insBanner(),old=insb.querySelector('.sl'),sc=old?old.scrollTop:0;
  insb.innerHTML=`<div class="ih"><b>🧭 ${esc(ins.cn)}</b><span>${k}/${n}</span><button onclick="insProf()" title="Tipo de ruta">${ins.prof=='foot'?'🚶':'🚗'}</button><button onclick="insToggleList()" title="Indicaciones">📋</button><button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div>
 <div class="nx" onclick="insRetry()"><i id="ins-i">${b.i}</i><span id="ins-b">${b.t}</span></div>${insListHtml()}
-<div class="ib"><div class="in"><b>${esc(p.name)}</b><small id="ins-s">${esc(insInfo(x))}</small></div><div class="ia"><button onclick="insNext(1)">Omitir</button><button id="ins-ok" class="ok ${ins.near!=null&&ins.near<=30?'pulse':''}" onclick="insNext()">✔ Revisado</button></div></div><div class="bar"><i style="width:${k/n*100}%"></i></div>`;
+<div class="ib"><div class="in"><b>${p.wp?'Recorrido de la línea':esc(p.name)}</b><small id="ins-s">${esc(insInfo(x))}</small></div><div class="ia"><button onclick="insNext(1)">Omitir</button><button id="ins-ok" class="ok ${ins.near!=null&&ins.near<=30?'pulse':''}" onclick="insNext()">${p.wp?'Siguiente':'✔ Revisado'}</button></div></div><div class="bar"><i style="width:${k/n*100}%"></i></div>`;
  const nw=insb.querySelector('.sl');if(nw)nw.scrollTop=sc}
 /* actualiza solo los textos (sin reconstruir los botones, para no perder toques en el celular) */
 function insUpd(){if(!ins)return;const x=ins.list[ins.i],t=insb.querySelector('#ins-b');if(!x||!t)return;const b=insBanner();insb.querySelector('#ins-i').textContent=b.i;t.innerHTML=b.t;insb.querySelector('#ins-s').textContent=insInfo(x);insb.querySelector('#ins-ok').classList.toggle('pulse',ins.near!=null&&ins.near<=30)}
@@ -824,11 +1287,11 @@ function insToggleList(){ins.open=!ins.open;insUi()}
 function insProf(){ins.prof=ins.prof=='foot'?'car':'foot';try{localStorage.setItem('gc_prof',ins.prof)}catch(e){}ins.rt=null;ins.pr=null;ins.err='';ins.ld=0;ins.tok++;ins.rr=0;insFetch();insUi()}
 function insNext(sk){const x=ins.list[ins.i];(sk?ins.sk:ins.ok).add(x.p);ins.prev=[x.p.lat,x.p.lng];insGo(ins.i+1)}
 function insMute(){ins.mute=!ins.mute;if(ins.mute&&window.speechSynthesis)speechSynthesis.cancel();insUi()}
-function insEnd(){clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;const n=ins.list.length;insSay('Inspección terminada. '+ins.ok.size+' de '+n+' equipos revisados.');
- ins.rep='Inspección '+ins.cn+' · '+new Date().toLocaleString()+'\n'+ins.list.map(x=>(ins.ok.has(x.p)?'✔ ':'✖ ')+x.p.name+' ('+T[x.p.t].n+')').join('\n');log('🧭 Inspección de '+ins.cn+': '+ins.ok.size+'/'+n+' equipos revisados');
- insb.innerHTML=`<div class="ih"><b>🧭 Inspección terminada</b><span>${ins.ok.size}/${n}</span><button onclick="insStop()">✕</button></div><div class="ib"><div class="in">Revisados: <b>${ins.ok.size}</b> · omitidos: <b>${ins.sk.size}</b></div><div class="ia"><button class="ok" onclick="insShare()">Compartir reporte</button></div></div>`}
+function insEnd(){insRestore();clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;const eqs=ins.list.filter(x=>!x.p.wp),n=eqs.length,okn=eqs.filter(x=>ins.ok.has(x.p)).length,skn=eqs.filter(x=>ins.sk.has(x.p)).length;insSay('Inspección terminada. Se recorrió todo el circuito; '+okn+' de '+n+' equipos revisados.');
+ ins.rep='Inspección '+ins.cn+' · '+new Date().toLocaleString()+'\n'+eqs.map(x=>(ins.ok.has(x.p)?'✔ ':'✖ ')+x.p.name+' ('+T[x.p.t].n+')').join('\n');log('🧭 Inspección de '+ins.cn+': '+okn+'/'+n+' equipos revisados');
+ insb.innerHTML=`<div class="ih"><b>🧭 Inspección terminada</b><span>${okn}/${n}</span><button onclick="insStop()">✕</button></div><div class="ib"><div class="in">Recorrido completo · revisados: <b>${okn}</b> · omitidos: <b>${skn}</b></div><div class="ia"><button class="ok" onclick="insShare()">Compartir reporte</button></div></div>`}
 function insShare(){const t=ins.rep;navigator.share?navigator.share({title:'Inspección '+ins.cn,text:t}).catch(()=>{}):navigator.clipboard.writeText(t).then(()=>toast('Reporte copiado'))}
-function insStop(){if(!ins)return;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
+function insStop(){insRestore();if(!ins)return;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
 </script>
 <script>
 /* ===== Guardado: copia interna en IndexedDB, almacenamiento protegido y estado visible ===== */
@@ -871,23 +1334,25 @@ ${S.pe?'':'<small class="h">ℹ Sin protección, el navegador puede borrar los d
  const host=$('#pl');if(!host)return;let photo=null,fkEdit='';
  const d=document.createElement('div');d.id='rp';
  d.innerHTML=`<div class="sum"><b>📣 Reporte de la falla</b></div>
-<input id="rpp" type="text" autocomplete="off" placeholder="Protección operada (ej. 51, 51N, 79)">
-<textarea id="rpt" rows="2" placeholder="Causa de la falla (ej. rama sobre la línea, ave, vehículo, equipo dañado…)"></textarea>
+<input id="rpp" type="text" autocomplete="off" placeholder="Protección operada (ej. 51, 51N, 79)"><div class="chips" id="rpcp"></div>
+<textarea id="rpt" rows="2" placeholder="Causa de la falla (ej. rama sobre la línea, ave, vehículo, equipo dañado…)"></textarea><div class="chips" id="rpcc"></div>
 <div class="g"><label class="btn">📷 Foto de la causa<input type="file" id="rpf" accept="image/*" capture="environment" hidden></label><span id="rpn" class="h" style="align-self:center;margin:0"></span></div>
 <div class="wn"><b>521</b><input id="rpw" type="tel" inputmode="numeric" autocomplete="off" placeholder="WhatsApp destino (10 dígitos)"></div>
 <button id="rps" type="button">📤 Enviar por WhatsApp</button>
 <small class="h" id="rpi"></small>`;
- host.after(d);
+ ($('#evr')||host).after(d);
  const $r=s=>d.querySelector(s),num=$r('#rpw'),pro=$r('#rpp'),cau=$r('#rpt'),pic=$r('#rpf'),pnm=$r('#rpn');
  /* el número se guarda y se usa siempre a 10 dígitos; el 521 se agrega al enviar (acepta pegar +52…, 521… o 044…) */
  const n10=v=>{const x=String(v||'').replace(/\D/g,'');return x.length>10?x.slice(-10):x};
  const fk=()=>typeof plan!=='undefined'&&plan&&plan.f?plan.f.p.join(','):'';
  try{num.value=n10(localStorage.getItem('gc_wa'))}catch(e){}
+ const chp=(el,arr,f,sep,j)=>{el.innerHTML=arr.map(x=>`<button type="button" class="chip">${x}</button>`).join('');el.onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const v=b.textContent,cur=f.value.split(sep).map(s=>s.trim()).filter(Boolean),i=cur.indexOf(v);i>=0?cur.splice(i,1):cur.push(v);f.value=cur.join(j);f.dispatchEvent(new Event('input'))}};
+ chp($r('#rpcp'),['51','51N','50','50N','79'],pro,'/','/');chp($r('#rpcc'),['Rama sobre línea','Ave o animal','Vehículo','Equipo dañado','Viento o tormenta','Vandalismo','Desconocida'],cau,',',', ');
  const hint=()=>{const n=n10(num.value),to=n.length==10?' de 521'+n:'';
   $r('#rpi').textContent=photo?'Con foto: se abre WhatsApp con todo listo; elija el chat'+(to||' del destinatario')+' y pulse «Enviar».':'Sin foto: se abre el chat'+(to||' del número')+' con el texto y la ubicación; pulse «Enviar».'};
  const quitaFoto=()=>{photo=null;pic.value='';pnm.textContent='';hint()};
  num.addEventListener('input',()=>{const v=n10(num.value);if(v!==num.value)num.value=v;try{localStorage.setItem('gc_wa',v)}catch(e){}hint()});
- [pro,cau].forEach(x=>x.addEventListener('input',()=>{fkEdit=fk()}));
+ [pro,cau].forEach(x=>x.addEventListener('input',()=>{fkEdit=fk();const e=plan&&EVT.find(v=>v.id==plan.eid);if(e){e.pr=pro.value;e.ca=cau.value;evSave()}}));
  /* elegir el número desde los contactos del teléfono (Chrome en Android) */
  if('contacts' in navigator&&'ContactsManager' in window){const b=document.createElement('button');b.type='button';b.textContent='👤 Contactos';$r('.wn').append(b);
   b.onclick=async()=>{try{const r=await navigator.contacts.select(['tel'],{multiple:false}),t=r&&r[0]&&r[0].tel&&r[0].tel[0];
@@ -900,12 +1365,13 @@ ${S.pe?'':'<small class="h">ℹ Sin protección, el navegador puede borrar los d
  pnm.onclick=()=>{if(photo)quitaFoto()};
  /* mensaje: Equipo Operado, Usuarios, Demanda (afectados por la operación del equipo), Protección Operada, Causa de Falla y ubicación */
  const msg=()=>{const P=plan,t=P.trip,dd=dem(P),ok=!!(dd&&P.Lc&&P.aff!=null),q=P.f.p,
-   us=ok?fu(dd.u*P.aff/P.Lc):'sin dato',dm=ok?(dd.mw*P.aff/P.Lc).toFixed(2)+' MW':'sin dato';
-  return '⚡ FALLA\nEquipo Operado: '+(t?t.name+(t.cn?' ('+t.cn+')':''):'sin dato')+'\nUsuarios: '+us+'\nDemanda: '+dm+'\nProtección Operada: '+(pro.value.trim()||'sin dato')+'\nCausa de Falla: '+(cau.value.trim()||'(sin descripción)')+'\n📍 https://www.google.com/maps?q='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n🕒 '+new Date().toLocaleString('es-MX')};
+   A0=ud(P,P.dn),us=A0?fu(A0.u):'sin dato',dm=A0?A0.mw.toFixed(2)+' MW':'sin dato';
+  return (SIM?'🧪 SIMULACRO · ':'')+'⚡ FALLA\nEquipo Operado: '+(t?t.name+(t.cn?' ('+t.cn+')':''):'sin dato')+'\nUsuarios: '+us+'\nDemanda: '+dm+'\nProtección Operada: '+(pro.value.trim()||'sin dato')+'\nCausa de Falla: '+(cau.value.trim()||'(sin descripción)')+'\nManiobras: '+mvTxt(P)+'\nRestablecimiento: '+(P.dn?(P.done?f1(pcs(P,servedSet(P))):f1(P.pct)+' (previsto)'):'sin dato')+'\n📍 https://www.google.com/maps?q='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n📲 Abrir en SECC-M: '+APPURL+'#falla='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n🕒 '+new Date().toLocaleString('es-MX')};
  const need=()=>{if(typeof plan!=='undefined'&&plan&&plan.f)return true;toast('Primero marque la falla: mantenga pulsado el punto sobre la línea del circuito');return false};
  const aTexto=(text,n,conFoto)=>{if(n.length!=10)return toast('Escriba el número de WhatsApp destino (10 dígitos)');
   window.open('https://wa.me/521'+n+'?text='+encodeURIComponent(text),'_blank');log('📣 Reporte de falla abierto en WhatsApp (texto y ubicación)');
   if(conFoto)toast('Se abrió WhatsApp con el texto: adjunte la foto desde su galería')};
+ window.waText=t=>{const n=n10(num.value);if(n.length!=10)return toast('Escriba el número de WhatsApp destino (10 dígitos) en «Reporte de la falla»');window.open('https://wa.me/521'+n+'?text='+encodeURIComponent((SIM?'🧪 SIMULACRO · ':'')+t),'_blank')};
  /* un solo botón: con foto → se comparte foto + mensaje en un solo envío; sin foto → chat directo al número con texto y ubicación */
  $r('#rps').onclick=async()=>{if(!need())return;const k=fk();
   if(fkEdit&&fkEdit!==k){pro.value=cau.value='';fkEdit='';quitaFoto();return toast('Esos datos eran de otra falla: capture protección, causa y foto de esta falla')}
@@ -914,6 +1380,41 @@ ${S.pe?'':'<small class="h">ℹ Sin protección, el navegador puede borrar los d
    try{await navigator.share({files:[photo],text,title:'Falla'});log('📣 Reporte de falla compartido con foto');quitaFoto();return}catch(e){if(e&&e.name=='AbortError')return}}
   aTexto(text,n,!!photo)};
  hint();
+})();
+</script>
+<script>
+/* ---------- Interfaz: pestañas, indicadores, mapa oscuro, botón de falla y guía ---------- */
+(function(){
+ const tabs=['falla','equipos','datos','mas'];let cur='falla';try{cur=localStorage.getItem('gc_tab')||'falla'}catch(e){}
+ window.goTab=t=>{if(!tabs.includes(t))return;$('#side').dataset.t=t;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));try{localStorage.setItem('gc_tab',t)}catch(e){}};
+ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{goTab(b.dataset.t);$('#side').scrollTop=0});goTab(tabs.includes(cur)?cur:'falla');
+ window.chips=()=>{const s=$('#chS');if(s)s.textContent='Carga '+seasonNow()+(SEAS=='auto'?' · auto':'');const x=$('#chX');if(x){x.textContent='🔁 '+XT.length+' transferencia'+(XT.length==1?'':'s');x.style.display=XT.length?'':'none'}
+  const m=$('#chM');if(m){m.textContent=SIM?'🧪 Simulacro activo':'🧪 Simulacro';m.classList.toggle('on',!!SIM)}
+  document.querySelectorAll('#sg button').forEach(b=>b.classList.toggle('on',b.dataset.s==SEAS));const t=$('#sgt');if(t)t.textContent='Hoy se usa la carga '+seasonNow()+' en amperes'+(SEAS=='auto'?' (según el mes: baja de octubre a abril, alta de mayo a septiembre).':' (elegida a mano).')};
+ $('#chS').onclick=()=>setSeason({auto:'baja',baja:'alta',alta:'auto'}[SEAS]||'auto');$('#chM').onclick=()=>simToggle();
+ document.querySelectorAll('#sg button').forEach(b=>b.onclick=()=>setSeason(b.dataset.s));
+ $('#dtp').onclick=()=>fileOut('plantilla_demandas.csv','\ufeffInterruptor o equipo,Usuarios,Demanda (MW),Carga baja (A),Carga alta (A),Pickup del interruptor (A)\r\nEJEMPLO-4010,1200,3.2,150,190,400\r\nR-EJEMPLO-01,300,0.8,38,48,\r\n','text/csv');
+ let dm=false;try{dm=localStorage.getItem('gc_dm')==='1'}catch(e){}
+ const sdm=()=>{document.body.classList.toggle('dm',dm);$('#dmb').textContent=dm?'🌙':'☀';try{localStorage.setItem('gc_dm',dm?'1':'0')}catch(e){}};sdm();$('#dmb').onclick=()=>{dm=!dm;sdm()};
+ const HINT={FA:'Toque sobre la línea donde está la falla',TR:'Troncal: toque el inicio y luego el final',ZU:'Zona: toque los vértices y pulse «Terminar zona» (Enter)'};
+ const fs=()=>{const m=window.mode===undefined?mode:mode;$('#fab').classList.toggle('on',m=='FA');$('#fab').textContent=m=='FA'?'✕ Cancelar':'⚡ Marcar falla';$('#mht').textContent=HINT[m]||'';$('#mh').classList.toggle('on',!!HINT[m])};
+ const _sm=setMode;window.setMode=function(m){_sm(m);fs()};
+ $('#fab').onclick=()=>{if(!circ.some(c=>c.on)){toast('Primero cargue y active al menos un circuito');return}setMode(mode=='FA'?null:'FA')};$('#mhx').onclick=()=>setMode(null);
+ document.querySelectorAll('#side').forEach(s=>s.addEventListener('click',e=>{const g=e.target.closest('.gs');if(g){goTab(g.dataset.t)}}));
+ window.guide=()=>{const el=$('#gdl');if(!el)return;const ints=pts.filter(p=>p.t=='INT'),mt=ints.filter(p=>DEM.get(dkey(p.name))).length,enl=pts.filter(p=>p.t=='ENL').length;let wa=false;try{wa=(localStorage.getItem('gc_wa')||'').length==10}catch(e){}
+  const S=[[circ.length>0,'Circuitos KMZ','datos',circ.length?circ.filter(c=>c.on).length+' activos de '+circ.length:'Cargue los archivos KMZ de sus circuitos'],
+   [DEM.size>0,'Tabla de usuarios y demanda','datos',DEM.size?DEM.size+' equipos · carga '+seasonNow():'Cargue el Excel: interruptor o equipo, usuarios, demanda, cargas en amperes y pickup'],
+   [ints.length>0,'Interruptores marcados','equipos',ints.length?ints.length+' ('+mt+' con datos de la tabla)':'Marque el interruptor de cada circuito'],
+   [enl>0,'Enlaces entre circuitos','equipos',enl?enl+' enlaces':'Marque los enlaces normalmente abiertos'],
+   [ZQ>0,'Mancha urbana (opcional)','datos',ZQ?'activa: la carga se reparte por zona urbana o rural':'Detéctela o dibújela para repartir mejor la carga'],
+   [wa,'WhatsApp de destino','falla','Escriba los 10 dígitos en «Reporte de la falla»']];
+  const req=S.filter((s,i)=>i!=4),done=req.filter(s=>s[0]).length;
+  el.innerHTML=S.map(s=>`<div class="gs ${s[0]?'ok':''}" data-t="${s[2]}"><i>${s[0]?'✓':'○'}</i><div><b>${s[1]}</b><small>${esc(s[3])}</small></div></div>`).join('');$('#gdn').textContent=done+'/'+req.length;
+  const g=$('#gd');if(done==req.length&&!g.dataset.auto){g.classList.add('cl');g.dataset.auto=1}};
+ setInterval(guide,3000);guide();chips();fs();
+ /* barra superior: panel · búsqueda de circuito o equipo · mi ubicación; zoom abajo a la derecha */
+ {const bar=$('#tbar'),sqe=document.querySelector('.sq'),lbe=$('#lb');if(sqe)bar.appendChild(sqe);if(lbe)bar.appendChild(lbe);if(map.zoomControl)map.zoomControl.setPosition('bottomright');
+  new MutationObserver(()=>setTimeout(()=>map.invalidateSize(),60)).observe(document.body,{attributes:true,attributeFilter:['class']});setTimeout(()=>map.invalidateSize(),80)}
 })();
 </script>
 </body></html>
