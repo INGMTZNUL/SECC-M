@@ -255,7 +255,7 @@ window.initGM=()=>{try{gR=L.gridLayer.googleMutant({type:'roadmap',maxZoom:21});
  if(map.hasLayer(calles)){map.removeLayer(calles);gR.addTo(map)}}catch(e){gOff('No se pudo iniciar Google Maps')}};
 if(L.gridLayer.googleMutant){const g=document.createElement('script');g.src='https://maps.googleapis.com/maps/api/js?key='+GMAPS_KEY+'&callback=initGM';g.async=true;g.onerror=()=>gOff('No cargó Google Maps (¿sin conexión?)');document.head.appendChild(g)}else setTimeout(()=>gOff('No cargó el complemento de Google Maps'),0);
 let tileWarn=0;[calles,carto,sat].forEach(t=>t.on('tileerror',()=>{if(!tileWarn++)log('⚠ No cargan los mosaicos del mapa: revise su conexión o cambie de capa (control arriba a la derecha)')}));
-let circ=[],pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0;
+let circ=[],ONS=new Set(),pts=[],G,mode=null,plan=null,ovr=null,prevSt=null,hl=new Map(),seq=0;
 let XF=[],XT=[],xfPrev=null,xfTm=0,QUIET=0,VJC=new Map(),EVT=[],SIM=null,CND=new Set(),TRK={},FORCE=new Set(),LQ=null,NORM=[],FT0=0,ZQ=0,ZG=null,ZN={osm:[],man:[],rural:.12,on:1,t:0},
  SEAS=(()=>{try{return localStorage.getItem('gc_seas')||'auto'}catch(e){return'auto'}})(); /* XF: maniobras calculadas activas (se guardan en el dispositivo); XT: transferencias activas detectadas por la topología */
 const ov=L.layerGroup().addTo(map),st=p=>ovr&&ovr.has(p)?ovr.get(p):p.st,km=m=>(m/1000).toFixed(2);
@@ -340,20 +340,46 @@ let subs=[];
 async function ingest(f,k,sv){const nm=sv?sv.name:f.name.replace(/\.(kmz|kml)$/i,''),kmz=sv?sv.kmz:/\.kmz$/i.test(f.name);
  try{const o=await openKml(f,kmz),sg=lines(o.d),c=sv||{id:k+Date.now()+Math.random(),k,kmz,t:Date.now(),name:nm,on:1,blob:f};
   if(k=='c'&&!sg.length){log('⚠ '+nm+': no contiene líneas de circuito');return}
-  if(k=='c'){c.color=c.color||COL[circ.length%COL.length];c.segs=sg;c.layer=L.polyline(sg,{color:c.color,weight:3,opacity:.9}).bindTooltip(nm,{sticky:true});circ.push(c);log('Circuito '+nm+': '+sg.length+' tramos')}
+  if(k=='c'){c.color=c.color||COL[circ.length%COL.length];c.segs=sg;c.layer=mkLayer(c);circ.push(c);dbDo('put',{id:c.id+'#segs',k:'segs',cid:c.id,segs:sg});log('Circuito '+nm+': '+sg.length+' tramos')}
   else{c.layer=await subLayer(o);subs.push(c);log('Capa de subestaciones: '+nm)}
   if(c.on)c.layer.addTo(map);if(!sv)dbDo('put',rec(c))}
  catch(x){log('⚠ '+nm+': '+x)}}
-for(const[i,k]of[['fi','c']])$('#'+i).onchange=async e=>{const fs=[...e.target.files];e.target.value='';for(const f of fs){if(k=='c'&&circ.length>=MAX){log('⚠ Límite de '+MAX+' circuitos');break}await ingest(f,k)}list();if(k=='c')resolveLinks(1);clearPlan();fitAll()};
-function fitAll(){const b=L.featureGroup([...circ,...subs].map(c=>c.layer)).getBounds();if(b.isValid())map.fitBounds(b)}
-(async()=>{const a=(await dbDo('getAll'))||[];a.sort((x,y)=>x.t-y.t);for(const r of a){if(r.k=='s'){dbDo('delete',r.id);continue}await ingest(r.blob,r.k,r)}list();resolveLinks();fitAll();if(a.length)log('Cargados automáticamente '+a.length+' archivo(s) guardado(s)')})();
+for(const[i,k]of[['fi','c']])$('#'+i).onchange=async e=>{const fs=[...e.target.files];e.target.value='';for(const f of fs){if(k=='c'&&circ.length>=MAX){log('⚠ Límite de '+MAX+' circuitos');break}await ingest(f,k)}setONS();pts.forEach(pvis);list();if(k=='c')resolveLinks(1);clearPlan();fitAll();bgCalc()};
+function fitAll(){const b=L.featureGroup([...circ.filter(c=>c.on),...subs].map(c=>c.layer)).getBounds();if(b.isValid())map.fitBounds(b)}
+/* ===== Carga por circuito: al abrir no se procesa ningún KMZ; se carga solo el circuito elegido y, en segundo plano y sin dibujarlos, sus vecinos por enlaces (solo para calcular transferencias) ===== */
+var BG={n:0};
+const isAct=c=>!!((c.on||c.calc)&&c.segs);
+function setONS(){ONS=new Set(circ.filter(c=>c.on).map(c=>c.name))}
+function ptShown(p){if(T[p.t].sv||(!p.cn&&!p.cn2))return true;return !!((p.cn&&ONS.has(p.cn))||(p.cn2&&ONS.has(p.cn2)))}
+function mkLayer(c){return L.polyline(c.segs||[],{color:c.color,weight:3,opacity:.9}).bindTooltip(c.name,{sticky:true})}
+function ensureC(c){if(c.segs)return Promise.resolve(c);if(c._ld)return c._ld;BG.n++;
+ c._ld=(async()=>{try{const o=await openKml(c.blob,c.kmz),sg=lines(o.d);c.segs=sg;c.layer.setLatLngs(sg);dbDo('put',{id:c.id+'#segs',k:'segs',cid:c.id,segs:sg})}catch(x){log('⚠ '+c.name+': '+x);c.segs=[]}finally{BG.n--;c._ld=null}return c})();return c._ld}
+function neighNames(){const on=new Set(circ.filter(c=>c.on).map(c=>c.name)),o=new Set();pts.forEach(p=>{if(p.t!='ENL'||!p.cn||!p.cn2)return;if(on.has(p.cn)&&!on.has(p.cn2))o.add(p.cn2);else if(on.has(p.cn2)&&!on.has(p.cn))o.add(p.cn)});return o}
+async function bgCalc(){const nm=neighNames();let ch=0;circ.forEach(c=>{const v=(!c.on&&nm.has(c.name))?1:0;if(!!c.calc!==!!v){c.calc=v;ch=1}});
+ const need=circ.filter(c=>c.calc&&!c.segs);if(need.length){await Promise.all(need.map(ensureC));ch=1}
+ if(ch){try{xfRefresh()}catch(e){}}}
+async function selC(c){if(!c.segs)toast('Cargando '+c.name+'…');await ensureC(c);
+ if(!c.on){c.on=1;c.layer.addTo(map);dbDo('put',rec(c));setONS();pts.forEach(pvis);clearPlan();list();bgCalc()}
+ const b=c.layer.getBounds();if(b.isValid())map.fitBounds(b)}
+window.BOOTP=(async()=>{const a=(await dbDo('getAll'))||[];a.sort((x,y)=>x.t-y.t);const ch=new Map();a.forEach(r=>{if(r.k=='segs')ch.set(r.cid,r.segs)});
+ let first=false;try{first=!localStorage.getItem('gc_lazy1')}catch(e){}
+ for(const r of a){if(r.k=='segs')continue;if(r.k=='s'){dbDo('delete',r.id);continue}
+  if(r.k=='c'){const c=r;c.color=c.color||COL[circ.length%COL.length];c.segs=ch.get(c.id)||null;if(first){c.on=0;dbDo('put',rec(c))}c.layer=mkLayer(c);circ.push(c)}
+  else await ingest(r.blob,r.k,r)}
+ try{localStorage.setItem('gc_lazy1','1')}catch(e){}
+ for(const c of circ.filter(c=>c.on))await ensureC(c);
+ circ.forEach(c=>{if(c.on)c.layer.addTo(map)});setONS();pts.forEach(pvis);list();
+ const b=L.featureGroup(circ.filter(c=>c.on).map(c=>c.layer)).getBounds();if(b.isValid())map.fitBounds(b);
+ await bgCalc();resolveLinks();
+ if(a.length)log(circ.filter(c=>c.on).length+' circuito(s) visible(s) de '+circ.length+' guardados; los demás se cargan al elegirlos');
+ if(first&&circ.length)toast('Elija el circuito a ver: en el panel (Circuitos) o con la búsqueda')})();
 function list(){const row=(c,i,a)=>`<div class="r"><input type="checkbox" ${c.on?'checked':''} onchange="vis('${a}',${i},this.checked)">${a=='c'?`<input type="color" value="${c.color}" onchange="col(${i},this.value)">`:'<span style="flex:none;width:22px;text-align:center">▲</span>'}<span title="${esc(c.name)}">${esc(c.name)}</span><button onclick="zoom('${a}',${i})">⌖</button>${a=='c'?`<button onclick="cNd(${i})" title="Circuito en licencia o fuera de servicio: no recibe cargas" style="${CND.has(c.name)?'color:#ffc233;border-color:#ffc233':''}">⛔</button>`:''}<button onclick="rm('${a}',${i})">✕</button></div>`;
  $('#cl').innerHTML=circ.map((c,i)=>row(c,i,'c')).join('');$('#cc').textContent=circ.length+'/'+MAX;fillDc()}
 const arr=a=>a=='c'?circ:subs;
-function vis(a,i,v){const c=arr(a)[i];c.on=v?1:0;v?c.layer.addTo(map):c.layer.remove();dbDo('put',rec(c));if(a=='c')clearPlan()}
+async function vis(a,i,v){const c=arr(a)[i];if(a=='c'&&v&&!c.segs){toast('Cargando '+c.name+'…');await ensureC(c)}c.on=v?1:0;v?c.layer.addTo(map):c.layer.remove();dbDo('put',rec(c));if(a=='c'){setONS();pts.forEach(pvis);clearPlan();if(v&&circ.filter(x=>x.on).length==1){const b=c.layer.getBounds();if(b.isValid())map.fitBounds(b)}bgCalc()}}
 function col(i,v){circ[i].color=v;circ[i].layer.setStyle({color:v});dbDo('put',rec(circ[i]))}
-function zoom(a,i){const b=arr(a)[i].layer.getBounds();if(b.isValid())map.fitBounds(b)}
-function rm(a,i){const c=arr(a).splice(i,1)[0];c.layer.remove();dbDo('delete',c.id);list();clearPlan()}
+function zoom(a,i){const c=arr(a)[i];if(a=='c')return selC(c);const b=c.layer.getBounds();if(b.isValid())map.fitBounds(b)}
+function rm(a,i){const c=arr(a).splice(i,1)[0];c.layer.remove();dbDo('delete',c.id);dbDo('delete',c.id+'#segs');setONS();pts.forEach(pvis);list();clearPlan();bgCalc()}
 function warnGps(){if(location.protocol=='file:'&&!$('#gw'))$('#side').insertAdjacentHTML('afterbegin','<section id="gw" style="border-color:#ffc233;color:#ffc233">⚠ El navegador bloquea el GPS en archivos locales (sobre todo en celular). Publique este archivo como página https (por ejemplo Netlify Drop o GitHub Pages) y ábralo desde ese enlace.</section>')}
 if(!window.isSecureContext)warnGps();
 /* ---------- Puntos ---------- */
@@ -374,7 +400,7 @@ function mk(p){const t=T[p.t],dr=p.t=='DR',h=L.divIcon({className:'',iconSize:[0
 /* casilla del equipo: oculto = no se ve y no participa en el análisis (igual que un circuito desmarcado) */
 let INSH=null;
 const insHidden=p=>!!INSH&&(T[p.t].sv?!(p.lc&&p.lc.includes(INSH.c)):!(p.cn===INSH.c||p.cn2===INSH.c));
-function pvis(p){if(p.vis!==0&&!insHidden(p)){if(!map.hasLayer(p.m))p.m.addTo(map);if(p.g&&!map.hasLayer(p.g))p.g.addTo(map)}else{p.m.remove();if(p.g)p.g.remove()}}
+function pvis(p){if(p.vis!==0&&!insHidden(p)&&ptShown(p)){if(!map.hasLayer(p.m))p.m.addTo(map);if(p.g&&!map.hasLayer(p.g))p.g.addTo(map)}else{p.m.remove();if(p.g)p.g.remove()}}
 /* durante una inspección solo se ve el circuito inspeccionado y los equipos ligados a él; al terminar, o al marcar una falla, todo vuelve a verse */
 function insIsolate(c){insRestore();INSH={c,xt:map.hasLayer(xtl)};
  circ.forEach(x=>{if(x.name!==c&&x.on&&map.hasLayer(x.layer))map.removeLayer(x.layer)});
@@ -572,7 +598,7 @@ function trunkPath(ci,a,b){const N=G.N,s=nearIn(a,ci),t=nearIn(b,ci);if(s<0||t<0
   pop=()=>{const r=H[0],l=H.pop();if(H.length){H[0]=l;let i=0;for(;;){const x=2*i+1,y=x+1;let m=i;if(x<H.length&&H[x][0]<H[m][0])m=x;if(y<H.length&&H[y][0]<H[m][0])m=y;if(m==i)break;[H[m],H[i]]=[H[i],H[m]];i=m}}return r};
  while(H.length){const[d,u]=pop();if(dn.has(u))continue;dn.add(u);if(u==t)break;for(const e of N[u].adj){if(e.d||e.tie)continue;const m=nb(u,e);if(N[m].c!==ci)continue;const k=d+e.l;if(k<(D.has(m)?D.get(m):Infinity)){D.set(m,k);pv.set(m,u);push([k,m])}}}
  if(!dn.has(t))return null;const out=[t];for(let n=t;n!==s;){n=pv.get(n);out.push(n)}return out.reverse()}
-const trunkNodes=()=>{if(!G.tn){G.tn=new Set();Object.entries(TRK).forEach(([nm,t])=>{const ci=circ.findIndex(c=>c.name==nm&&c.on);if(ci<0)return;const p=trunkPath(ci,t.a,t.b);p&&p.forEach(n=>G.tn.add(n))})}return G.tn};
+const trunkNodes=()=>{if(!G.tn){G.tn=new Set();Object.entries(TRK).forEach(([nm,t])=>{const ci=circ.findIndex(c=>c.name==nm&&isAct(c));if(ci<0)return;const p=trunkPath(ci,t.a,t.b);p&&p.forEach(n=>G.tn.add(n))})}return G.tn};
 function trMode(){const n=$('#trs')&&$('#trs').value;if(!n)return toast('Elija el circuito');TRN=n;trA=null;setMode('TR');log('Troncal de '+n+': toque en el mapa el INICIO (normalmente su interruptor) y luego el FINAL de la troncal')}
 function trClick(q){const ci=circ.findIndex(c=>c.name==TRN&&c.on);if(ci<0){setMode(null);return}
  if(!trA){trA=q;log('Inicio marcado; ahora toque el FINAL de la troncal');return}
@@ -623,7 +649,7 @@ function zClearOsm(){ZN.osm=[];ZN.t=0;zIndex();znSave();zDraw();zList();clearPla
 function drawXT(){xtl.clearLayers();
  XT.forEach(t=>{try{L.polyline(segs(t.S),{color:'#3ddc84',weight:7,opacity:.85,dashArray:'3 9',lineCap:'round',interactive:false}).addTo(xtl);L.marker(t.at,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],html:`<div class="xtag">${esc(t.fromName)} → ${esc(t.to)}</div>`})}).addTo(xtl)}catch(e){}})}
 function drawTR(){trl.clearLayers();Object.entries(TRK).forEach(([nm,t])=>{try{const ci=circ.findIndex(c=>c.name==nm&&c.on);if(ci<0)return;const p=trunkPath(ci,t.a,t.b);if(p)L.polyline(p.map(n=>G.N[n].p),{color:'#00e5ff',weight:3,opacity:.85,dashArray:'1 7',interactive:false}).addTo(trl)}catch(e){}})}
-const xfSig=()=>pts.map(p=>p.id+':'+p.st+(p.nd?'n':'')+':'+p.lat.toFixed(5)+p.lng.toFixed(5)).join(',')+'#'+circ.map(c=>c.id+(c.on?1:0)).join(',')+'#'+JSON.stringify(TRK)+'#'+ZQ;let xfSg='';
+const xfSig=()=>pts.map(p=>p.id+':'+p.st+(p.nd?'n':'')+':'+p.lat.toFixed(5)+p.lng.toFixed(5)).join(',')+'#'+circ.map(c=>c.id+(c.on?1:c.calc?2:0)+(c.segs?'s':'')).join(',')+'#'+JSON.stringify(TRK)+'#'+ZQ;let xfSg='';
 /*NEW-FIN*/
 
 /* ---------- Servicios ligados a circuitos: siguen visibles cuando se inspecciona alguno de ellos ---------- */
@@ -639,7 +665,7 @@ function lcAuto(){let k=0,s=0;pts.forEach(p=>{if(!T[p.t].sv||p.t=='CG'||(p.lc&&p
 
 /* ---------- Conexiones de ramal y subramal: se resaltan en el mapa solo como información ---------- */
 const rml=L.layerGroup(),updRM=()=>{const on=!INSH&&map.getZoom()>=15&&$('#rmv')&&$('#rmv').checked;if(on&&!map.hasLayer(rml))rml.addTo(map);if(!on&&map.hasLayer(rml))map.removeLayer(rml)};
-function drawRM(){rml.clearLayers();VJC.clear();if(!G)return;pts.filter(p=>p.t=='INT'&&p.n>=0).forEach(p=>{try{genVJ(p)}catch(e){}});
+function drawRM(){rml.clearLayers();VJC.clear();if(!G)return;pts.filter(p=>p.t=='INT'&&p.n>=0&&ptShown(p)).forEach(p=>{try{genVJ(p)}catch(e){}});
  (G.vje||[]).forEach(x=>{delete x.vj});G.vje=[];
  VJC.forEach((v,k)=>L.circleMarker(v.pos,{radius:5,color:'#8da2b8',weight:2,fillColor:'#0f1720',fillOpacity:.95}).bindPopup(`<b>Conexión de ramal</b><br>${esc(v.cn||'')} · ramal de ${km(v.sub)} km<br><small>Solo información. Si pica los puentes aquí, el punto queda abierto en el circuito y el análisis recalcula la maniobra.</small><br><button onclick="openPuenteo('${k}')">Abrir puenteo</button> <button onclick="ramalExtra('${k}')">Abrir como maniobra extra</button>`).addTo(rml));updRM()}
 map.on('zoomend',updRM);
@@ -680,7 +706,7 @@ const SPLITUI=P=>{const so=P.sopts||[];let s='';if(SPLIT.length)s+='<div class="
  if(so.length&&!SPLITM)s+='<div class="r" style="flex-wrap:wrap"><small>Más carga recuperable con un seccionamiento intermedio:</small> '+so.slice(0,4).map(o=>`<button class="chip" onclick="forceSplit('${o.w.u}','${o.c[0].p.u}','${o.c[1]?o.c[1].p.u:''}')">✂ ${esc(o.w.name)} · ${o.kind=='split'?esc(o.c[0].p.name)+' + '+esc(o.c[1].p.name)+' (toda la sección)':esc(o.c[0].p.name)+' (solo '+fu(o.u)+' usuarios · '+o.mw.toFixed(2)+' MW)'}${o.mg==null?'':' · margen '+Math.round(o.mg)+' A'}</button>`).join('')+'</div>';return s};
 
 /* ---------- Velocidad: la red se construye una vez y se reutiliza mientras no cambie nada estructural ---------- */
-const gsig=()=>circ.map(c=>c.id+(c.on?1:0)+':'+c.segs.length).join(',')+'#'+pts.map(p=>p.id+p.t+p.lat.toFixed(6)+p.lng.toFixed(6)+(p.cn||'')+(p.cn2||'')+p.vis+(p.w||'')).join('|')+'#'+JSON.stringify(flows).length+'#'+(+$('#tol').value||4)+'#'+ZQ+ZN.man.length+'/'+ZN.osm.length+ZN.rural+ZN.on;
+const gsig=()=>circ.map(c=>c.id+(c.on?1:c.calc?2:0)+':'+(c.segs?c.segs.length:-1)).join(',')+'#'+pts.map(p=>p.id+p.t+p.lat.toFixed(6)+p.lng.toFixed(6)+(p.cn||'')+(p.cn2||'')+p.vis+(p.w||'')).join('|')+'#'+JSON.stringify(flows).length+'#'+(+$('#tol').value||4)+'#'+ZQ+ZN.man.length+'/'+ZN.osm.length+ZN.rural+ZN.on;
 function undoFSplit(){const s=G&&G.fsp;if(!s)return;const N=G.N,{e,a,b,n}=s;
  if(N.length-1===n&&G.E[G.E.length-1]===b&&G.E[G.E.length-2]===a){delete e.d;N[e.a].adj.splice(N[e.a].adj.lastIndexOf(a),1);N[e.b].adj.splice(N[e.b].adj.lastIndexOf(b),1);a.d=b.d=1;N.pop();G.E.length-=2;G.fx=(G.fx||0)+1}else G.bad=1;
  G.fsp=null;delete G.tn;(G.vje||[]).forEach(x=>{delete x.vj});G.vje=[]}
@@ -707,17 +733,17 @@ function nearC(c,q){let d=1e18,eb=0,bp=null;const k=Math.cos(q[0]*rad);
  return{d,eb,p:bp}}
 /* circuito activo que mejor coincide con la marca (posición y dirección); amb = otros circuitos con casi la misma coincidencia */
 function pickCirc(a,b){const m=[(a[0]+b[0])/2,(a[1]+b[1])/2],br=bear(a,b),r=[];
- circ.forEach((c,ci)=>{if(!c.on)return;const M=nearC(c,m);if(M.d>80)return;const d=(M.d+nearC(c,a).d+nearC(c,b).d)/3;let da=Math.abs((br-M.eb)%180);da=Math.min(da,180-da);r.push({ci,sc:d+25*Math.sin(da*rad)})});
+ circ.forEach((c,ci)=>{if(!isAct(c))return;const M=nearC(c,m);if(M.d>80)return;const d=(M.d+nearC(c,a).d+nearC(c,b).d)/3;let da=Math.abs((br-M.eb)%180);da=Math.min(da,180-da);r.push({ci,sc:d+25*Math.sin(da*rad)})});
  r.sort((x,y)=>x.sc-y.sc);return{ci:r.length?r[0].ci:-1,amb:r.filter((x,i)=>i&&x.sc-r[0].sc<3).map(x=>circ[x.ci].name)}}
 /* Todo equipo, enlace, cruce y anclaje queda ligado a UN circuito (p.cn); un enlace une exactamente dos (p.cn y p.cn2) */
-function pCirc(p){let ci=p.cn?circ.findIndex(c=>c.name==p.cn&&c.on):-1;
+function pCirc(p){let ci=p.cn?circ.findIndex(c=>c.name==p.cn&&isAct(c)):-1;
  if(ci<0&&!p.cn){const r=p.t=='DR'?pickCirc(p.a,p.b):pickPt([p.lat,p.lng]);ci=r.ci;if(ci>=0){p.cn=circ[ci].name;p.au=1;save();if(r.amb.length)log('⚠ '+p.name+': por ese punto pasan varios circuitos ('+[p.cn,...r.amb].join(', ')+'); se ligó a '+p.cn+'. Verifique el circuito en su ventana.')}}
  return ci}
-function pickPt(q){const r=[];circ.forEach((c,ci)=>{if(!c.on)return;const M=nearC(c,q);if(M.d<=80)r.push({ci,d:M.d,p:M.p})});r.sort((x,y)=>x.d-y.d);
+function pickPt(q){const r=[];circ.forEach((c,ci)=>{if(!isAct(c))return;const M=nearC(c,q);if(M.d<=80)r.push({ci,d:M.d,p:M.p})});r.sort((x,y)=>x.d-y.d);
  return{ci:r.length?r[0].ci:-1,list:r,amb:r.filter((x,i)=>i&&x.d-r[0].d<5).map(x=>circ[x.ci].name)}}
 /* Enlace pendiente: tiene cn y cn2 vacío. Se completa con el circuito activo más cercano (≤80 m) distinto de cn */
 function linkFill(p){const q=[p.lat,p.lng],r=[];
- circ.forEach((c,ci)=>{if(!c.on||c.name==p.cn)return;const d=nearC(c,q).d;if(d<=80)r.push({ci,d})});
+ circ.forEach((c,ci)=>{if(!isAct(c)||c.name==p.cn)return;const d=nearC(c,q).d;if(d<=80)r.push({ci,d})});
  r.sort((x,y)=>x.d-y.d);if(!r.length)return false;
  p.cn2=circ[r[0].ci].name;p.au=1;
  log('🔗 '+p.name+' detectado: '+p.cn+' ↔ '+p.cn2+(r.length>1&&r[1].d-r[0].d<5?' ⚠ también hay cerca '+r.slice(1).map(x=>circ[x.ci].name).join(', ')+'; si no es el correcto, cámbielo en la ventana del enlace':''));
@@ -725,7 +751,7 @@ function linkFill(p){const q=[p.lat,p.lng],r=[];
 function resolveLinks(hint){let n=0;
  pts.forEach(p=>{if(p.t!='ENL')return;if(!p.cn&&p.cn2){p.cn=p.cn2;p.cn2=''}if(!p.cn||p.cn2)return;
   if(linkFill(p)){n++;mk(p)}
-  else if(hint){let m=1e18,mc='';circ.forEach(c=>{if(!c.on||c.name==p.cn)return;const d=nearC(c,[p.lat,p.lng]).d;if(d<m){m=d;mc=c.name}});
+  else if(hint){let m=1e18,mc='';circ.forEach(c=>{if(!isAct(c)||c.name==p.cn)return;const d=nearC(c,[p.lat,p.lng]).d;if(d<m){m=d;mc=c.name}});
    if(m<=400)log('⚠ '+p.name+' sigue pendiente: '+mc+' pasa a '+Math.round(m)+' m (el límite es 80 m). Acerque el enlace a esa línea y se enlazará solo')}});
  if(n){save();plist();clearPlan()}return n}
 function relink(p){const r=pickCirc(p.a,p.b);if(r.ci>=0)p.cn=circ[r.ci].name}
@@ -804,9 +830,9 @@ function redrawF(){fg.clearLayers();flows.forEach(f=>{const P=f.pts,g=L.layerGro
 function delF(id){flows=flows.filter(f=>f.id!=id);saveF();redrawF();clearPlan()}
 $('#be').onclick=()=>endTrace(1);$('#bu').onclick=()=>{draft.pop();dvr()};
 function applyFlows(w){for(const fl of flows){const P=fl.pts,e0=P[0],e1=P[P.length-1];
- let ci=fl.cn?circ.findIndex(c=>c.name==fl.cn&&c.on):-1;
+ let ci=fl.cn?circ.findIndex(c=>c.name==fl.cn&&isAct(c)):-1;
  if(!fl.cn){const r=pickFlow(P);ci=r.ci;if(ci>=0){fl.cn=circ[ci].name;fl.au=1;saveF()}}
- if(ci<0){const ex=circ.find(c=>c.name==fl.cn);if(!ex||ex.on)w.push('Un cruce (trazo de flujo) ligado a "'+(fl.cn||'?')+'" no tiene su circuito cargado o está lejos de su línea');continue}
+ if(ci<0){const ex=circ.find(c=>c.name==fl.cn);if(!ex||isAct(ex))w.push('Un cruce (trazo de flujo) ligado a "'+(fl.cn||'?')+'" no tiene su circuito cargado o está lejos de su línea');continue}
  const f0=locate(e0,30,ci);if(!f0){w.push('Un trazo no tiene línea a menos de 30 m en su inicio');continue}const a=split(f0);
  const f1=locate(e1,30,ci);if(!f1){w.push('Un trazo no tiene línea a menos de 30 m en su final');continue}const b=split(f1);
  const lim=dist(e0,e1)*2.5+60,D=new Map([[a,0]]),pv=new Map(),dn=new Set();
@@ -821,7 +847,7 @@ function build(){const N=[],E=[],grid=new Map(),K=5e-5,TL=Math.min(5,Math.max(.5
   for(let a=i-1;a<=i+1;a++)for(let b=j-1;b<=j+1;b++){const l=grid.get(c+'|'+a+'|'+b);if(l)for(const n of l)if(N[n].x===x&&dist(N[n].p,p)<TL)return n}
   const n=N.length,k=c+'|'+i+'|'+j;N.push({p,c,x,adj:[],sw:null});(grid.get(k)||grid.set(k,[]).get(k)).push(n);return n};
  const gx=new Map(),KG=5e-4,gadd=e=>{const A=N[e.a].p,B=N[e.b].p;for(let i=Math.floor(Math.min(A[0],B[0])/KG);i<=Math.floor(Math.max(A[0],B[0])/KG);i++)for(let j=Math.floor(Math.min(A[1],B[1])/KG);j<=Math.floor(Math.max(A[1],B[1])/KG);j++){const k=i+'|'+j;(gx.get(k)||gx.set(k,[]).get(k)).push(e)}};
- circ.forEach((c,ci)=>{if(!c.on)return;for(const[si,s]of c.segs.entries())for(let i=1;i<s.length;i++){const a=node(ci,s[i-1],si),b=node(ci,s[i],si);if(a==b)continue;
+ circ.forEach((c,ci)=>{if(!isAct(c))return;for(const[si,s]of c.segs.entries())for(let i=1;i<s.length;i++){const a=node(ci,s[i-1],si),b=node(ci,s[i],si);if(a==b)continue;
   const e={a,b,l:dist(N[a].p,N[b].p)};if(ZQ)e.q=e.l*zDens([(N[a].p[0]+N[b].p[0])/2,(N[a].p[1]+N[b].p[1])/2]);E.push(e);gadd(e);N[a].adj.push(e);N[b].adj.push(e)}});
  return{N,E,gx,gadd,vs:0}}
 function locate(q,max,only){let best=null,d=max;const k=Math.cos(q[0]*rad),vs=++G.vs,dl=max/(R*rad),dn=dl/Math.max(k,.2),cand=[];
@@ -837,15 +863,15 @@ const near=(q,x)=>{let b=-1,d=80;G.N.forEach((n,i)=>{if(n.c===x)return;const k=d
 function attach(){G=build();const w=[];applyFlows(w);pts.forEach(p=>{p.n=-1});
  [...pts.filter(p=>p.vis!==0&&!T[p.t].sv&&p.t!='ENL'),...pts.filter(p=>p.vis!==0&&p.t=='ENL')].forEach(p=>{p.n=-1;const q=[p.lat,p.lng];
   if(p.t!='ENL'){const ci=pCirc(p);
-   if(ci<0){if(!(p.cn&&circ.some(c=>c.name==p.cn&&!c.on)))w.push(p.name+' ('+T[p.t].n+'): su circuito'+(p.cn?' "'+p.cn+'"':'')+' no está cargado o no hay línea cerca');return}
+   if(ci<0){if(!(p.cn&&circ.some(c=>c.name==p.cn&&!isAct(c))))w.push(p.name+' ('+T[p.t].n+'): su circuito'+(p.cn?' "'+p.cn+'"':'')+' no está cargado o no hay línea cerca');return}
    const f=locate(q,80,ci);if(!f)return w.push(p.name+' fuera de su circuito ('+p.cn+', a más de 80 m)');p.n=split(f);G.N[p.n].sw=p;return}
   /* enlace: une exactamente los dos circuitos indicados */
   let a,b;
   if(!p.cn&&p.cn2){p.cn=p.cn2;p.cn2=''}
   if(p.cn&&!p.cn2&&linkFill(p)){save();mk(p)}
   if(p.cn&&!p.cn2)return w.push(p.name+' (enlace): pendiente, aún no hay otro circuito a menos de 80 m; cargue el KMZ del circuito con el que se enlaza');
-  if(p.cn&&p.cn2){const ca=circ.findIndex(c=>c.name==p.cn&&c.on),cb=circ.findIndex(c=>c.name==p.cn2&&c.on);
-   if(ca<0||cb<0){if(!circ.some(c=>(c.name==p.cn||c.name==p.cn2)&&!c.on))w.push(p.name+' (enlace): falta cargar el circuito "'+(ca<0?p.cn:p.cn2)+'"');return}
+  if(p.cn&&p.cn2){const ca=circ.findIndex(c=>c.name==p.cn&&isAct(c)),cb=circ.findIndex(c=>c.name==p.cn2&&isAct(c));
+   if(ca<0||cb<0){if(!circ.some(c=>(c.name==p.cn||c.name==p.cn2)&&!isAct(c)))w.push(p.name+' (enlace): falta cargar el circuito "'+(ca<0?p.cn:p.cn2)+'"');return}
    a=nearIn(q,ca);b=nearIn(q,cb);if(a<0||b<0)return w.push(p.name+' (enlace): no hay línea de '+(a<0?p.cn:p.cn2)+' a menos de 80 m')}
   else{a=near(q,-1);if(a<0)return w.push(p.name+' sin circuito cercano');b=near(q,G.N[a].c);if(b<0)return w.push(p.name+' sin segundo circuito cercano');p.cn=circ[G.N[a].c].name;p.cn2=circ[G.N[b].c].name;p.au=1;save()}
   p.n=a;p.n2=b;const e={a,b,l:0,tie:p};G.N[a].adj.push(e);G.N[b].adj.push(e)});
@@ -1048,12 +1074,13 @@ function ramalExtra(k){map.closePopup();const P=plan,v=VJC.get(k);if(!P||!P.Bl||
 /* ===== Falla recibida por enlace (WhatsApp) o pegada en la barra de búsqueda ===== */
 const APPURL='https://ingmtznul.github.io/SECC-M/';
 function parseLL(t){const m=String(t||'').match(/(-?\d{1,3}\.\d+)\s*[,;\s]\s*(-?\d{1,3}\.\d+)/);if(!m)return null;const a=+m[1],b=+m[2];return Math.abs(a)<=90&&Math.abs(b)<=180?[a,b]:null}
-let FALLA_IV=null;
-function fallaHash(){const m=/[#&]falla=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/.exec(location.hash);if(!m)return;const q=parseLL(m[1]+','+m[2]);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(!q)return;
- map.setView(q,17);toast('Falla recibida: '+q[0].toFixed(5)+', '+q[1].toFixed(5)+' · esperando a que carguen los circuitos');clearInterval(FALLA_IV);let n=0,last=-1,ok=0;
- FALLA_IV=setInterval(()=>{n++;const c=circ.length;if(circ.some(x=>x.on)&&c===last)ok++;else ok=0;last=c;
-  if(ok>=2){clearInterval(FALLA_IV);map.setView(q,17);window.faultAt(q)}
-  else if(n>60){clearInterval(FALLA_IV);toast('Este dispositivo no tiene circuitos cargados: cargue los KMZ y abra de nuevo el enlace')}},500)}
+async function autoSel(q){await window.BOOTP;for(const c of circ)await ensureC(c);
+ const near=circ.filter(c=>c.segs&&c.segs.length&&nearC(c,q).d<=200);let ch=0;
+ near.forEach(c=>{if(!c.on){c.on=1;c.layer.addTo(map);dbDo('put',rec(c));ch=1}});if(ch){setONS();pts.forEach(pvis);list()}
+ await bgCalc()}
+async function fallaGo(q){toast('Buscando el circuito de la falla…');await autoSel(q);window.faultAt(q)}
+function fallaHash(){const m=/[#&](falla|ver)=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/.exec(location.hash);if(!m)return;const q=parseLL(m[2]+','+m[3]);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(!q)return;
+ map.setView(q,17);m[1]=='ver'?verPunto(q):fallaGo(q)}
 setTimeout(fallaHash,300);addEventListener('hashchange',fallaHash);
 
 list();cnt();
@@ -1065,8 +1092,8 @@ addEventListener('resize',()=>map.invalidateSize());setTimeout(()=>map.invalidat
 /* búsqueda de equipos y circuitos */
 const sq=L.control({position:'topleft'});sq.onAdd=()=>{const d=L.DomUtil.create('div','leaflet-bar sq');d.innerHTML='<input id="sqi" placeholder="🔎 Buscar equipo o circuito" autocomplete="off"><div id="sqr"></div>';L.DomEvent.disableClickPropagation(d);return d};sq.addTo(map);
 $('#sqi').oninput=function(){const v=this.value.trim().toLowerCase(),r=$('#sqr');r.innerHTML='';if(!v)return;
- const ll=parseLL(this.value);if(ll){[['📍 Ir a '+ll[0].toFixed(5)+', '+ll[1].toFixed(5),()=>map.setView(ll,17)],['⚡ Marcar falla aquí',()=>{map.setView(ll,17);window.faultAt(ll)}]].forEach(([t,f])=>{const b=document.createElement('button');b.innerHTML='<b>'+t+'</b>';b.onclick=()=>{f();r.innerHTML='';this.value=''};r.appendChild(b)});return}
- const a=[...pts.filter(p=>p.vis!==0&&p.name.toLowerCase().includes(v)).map(p=>({n:p.name,s:T[p.t].n+(p.cn?' · '+p.cn:''),f:()=>{map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}})),...circ.filter(c=>c.name.toLowerCase().includes(v)).map(c=>({n:c.name,s:'Circuito',f:()=>map.fitBounds(c.layer.getBounds())}))].slice(0,7);
+ const ll=parseLL(this.value);if(ll){[['📍 Ir a '+ll[0].toFixed(5)+', '+ll[1].toFixed(5),()=>map.setView(ll,17)],['⚡ Marcar falla aquí',()=>{map.setView(ll,17);fallaGo(ll)}]].forEach(([t,f])=>{const b=document.createElement('button');b.innerHTML='<b>'+t+'</b>';b.onclick=()=>{f();r.innerHTML='';this.value=''};r.appendChild(b)});return}
+ const a=[...pts.filter(p=>p.vis!==0&&p.name.toLowerCase().includes(v)).map(p=>({n:p.name,s:T[p.t].n+(p.cn?' · '+p.cn:''),f:()=>{map.setView([p.lat,p.lng],Math.max(map.getZoom(),17));p.m.openPopup()}})),...circ.filter(c=>c.name.toLowerCase().includes(v)).map(c=>({n:c.name,s:'Circuito',f:()=>selC(c)}))].slice(0,7);
  a.forEach(x=>{const b=document.createElement('button');b.innerHTML=`<b>${esc(x.n)}</b> <small style="display:inline;padding:0">${esc(x.s)}</small>`;b.onclick=()=>{x.f();r.innerHTML='';this.value=''};r.appendChild(b)});if(!a.length)r.innerHTML='<small>Sin resultados</small>'};
 /* respaldo completo en un archivo */
 const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
@@ -1415,6 +1442,55 @@ ${S.pe?'':'<small class="h">ℹ Sin protección, el navegador puede borrar los d
  /* barra superior: panel · búsqueda de circuito o equipo · mi ubicación; zoom abajo a la derecha */
  {const bar=$('#tbar'),sqe=document.querySelector('.sq'),lbe=$('#lb');if(sqe)bar.appendChild(sqe);if(lbe)bar.appendChild(lbe);if(map.zoomControl)map.zoomControl.setPosition('bottomright');
   new MutationObserver(()=>setTimeout(()=>map.invalidateSize(),60)).observe(document.body,{attributes:true,attributeFilter:['class']});setTimeout(()=>map.invalidateSize(),80)}
+})();
+</script>
+<script>
+/* ===== Hallazgo de riesgo de falla: botón ⚠️ en la barra superior (no tapa el mapa) → ventana con descripción y foto → WhatsApp a un contacto a elegir ===== */
+async function verPunto(q){map.setView(q,17);toast('Buscando el circuito del hallazgo…');await autoSel(q);
+ if(window.HLM_MK)window.HLM_MK.remove();
+ window.HLM_MK=L.marker(q,{icon:L.divIcon({className:'',html:'<div class="fl">⚠️</div>',iconSize:[26,26],iconAnchor:[13,13]})}).addTo(map).bindPopup('⚠ Hallazgo reportado<br><small>'+q[0].toFixed(6)+', '+q[1].toFixed(6)+'</small><br><button onclick="window.HLM_MK.remove()">Quitar marca</button>').openPopup()}
+(function(){
+ document.head.insertAdjacentHTML('beforeend','<style>#tbar #hlb{flex:none;width:42px;min-height:42px;padding:0;border-radius:12px;background:var(--p);border:1px solid var(--l);font-size:19px;box-shadow:0 2px 10px rgba(0,0,0,.3);cursor:pointer}#hlm{position:fixed;inset:0;z-index:3200;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center}#hlm.on{display:flex}#hlm .hlc{width:100%;max-width:460px;max-height:94%;overflow:auto;background:var(--p);color:var(--t);border:1px solid var(--l);border-radius:16px 16px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}@media(min-width:700px){#hlm{align-items:center}#hlm .hlc{border-radius:16px}}#hlm .hlh{display:flex;align-items:center;justify-content:space-between;gap:8px}#hlm textarea{width:100%;box-sizing:border-box;background:var(--bg);color:var(--t);border:1px solid var(--l);border-radius:10px;padding:10px;font:14px var(--fp);resize:vertical}#hlm #hli{display:none;max-width:100%;max-height:180px;border-radius:10px;object-fit:cover}#hlm #hls{background:var(--a);color:#fff;font-weight:700;min-height:46px;border-radius:10px;border:0;cursor:pointer}#hlm small{color:var(--m)}</style>');
+ const bar=$('#tbar');if(!bar)return;const hb=document.createElement('button');hb.id='hlb';hb.type='button';hb.title='Reportar un hallazgo (riesgo de falla)';hb.textContent='⚠️';bar.appendChild(hb);
+ const m=document.createElement('div');m.id='hlm';
+ m.innerHTML=`<div class="hlc"><div class="hlh"><b>⚠️ Hallazgo de riesgo de falla</b><button type="button" id="hlx" class="ib" title="Cerrar">✕</button></div>
+<div id="hll"></div>
+<div class="chips" id="hlc"></div>
+<textarea id="hlt" rows="3" placeholder="Descripción del hallazgo (qué se vio y dónde)"></textarea>
+<div class="g"><label class="btn">📷 Tomar foto<input type="file" id="hlf" accept="image/*" capture="environment" hidden></label><span id="hln" class="h" style="align-self:center;margin:0"></span></div>
+<img id="hli" alt="Foto del hallazgo">
+<button type="button" id="hls">📤 Enviar por WhatsApp</button>
+<small>Se abre WhatsApp para que elija a qué contacto o grupo enviarlo.</small></div>`;
+ document.body.appendChild(m);
+ const $m=x=>m.querySelector(x),txt=$m('#hlt'),pic=$m('#hlf'),pnm=$m('#hln'),img=$m('#hli'),loc=$m('#hll');
+ let photo=null,POS=null,CTX={cn:'',eq:''};
+ const fmtP=()=>POS.q[0].toFixed(6)+', '+POS.q[1].toFixed(6)+(POS.acc?' (±'+Math.round(POS.acc)+' m)':'');
+ const showLoc=()=>{loc.innerHTML=!POS?'📍 Obteniendo ubicación…':(POS.mapc?'📍 Sin GPS: se usa el centro del mapa · ':'📍 ')+fmtP()+(CTX.cn?'<br>Circuito: <b>'+esc(CTX.cn)+'</b>':'')+(CTX.eq?' · cerca de <b>'+esc(CTX.eq)+'</b>':'')};
+ function ctxOf(q){let cn='',eq=null,d=1e9;try{const r=pickPt(q);if(r&&r.ci>=0)cn=circ[r.ci].name}catch(e){}
+  pts.forEach(p=>{if(p.vis===0||T[p.t].sv)return;const x=dist(q,[p.lat,p.lng]);if(x<d){d=x;eq=p}});
+  return{cn:cn||(eq&&d<=150&&eq.cn)||'',eq:eq&&d<=150?eq.name+' ('+Math.round(d)+' m)':''}}
+ async function ubica(){POS=null;showLoc();
+  const p=await new Promise(res=>{if(!navigator.geolocation)return res(null);navigator.geolocation.getCurrentPosition(g=>res({q:[g.coords.latitude,g.coords.longitude],acc:g.coords.accuracy}),()=>res(null),{enableHighAccuracy:true,timeout:12000,maximumAge:8000})});
+  if(p)POS=p;else{const c=map.getCenter();POS={q:[c.lat,c.lng],acc:null,mapc:1}}
+  CTX=ctxOf(POS.q);showLoc()}
+ const chp=['Rama sobre la línea','Poste dañado o inclinado','Aislador roto','Cable flojo o dañado','Equipo con daño','Ave o animal','Otro'];
+ $m('#hlc').innerHTML=chp.map(x=>`<button type="button" class="chip">${x}</button>`).join('');
+ $m('#hlc').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const v=b.textContent;if(!txt.value.includes(v))txt.value=(txt.value.trim()?txt.value.trim()+', ':'')+v};
+ async function shrink(f){try{const bm=await createImageBitmap(f),k=Math.min(1,1600/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+   const bl=await new Promise(r=>c.toBlob(r,'image/jpeg',.82));return bl?new File([bl],'hallazgo.jpg',{type:'image/jpeg'}):f}catch(e){return f}}
+ const quitaFoto=()=>{if(img.src)try{URL.revokeObjectURL(img.src)}catch(e){}photo=null;pic.value='';pnm.textContent='';img.removeAttribute('src');img.style.display='none'};
+ pic.addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;photo=await shrink(f);img.src=URL.createObjectURL(photo);img.style.display='block';pnm.textContent='✔ '+Math.round(photo.size/1024)+' KB · quitar'});
+ pnm.onclick=()=>{if(photo)quitaFoto()};
+ const cerrar=()=>m.classList.remove('on');
+ hb.onclick=()=>{txt.value='';quitaFoto();m.classList.add('on');ubica();setTimeout(()=>txt.focus(),200)};
+ $m('#hlx').onclick=cerrar;
+ $m('#hls').onclick=async()=>{const d=txt.value.trim();if(!d)return toast('Escriba la descripción del hallazgo');if(!POS)await ubica();
+  const q=POS.q,text='⚠ HALLAZGO · RIESGO DE FALLA\nCircuito: '+(CTX.cn||'sin dato')+'\nCerca de: '+(CTX.eq||'sin dato')+'\nDescripción: '+d+'\n'+(POS.mapc?'⚠ Ubicación aproximada (centro del mapa, sin GPS)\n':'')+'📍 https://www.google.com/maps?q='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n📲 Ver en SECC-M: '+APPURL+'#ver='+q[0].toFixed(6)+','+q[1].toFixed(6)+'\n🕒 '+new Date().toLocaleString('es-MX');
+  if(photo&&navigator.share&&navigator.canShare&&navigator.canShare({files:[photo]})){
+   try{await navigator.share({files:[photo],text,title:'Hallazgo'});log('⚠ Hallazgo compartido con foto');toast('Hallazgo enviado');cerrar();return}catch(e){if(e&&e.name=='AbortError')return}}
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');log('⚠ Hallazgo abierto en WhatsApp');
+  if(photo){const a=document.createElement('a');a.href=URL.createObjectURL(photo);a.download='hallazgo.jpg';document.body.appendChild(a);a.click();a.remove();toast('Se abrió WhatsApp con el texto. La foto se guardó en Descargas: adjúntela en el chat')}
+  cerrar()};
 })();
 </script>
 </body></html>
