@@ -115,7 +115,7 @@ body.sheet #side{display:block}
 #hd{position:sticky;top:0;z-index:6;margin:0 0 12px;padding:10px 12px 10px;background:var(--p);border-bottom:1px solid var(--l)}
 #hd>*{max-width:756px;margin-left:auto;margin-right:auto}
 .lg{display:flex;align-items:center;gap:10px}.lg>div{flex:1}.lg small{display:block;color:var(--m);font:500 11.5px var(--fp)}
-.lgo{flex:none;width:32px;height:32px;border-radius:9px;background:var(--a);display:grid;place-items:center;color:#fff;font-size:15px}.lgo::after{content:'⚡'}
+.lgo{flex:none;width:36px;height:36px;border-radius:9px;object-fit:cover;display:block}
 .lgt{font:700 19px/1 var(--fp);letter-spacing:.08em;color:var(--t)}
 .ib{min-height:36px;width:36px;padding:0;border-radius:10px;font-size:15px}
 #chs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -182,7 +182,7 @@ body.sheet #fab,body.sheet #tbar{display:none}
 <div id="tbar"><button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button></div>
 <button id="fab" type="button">⚡ Marcar falla</button><div id="mh"><span id="mht"></span><button type="button" id="mhx">✕</button></div><div id="simban">🧪 SIMULACRO · nada se guarda</div>
 <aside id="side">
-<header id="hd"><div class="lg"><i class="lgo"></i><div><b class="lgt">SECC-M</b><small>Seccionamiento ante falla · RGD</small></div><button id="dmb" class="ib" title="Mapa oscuro / claro">🌙</button><button id="pcl" class="ib" title="Cerrar el panel y ver el mapa" onclick="document.body.classList.remove('sheet');document.getElementById('shb').textContent='☰ Panel'">✕</button></div>
+<header id="hd"><div class="lg"><img class="lgo" src="Icon-192.png" alt="SECC-M" onerror="this.style.display='none'"><div><b class="lgt">SECC-M</b><small>Seccionamiento ante falla · RGD</small></div><button id="dmb" class="ib" title="Mapa oscuro / claro">🌙</button><button id="pcl" class="ib" title="Cerrar el panel y ver el mapa" onclick="document.body.classList.remove('sheet');document.getElementById('shb').textContent='☰ Panel'">✕</button></div>
 <div id="chs"><button id="chS" class="chp" title="Carga para la viabilidad de transferencias: toque para cambiar entre Auto, Baja y Alta"></button><span class="chp" id="chX"></span><button id="chM" class="chp" title="Modo simulacro: pruebe sin guardar nada"></button></div>
 <nav id="tabs"><button data-t="falla">⚡<span>Falla</span></button><button data-t="equipos">🛠<span>Equipos</span></button><button data-t="datos">🗂<span>Datos</span></button><button data-t="mas">⚙<span>Más</span></button></nav></header>
 <section id="gd" data-tab="falla"><h2>Guía de inicio <b id="gdn"></b></h2><div id="gdl"></div></section>
@@ -550,9 +550,9 @@ function evEnd(id){const e=EVT.find(x=>x.id==id)||EVT.find(x=>x.id==(plan&&plan.
  toast('Restablecido · '+dmin((e.t1-e.t0)/60000)+(e.um!=null?' · '+fu(e.um)+' usuarios-minuto':''),'Avisar por WhatsApp',()=>waText(evMsgEnd(e)))}
 function evList(){const el=$('#evl');if(!el)return;$('#evn')&&($('#evn').textContent=EVT.length||'');
  el.innerHTML=EVT.length?[...EVT].reverse().slice(0,15).map(e=>`<div class="xr"><div><b>${fd(e.t0)} · ${esc(e.cr||e.fc||'')}${e.sim?' 🧪':''}</b><small>${esc(e.eq)}${e.u!=null?' · '+fu(e.u)+' usuarios':''} · ${e.t1?'✅ '+dmin((e.t1-e.t0)/60000)+(e.um!=null?' · '+fu(e.um)+' u-min':''):'⏳ en curso desde '+hm(e.t0)}</small></div>${e.t1?'':`<button data-a="evr" data-k="${e.id}" title="Registrar restablecimiento">✅</button>`}<button data-a="evp" data-k="${e.id}" title="Reporte PDF">📄</button><button data-a="evw" data-k="${e.id}" title="Avisar por WhatsApp">📤</button><button data-a="evd" data-k="${e.id}" title="Borrar">✕</button></div>`).join(''):'<small class="h">Aún no hay eventos: se crean al ejecutar una maniobra.</small>'}
-if($('#evl'))$('#evl').addEventListener('click',x=>{const b=x.target.closest('button[data-a]');if(!b)return;const id=+b.dataset.k,e=EVT.find(v=>v.id==id);if(!e)return;
+if($('#evl'))$('#evl').addEventListener('click',async x=>{const b=x.target.closest('button[data-a]');if(!b)return;const id=+b.dataset.k,e=EVT.find(v=>v.id==id);if(!e)return;
  if(b.dataset.a=='evp')repFalla(id);else if(b.dataset.a=='evr')evEnd(id);else if(b.dataset.a=='evw')waText(e.t1?evMsgEnd(e):`⚡ EVENTO EN CURSO\nCircuito: ${e.cr||e.fc}\nEquipo Operado: ${e.eq}\nDesde: ${hm(e.t0)}\nManiobras: ${evMv(e)||'—'}`);
- else if(b.dataset.a=='evd'&&confirm('¿Borrar este evento?')){EVT=EVT.filter(v=>v!==e);evSave();evList()}});
+ else if(b.dataset.a=='evd'&&await askC('¿Borrar este evento?','Borrar')){EVT=EVT.filter(v=>v!==e);evSave();evList()}});
 function evCsv(){const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"',f=t=>t?new Date(t).toLocaleString('es-MX',{hour12:false}):'';
  const head=['Fecha y hora de falla','Circuito','Equipo operado','Protección operada','Causa','Usuarios afectados','Demanda afectada (MW)','Carta','Maniobra 1 (hora)','Restablecido tras maniobra 1 (%)','Maniobra 2 (hora)','Restablecido tras maniobra 2 (%)','Maniobras','Restablecimiento total (hora)','Duración (min)','Usuarios-minuto','Simulacro'];
  const rows=EVT.map(e=>[f(e.t0),e.cr,e.eq,e.pr,e.ca,e.u==null?'':Math.round(e.u),e.mw==null?'':e.mw.toFixed(2),e.se||'',f(e.m1&&e.m1.t),e.m1&&e.m1.pct!=null?e.m1.pct.toFixed(1):'',f(e.m2&&e.m2.t),e.m2&&e.m2.pct!=null?e.m2.pct.toFixed(1):'',evMv(e),f(e.t1),e.t1?Math.round((e.t1-e.t0)/60000):'',e.um==null?'':Math.round(e.um),e.sim?'sí':'']);
@@ -576,7 +576,7 @@ async function stImport(file){if(SIM)return toast('Salga del simulacro antes de 
  if(!d||d.app!='SECC-M'||!Array.isArray(d.st))return toast('El archivo no es un estado de SECC-M');
  (d.auto||[]).forEach(o=>{if(!pts.some(p=>pkey(p)==o.t+'|'+o.name+'|'+(+o.lat).toFixed(5)+'|'+(+o.lng).toFixed(5)))addPt(o)});
  const idx=new Map(pts.map(p=>[pkey(p),p])),ch=[];let miss=0;d.st.forEach(([k,s,md,nd])=>{const p=idx.get(k);if(!p){miss++;return}if(p.st!==s||(p.md||'')!==md||!!p.nd!==!!nd)ch.push([p,s,md,nd])});
- if(!confirm('Estado de '+fd(d.t)+': se cambiarán '+ch.length+' equipo(s)'+(miss?' ('+miss+' no existen en este celular y se omiten)':'')+'. ¿Aplicar?'))return;
+ if(!await askC('Estado de '+fd(d.t)+': se cambiarán '+ch.length+' equipo(s)'+(miss?' ('+miss+' no existen en este celular y se omiten)':'')+'. ¿Aplicar?'))return;
  ch.forEach(([p,s,md,nd])=>{p.st=s;if(p.t=='RES')p.md=md=='SW'?'SW':'RES';p.nd=nd?1:0});
  const toU=k=>{const p=idx.get(k)||[...idx.values()].find(x=>pkey(x)==k);return p?p.u:null};
  if(Array.isArray(d.xf))XF=d.xf.map(r=>({...r,chg:r.chg.map(c=>[toU(c[0]),c[1],c[2]]).filter(c=>c[0]),keep:(r.keep||[]).map(toU).filter(Boolean)}));
@@ -629,7 +629,7 @@ async function ovQuery(q){let err='';for(const u of OVP){try{const c=new AbortCo
 function stitch(ws){const rings=[],ws2=ws.map(w=>w.slice());while(ws2.length){let r=ws2.pop(),g=1;while(g){g=0;if(r[0][0]==r[r.length-1][0]&&r[0][1]==r[r.length-1][1])break;for(let i=0;i<ws2.length;i++){const w=ws2[i],a=r[r.length-1],b=r[0],eq=(p,q)=>p[0]==q[0]&&p[1]==q[1];
   if(eq(a,w[0])){r=r.concat(w.slice(1))}else if(eq(a,w[w.length-1])){r=r.concat(w.slice(0,-1).reverse())}else if(eq(b,w[w.length-1])){r=w.slice(0,-1).concat(r)}else if(eq(b,w[0])){r=w.slice(1).reverse().concat(r)}else continue;ws2.splice(i,1);g=1;break}}rings.push(r)}return rings}
 async function zOsm(){const on=circ.filter(c=>c.on);if(!on.length)return toast('Active al menos un circuito');
- if(!confirm('Para detectar la mancha urbana, la app consultará OpenStreetMap por internet. Solo se envía el rectángulo geográfico que cubren sus circuitos activos (no sus archivos ni los nombres de los circuitos). ¿Continuar?'))return;
+ if(!await askC('Para detectar la mancha urbana, la app consultará OpenStreetMap por internet. Solo se envía el rectángulo geográfico que cubren sus circuitos activos (no sus archivos ni los nombres de los circuitos). ¿Continuar?'))return;
  let a=90,b=180,c=-90,d=-180;on.forEach(x=>x.segs.forEach(s=>s.forEach(([y,xx])=>{if(y<a)a=y;if(y>c)c=y;if(xx<b)b=xx;if(xx>d)d=xx})));a-=.004;b-=.004;c+=.004;d+=.004;
  const S=.12,tiles=[];for(let y=a;y<c;y+=S)for(let x=b;x<d;x+=S)tiles.push([y,x,Math.min(y+S,c),Math.min(x+S,d)]);
  const out=[],seen=new Set();let k=0;const btn=$('#zosm');if(btn)btn.disabled=true;
@@ -1045,7 +1045,7 @@ function stepUi(){let m=$('#srm');if(!m){m=document.createElement('div');m.id='s
  m.innerHTML=`<div class="srb"><b>${esc(S.ttl)} · paso ${S.i+1} de ${S.A.length}</b><div class="sra"><em class="${a.s?'CERRAR':'ABRIR'}">${a.s?'CERRAR':'ABRIR'}</em> ${esc(a.t)}</div><div class="srt">${S.A.map((x,j)=>`<span class="${j<S.i?'ok':j==S.i?'cur':''}">${j+1}</span>`).join('')}</div><small>Confirme solo cuando el equipo ya esté operado en campo.${last&&last.nu?' El paso anterior (puentes del ramal) no se puede deshacer.':''}</small><div class="srr"><button id="sru" ${S.i&&!(last&&last.nu)?'':'disabled'}>↶ Deshacer</button><button id="srx">Cancelar</button><button id="srk">Confirmar ✔</button></div></div>`;
  $('#srk').onclick=()=>{try{applyA(a,S.h);if(a.post)a.post();S.i++;if(S.i>=S.A.length){SR=null;stepUi();S.fin(S.h)}else stepUi()}catch(e){log('⚠ Error en el paso: '+e.message);console.error(e)}};
  $('#sru').onclick=()=>{const x=S.h.pop();if(!x)return;x.p.st=x.prev;pts.includes(x.p)&&mk(x.p);S.i--;log('DESHACER '+x.p.name);stepUi()};
- $('#srx').onclick=()=>{if(S.h.some(x=>x.nu)&&!confirm('Ya se picaron puentes de ramal y eso no se puede deshacer. ¿Cancelar de todos modos?'))return;while(S.h.length){const x=S.h.pop();x.p.st=x.prev;pts.includes(x.p)&&mk(x.p)}SR=null;stepUi();S.can&&S.can();log('Maniobra cancelada: ningún equipo quedó cambiado')}}
+ $('#srx').onclick=async()=>{if(S.h.some(x=>x.nu)&&!await askC('Ya se picaron puentes de ramal y eso no se puede deshacer. ¿Cancelar de todos modos?'))return;while(S.h.length){const x=S.h.pop();x.p.st=x.prev;pts.includes(x.p)&&mk(x.p)}SR=null;stepUi();S.can&&S.can();log('Maniobra cancelada: ningún equipo quedó cambiado')}}
 const evSteps=(P,h)=>{const e=EVT.find(x=>x.id==P.eid);if(!e||!h)return;e.sp=(e.sp||[]).concat(h.map(x=>({t:x.t,s:x.s,n:x.p.name,m:P.done})));evSave()};
 function repSvg(P){try{const ll=q=>Array.isArray(q)?q:[q.lat,q.lng],nz=S=>S.map(s=>s.map(ll)),s1=nz(segs(P.Z)),s2=nz(P.isl.flatMap(i=>segs(i.S))),all=[...s1,...s2];if(!all.length)return'';let a=90,b=180,c=-90,d=-180;all.forEach(s=>s.forEach(q=>{a=Math.min(a,q[0]);c=Math.max(c,q[0]);b=Math.min(b,q[1]);d=Math.max(d,q[1])}));
  const W=640,H=340,k=Math.cos((a+c)/2*Math.PI/180),sc=Math.min((W-24)/(((d-b)*k)||1e-9),(H-24)/((c-a)||1e-9)),X=q=>(12+(q[1]-b)*k*sc).toFixed(1),Y=q=>(H-12-(q[0]-a)*sc).toFixed(1),ln=(S,col,w)=>S.map(s=>`<line x1="${X(s[0])}" y1="${Y(s[0])}" x2="${X(s[1])}" y2="${Y(s[1])}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`).join(''),f=ll(P.f.p);
@@ -1101,7 +1101,7 @@ $('#bk').onclick=async()=>{try{const files=[];for(const k of['c','s'])for(const 
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({gridctrl:1,pts:pts.map(ser),flows,files,dem:DEMR,xf:XF,evt:EVT,cnd:[...CND],trk:TRK,zn:{man:ZN.man.map(z=>({c:z.c,poly:z.poly})),rural:ZN.rural,on:ZN.on}})],{type:'application/json'}));a.download='secc-m-respaldo-'+new Date().toISOString().slice(0,10)+'.json';a.click();
  try{localStorage.setItem('gc_bk',Date.now())}catch(e){}toast('Respaldo guardado: '+pts.length+' equipos y '+files.length+' KMZ')}catch(e){log('⚠ No se pudo crear el respaldo')}};
 $('#br').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;let d;try{d=JSON.parse(await f.text());if(!d.gridctrl)throw 0}catch(x){return log('⚠ El archivo no es un respaldo de SECC-M')}
- if(!confirm('Restaurar reemplazará los equipos y cruces actuales. ¿Continuar?'))return;
+ if(!await askC('Restaurar reemplazará los equipos y cruces actuales. ¿Continuar?'))return;
  loadPts(d.pts||[]);save();XF=Array.isArray(d.xf)?d.xf:[];xfSave();xfList();if(Array.isArray(d.evt)){EVT=d.evt;evSave();evList()}if(Array.isArray(d.cnd)){CND=new Set(d.cnd);cndSave()}if(d.trk){TRK=d.trk;trkSave()}if(d.zn){ZN.man=d.zn.man||[];ZN.rural=d.zn.rural||.12;ZN.on=d.zn.on===0?0:1;zIndex();znSave();zDraw();zList()}list();trList();flows=d.flows||[];fseq=Math.max(0,...flows.map(x=>x.id||0));saveF();redrawF();if(Array.isArray(d.dem)&&d.dem.length)setDem(d.dem,true);
  for(const x of d.files||[]){if(arr(x.k).some(c=>c.name==x.name))continue;await ingest(new File([Uint8Array.from(atob(x.b),ch=>ch.charCodeAt(0))],x.name+(x.kmz?'.kmz':'.kml')),x.k)}
  list();resolveLinks(1);clearPlan();fitAll();toast('Respaldo restaurado')};
@@ -1492,5 +1492,16 @@ async function verPunto(q){map.setView(q,17);toast('Buscando el circuito del hal
   if(photo){const a=document.createElement('a');a.href=URL.createObjectURL(photo);a.download='hallazgo.jpg';document.body.appendChild(a);a.click();a.remove();toast('Se abrió WhatsApp con el texto. La foto se guardó en Descargas: adjúntela en el chat')}
   cerrar()};
 })();
+</script>
+<script>
+/* ===== Ventanas de confirmación propias: las nativas del navegador siempre muestran el nombre del sitio (github.io) ===== */
+function askC(msg,ok){return new Promise(res=>{let m=document.getElementById('askm');if(!m){m=document.createElement('div');m.id='askm';document.body.appendChild(m)}
+ m.innerHTML='<div class="askc"><div class="askt"></div><div class="askb"><button type="button" class="aks">Cancelar</button><button type="button" class="ako"></button></div></div>';
+ m.querySelector('.askt').textContent=msg;const o=m.querySelector('.ako');o.textContent=ok||'Aceptar';
+ const end=v=>{m.classList.remove('on');document.removeEventListener('keydown',kd);res(v)},kd=e=>{if(e.key=='Escape')end(false)};
+ document.addEventListener('keydown',kd);m.querySelector('.aks').onclick=()=>end(false);o.onclick=()=>end(true);m.onclick=e=>{if(e.target===m)end(false)};
+ m.classList.add('on');o.focus()})}
+window.alert=m=>toast(String(m));
+document.head.insertAdjacentHTML('beforeend','<style>#askm{position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:18px}#askm.on{display:flex}#askm .askc{width:100%;max-width:380px;background:var(--p);color:var(--t);border:1px solid var(--l);border-radius:14px;padding:18px 16px 14px;box-shadow:0 12px 40px rgba(0,0,0,.6)}#askm .askt{font-size:15px;line-height:1.45;white-space:pre-line;margin-bottom:16px}#askm .askb{display:flex;gap:10px;justify-content:flex-end}#askm .askb button{min-height:44px;padding:0 18px;border-radius:10px;font:600 14px var(--fp);cursor:pointer}#askm .ako{background:var(--a);color:#fff;border:0}</style>');
 </script>
 </body></html>
