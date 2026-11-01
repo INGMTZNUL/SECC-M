@@ -178,7 +178,21 @@ body.dm .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) c
 #mvbar,#ins{bottom:calc(76px + env(safe-area-inset-bottom))}
 @media(max-width:640px){#tbar #lb{width:42px;padding:0;justify-content:center;font-size:0}#tbar #lb::before{content:'◎';font-size:19px}#shb{padding:0 12px}.lg small{display:none}#co{display:none}}
 body.sheet #fab,body.sheet #tbar{display:none}
-</style></head><body>
+</style><style>
+/* ===== Pantalla de conducción: solo lo indispensable, letra grande y alto contraste ===== */
+body.drv #tbar,body.drv #shb,body.drv #fab,body.drv #side,body.drv .leaflet-top,body.drv #co{display:none!important}
+body.drv #ins{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;border-width:3px;background:#000;padding-bottom:env(safe-area-inset-bottom)}
+body.drv #ins .ih{background:#000;padding:6px 10px}body.drv #ins .ih b{font-size:18px}
+body.drv #ins .nx{background:#000;padding:12px 14px;font-size:26px;line-height:1.2;color:#fff;border-color:#2f80ff}
+body.drv #ins .nx i{font-size:48px;width:60px;color:#5ab0ff}
+body.drv #ins .nx b{display:block;font-size:38px;color:#ffe066}
+body.drv #ins .ib{padding:10px 14px}
+body.drv #ins .in b{font-size:24px;color:#fff}body.drv #ins .in small{font-size:16px;color:#cfe3f5}
+body.drv #ins button{min-height:58px;font-size:20px;padding:10px 20px}
+body.drv #ins .ih button{min-height:46px;font-size:20px;padding:6px 12px}
+body.drv #ins .ia{flex:1;justify-content:flex-end}
+</style>
+</head><body>
 <div id="tbar"><button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button></div>
 <button id="fab" type="button">⚡ Marcar falla</button><div id="mh"><span id="mht"></span><button type="button" id="mhx">✕</button></div><div id="simban">🧪 SIMULACRO · nada se guarda</div>
 <aside id="side">
@@ -1220,12 +1234,37 @@ function insMenu(id){const p=byId(id);if(!p)return;map.closePopup();insStop();
   if(src){bd.appendChild(bt('→ Hacia el final del circuito',()=>go('down')));bd.appendChild(bt('← Hacia el interruptor',()=>go('up')))}
   bd.appendChild(bt('↔ Todo el circuito '+p.cn,()=>go('all')))}
  insb.append(h,bd)}
-function insStart(id,dir,cnn){const ip=byId(id);if(!ip)return;const c=cnn||ip.cn;if(!c)return;
+function insStart(id,dir,cnn,rs){const ip=byId(id);if(!ip)return;const c=cnn||ip.cn;if(!c)return;
  const list=insBuild(ip,c,dir||'all');if(!list)return toast('⚠ '+ip.name+' no está sobre la línea de su circuito');
  if(list.length<2)return toast(dir&&dir!='all'?'No hay más equipos en esa dirección':'No hay otros equipos alcanzables en '+c);
- insStop();ins={cn:c,list,i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0};map.closePopup();
- navigator.wakeLock&&navigator.wakeLock.request('screen').then(w=>ins?ins.wl=w:w.release()).catch(()=>{});
- insIsolate(c);insGo(0);ins.tm=setInterval(insTick,2000)}
+ insStop();ins={cn:c,list,i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0,id,dir:dir||'all',c,drv:(()=>{try{return localStorage.getItem('gc_drv')!=='0'}catch(e){return true}})()};map.closePopup();
+ const okRs=rs&&rs.n==list.length;
+ if(okRs){list.forEach((x,k)=>{if(rs.ok.includes(k))ins.ok.add(x.p);if(rs.sk.includes(k))ins.sk.add(x.p)});ins.resumed=1}
+ insDrvApply();insWake();
+ insIsolate(c);insGo(okRs?Math.min(rs.i,list.length-1):0);ins.tm=setInterval(insTick,2000)}
+/* ---------- avance automático, pantalla encendida, modo conducción y reanudación ---------- */
+function insWake(){if(!ins||!navigator.wakeLock||document.visibilityState!=='visible')return;if(ins.wl&&!ins.wl.released)return;try{navigator.wakeLock.request('screen').then(w=>{if(ins)ins.wl=w;else w.release()}).catch(()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(ins)insWake()});
+function insDrvApply(){document.body.classList.toggle('drv',!!(ins&&ins.drv))}
+function insDrv(){ins.drv=!ins.drv;try{localStorage.setItem('gc_drv',ins.drv?'1':'0')}catch(e){}insDrvApply();insUi()}
+/* llegó (o ya pasó junto) al equipo: se marca como revisado y se pasa al siguiente sin tocar la pantalla. Solo con GPS preciso (±60 m) */
+function insAuto(p,d,s){const acc=meAcc?meAcc.getRadius():999;s.min=Math.min(s.min==null?1e9:s.min,d);
+ if(acc>60||!(d<=35||(s.min<=70&&d>s.min+30)))return false;
+ ins.ok.add(p);ins.prev=[p.lat,p.lng];ins.pre=T[p.t].n+' '+p.name+' revisado. ';try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}insGo(ins.i+1);return true}
+function insSave(){if(!ins)return;try{const ok=[],sk=[];ins.list.forEach((x,k)=>{if(ins.ok.has(x.p))ok.push(k);if(ins.sk.has(x.p))sk.push(k)});
+ localStorage.setItem('gc_insr',JSON.stringify({id:ins.id,dir:ins.dir,c:ins.c,i:ins.i,n:ins.list.length,ok,sk,t:Date.now()}))}catch(e){}}
+function insDiscard(){try{localStorage.removeItem('gc_insr')}catch(e){}insb.innerHTML=''}
+async function insResume(){let s=null;try{s=JSON.parse(localStorage.getItem('gc_insr')||'null')}catch(e){}if(!s)return;
+ const ci=circ.findIndex(c=>c.name==s.c);if(ci<0){toast('No se encontró el circuito '+s.c);return insDiscard()}
+ const c=circ[ci];insb.innerHTML='<div class="nx"><span>⏳ Cargando el circuito…</span></div>';
+ try{if(!c.on)await vis('c',ci,true);else if(!c.segs)await ensureC(c)}catch(e){}
+ insStart(s.id,s.dir,s.c,s)}
+/* al reabrir la app: ofrece continuar la inspección donde se quedó */
+(function(){let tries=0;const run=()=>{if(ins||insb.innerHTML)return;let s=null;try{s=JSON.parse(localStorage.getItem('gc_insr')||'null')}catch(e){}
+ if(!s||Date.now()-s.t>12*3600e3)return;
+ if(!byId(s.id)){if(++tries<20)setTimeout(run,1500);return}
+ insb.innerHTML=`<div class="ih"><b>🧭 Inspección pendiente</b><button onclick="insDiscard()">✕</button></div><div class="ib"><div class="in"><b>Circuito ${esc(s.c)}</b><small>Iba en el equipo ${Math.min(s.i+1,s.n)} de ${s.n}</small></div><div class="ia"><button class="ok" style="min-height:56px;font-size:20px" onclick="insResume()">▶ Continuar</button></div></div>`};
+ setTimeout(run,2500)})();
 /* ---------- rutas por calles (OSRM, mapa de OpenStreetMap) ---------- */
 async function insRoute(a,b,prof){const co=a[1].toFixed(6)+','+a[0].toFixed(6)+';'+b[1].toFixed(6)+','+b[0].toFixed(6),q='?overview=full&geometries=geojson&steps=true&alternatives=false',
  us=prof=='foot'?['https://routing.openstreetmap.de/routed-foot/route/v1/driving/'+co+q]:['https://routing.openstreetmap.de/routed-car/route/v1/driving/'+co+q,'https://router.project-osrm.org/route/v1/driving/'+co+q];
@@ -1242,7 +1281,7 @@ async function insFetch(){if(!ins||ins.ld)return;const x=ins.list[ins.i];if(!x)r
  if(!ins||tok!==ins.tok)return;ins.ld=0;
  if(!r){ins.err='Sin conexión con el servicio de rutas';ins.fb=[from,to];if(ins.intro)insSay(ins.intro);ins.intro='';insDraw(1);insUpd();return}
  ins.rt=r;ins.pr=null;ins.err='';ins.fb=null;ins.ann={};
- if(!p.wp)insSay((ins.intro?ins.intro+'. ':'')+'Ruta de '+insFm(r.dist)+'. '+insCap(insStepTxt(r.steps[0],'')));ins.intro='';
+ if(!p.wp)insSay((ins.intro?ins.intro+', a '+insFm(r.dist)+'. ':'Ruta de '+insFm(r.dist)+'. ')+insCap(insStepTxt(r.steps[0],'')));ins.intro='';
  insDraw(1);insUi()}
 function insRetry(){if(ins&&ins.err){ins.err='';ins.try=0;insFetch()}}
 /* ---------- textos de las indicaciones ---------- */
@@ -1267,13 +1306,15 @@ function insStepTxt(s,eq){const m=s.m||{},t=m.type,md=m.modifier,nm=s.nm,on=nm?'
 const insIco=s=>s.m.type=='arrive'?'🏁':s.m.type=='depart'?'🧭':(INS_ARW[s.m.modifier]||'↑');
 /* ---------- recorrido ---------- */
 function insGo(i){ins.i=i;ins.say={};ins.ann={};ins.rt=null;ins.pr=null;ins.err='';ins.msg='';ins.fb=null;ins.ld=0;ins.offc=0;ins.near=null;ins.tok++;const x=ins.list[i];if(!x)return insEnd();const p=x.p;
- ins.intro=p.wp?'':(i?'Siguiente: ':'Iniciando inspección del circuito '+ins.cn+'. Primer equipo: ')+T[p.t].n+' '+p.name;
+ const pre=ins.pre||'';ins.pre='';const lead=ins.resumed?'Retomando la inspección del circuito '+ins.cn+'. Siguiente: ':(i?'Siguiente: ':'Iniciando inspección del circuito '+ins.cn+'. Primer equipo: ');ins.resumed=0;
+ ins.intro=p.wp?pre:pre+lead+T[p.t].n+' '+p.name;
  if(!me&&!ins.prev){if(ins.intro)insSay(ins.intro);ins.intro='';map.setView([p.lat,p.lng],Math.max(map.getZoom(),16))}
- insDraw();insUi();insFetch()}
-function insTick(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p;ins.near=null;
+ insDraw();insUi();insFetch();insSave()}
+function insTick(){if(!ins)return;insWake();const x=ins.list[ins.i];if(!x)return;const p=x.p;ins.near=null;
  if(!ins.rt&&!ins.ld&&(me||ins.prev)&&(ins.msg||Date.now()-(ins.try||0)>12000))insFetch();
  if(me){const d=map.distance(me.getLatLng(),[p.lat,p.lng]),s=ins.say;ins.near=d;insFollow();
   if(p.wp){if(d<=Math.max(70,(ins.rt?ins.rt.snap||0:0)+40)||(ins.pr&&ins.pr.tot<=25)){ins.ok.add(p);ins.prev=[p.lat,p.lng];insGo(ins.i+1);return}}
+  else if(insAuto(p,d,s)){return}
   else if(d<=30&&!s.h){s.h=1;insSay('Llegó a '+T[p.t].n+' '+p.name+(p.st?', cerrado':', abierto')+'. Confirme la revisión.')}
   else if(!ins.rt&&!ins.ld){if(d<=100&&d>30&&!s.m){s.m=1;insSay('En cien metros, '+T[p.t].n+' '+p.name)}else if(d>100&&d<=300&&!s.f){s.f=1;insSay('En '+insFm(d)+', '+T[p.t].n+' '+p.name)}}}
  insUpd()}
@@ -1304,10 +1345,10 @@ function insBanner(){const x=ins.list[ins.i],r=ins.rt,eq=dn(x.p);
  if(ins.pr){const nx=r.steps[ins.pr.si+1];return nx?{i:insIco(nx),t:'<b>'+insFk(ins.pr.rem)+'</b> · '+esc(insCap(insStepTxt(nx,eq)))}:{i:'🏁',t:'Llegando a su destino'}}
  return{i:'🧭',t:'Ruta: <b>'+insFk(r.dist)+'</b> · '+insFt(r.dur)+' · '+esc(insCap(insStepTxt(r.steps[0],'')))}}
 const insInfo=x=>tn(x.p)+(ins.rt?' · '+insFk(ins.rt.dist)+' · '+insFt(ins.rt.dur):'')+(ins.near!=null?' · a '+Math.round(ins.near)+' m de usted':'');
-function insListHtml(){const r=ins.rt;if(!r||!ins.open)return'';const cur=ins.pr?ins.pr.si+1:-1;
+function insListHtml(){const r=ins.rt;if(!r||!ins.open||ins.drv)return'';const cur=ins.pr?ins.pr.si+1:-1;
  return'<div class="sl">'+r.steps.map((s,i)=>`<div class="${i==cur?'cur':''}"><span style="flex:none;width:18px">${insIco(s)}</span><span style="flex:1">${esc(insCap(insStepTxt(s,'')))}</span><small style="flex:none;color:var(--m)">${insFk(s.d)}</small></div>`).join('')+'</div>'}
 function insUi(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p,n=ins.list.length,k=ins.ok.size+ins.sk.size,b=insBanner(),old=insb.querySelector('.sl'),sc=old?old.scrollTop:0;
- insb.innerHTML=`<div class="ih"><b>🧭 ${esc(ins.cn)}</b><span>${k}/${n}</span><button onclick="insProf()" title="Tipo de ruta">${ins.prof=='foot'?'🚶':'🚗'}</button><button onclick="insToggleList()" title="Indicaciones">📋</button><button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div>
+ insb.innerHTML=`<div class="ih"><b>🧭 ${esc(ins.cn)}</b><span>${k}/${n}</span><button onclick="insDrv()" title="Pantalla de conducción">${ins.drv?'🗺':'🚘'}</button>${ins.drv?'':`<button onclick="insProf()" title="Tipo de ruta">${ins.prof=='foot'?'🚶':'🚗'}</button><button onclick="insToggleList()" title="Indicaciones">📋</button>`}<button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div>
 <div class="nx" onclick="insRetry()"><i id="ins-i">${b.i}</i><span id="ins-b">${b.t}</span></div>${insListHtml()}
 <div class="ib"><div class="in"><b>${p.wp?'Recorrido de la línea':esc(p.name)}</b><small id="ins-s">${esc(insInfo(x))}</small></div><div class="ia"><button onclick="insNext(1)">Omitir</button><button id="ins-ok" class="ok ${ins.near!=null&&ins.near<=30?'pulse':''}" onclick="insNext()">${p.wp?'Siguiente':'✔ Revisado'}</button></div></div><div class="bar"><i style="width:${k/n*100}%"></i></div>`;
  const nw=insb.querySelector('.sl');if(nw)nw.scrollTop=sc}
@@ -1317,11 +1358,11 @@ function insToggleList(){ins.open=!ins.open;insUi()}
 function insProf(){ins.prof=ins.prof=='foot'?'car':'foot';try{localStorage.setItem('gc_prof',ins.prof)}catch(e){}ins.rt=null;ins.pr=null;ins.err='';ins.ld=0;ins.tok++;ins.rr=0;insFetch();insUi()}
 function insNext(sk){const x=ins.list[ins.i];(sk?ins.sk:ins.ok).add(x.p);ins.prev=[x.p.lat,x.p.lng];insGo(ins.i+1)}
 function insMute(){ins.mute=!ins.mute;if(ins.mute&&window.speechSynthesis)speechSynthesis.cancel();insUi()}
-function insEnd(){insRestore();clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;const eqs=ins.list.filter(x=>!x.p.wp),n=eqs.length,okn=eqs.filter(x=>ins.ok.has(x.p)).length,skn=eqs.filter(x=>ins.sk.has(x.p)).length;insSay('Inspección terminada. Se recorrió todo el circuito; '+okn+' de '+n+' equipos revisados.');
+function insEnd(){insRestore();document.body.classList.remove('drv');try{localStorage.removeItem('gc_insr')}catch(e){}clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;const eqs=ins.list.filter(x=>!x.p.wp),n=eqs.length,okn=eqs.filter(x=>ins.ok.has(x.p)).length,skn=eqs.filter(x=>ins.sk.has(x.p)).length;insSay('Inspección terminada. Se recorrió todo el circuito; '+okn+' de '+n+' equipos revisados.');
  ins.rep='Inspección '+ins.cn+' · '+new Date().toLocaleString()+'\n'+eqs.map(x=>(ins.ok.has(x.p)?'✔ ':'✖ ')+x.p.name+' ('+T[x.p.t].n+')').join('\n');log('🧭 Inspección de '+ins.cn+': '+okn+'/'+n+' equipos revisados');
  insb.innerHTML=`<div class="ih"><b>🧭 Inspección terminada</b><span>${okn}/${n}</span><button onclick="insStop()">✕</button></div><div class="ib"><div class="in">Recorrido completo · revisados: <b>${okn}</b> · omitidos: <b>${skn}</b></div><div class="ia"><button class="ok" onclick="insShare()">Compartir reporte</button></div></div>`}
 function insShare(){const t=ins.rep;navigator.share?navigator.share({title:'Inspección '+ins.cn,text:t}).catch(()=>{}):navigator.clipboard.writeText(t).then(()=>toast('Reporte copiado'))}
-function insStop(){insRestore();if(!ins)return;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
+function insStop(){insRestore();document.body.classList.remove('drv');try{localStorage.removeItem('gc_insr')}catch(e){}if(!ins)return;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
 </script>
 <script>
 /* ===== Guardado: copia interna en IndexedDB, almacenamiento protegido y estado visible ===== */
