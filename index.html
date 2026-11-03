@@ -180,7 +180,7 @@ body.dm .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) c
 body.sheet #fab,body.sheet #tbar{display:none}
 </style><style>
 /* ===== Pantalla de conducción: solo lo indispensable, letra grande y alto contraste ===== */
-body.drv #tbar,body.drv #shb,body.drv #fab,body.drv #side,body.drv .leaflet-top .leaflet-control:not(.vmic),body.drv #co{display:none!important}
+body.drv #tbar,body.drv #shb,body.drv #fab,body.drv #side,body.drv .leaflet-top .leaflet-control:not(.vmic):not(.loc),body.drv #co{display:none!important}
 body.drv #ins{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;border-width:3px;background:#000;padding-bottom:env(safe-area-inset-bottom)}
 body.drv #ins .ih{background:#000;padding:6px 10px}body.drv #ins .ih b{font-size:18px}
 body.drv #ins .nx{background:#000;padding:12px 14px;font-size:26px;line-height:1.2;color:#fff;border-color:#2f80ff}
@@ -200,6 +200,7 @@ body.drv #ins .ia{flex:1;justify-content:flex-end}
 #vc{position:fixed;left:8px;right:8px;top:calc(10px + env(safe-area-inset-top));z-index:1500;background:#000;border:3px solid var(--a);border-radius:14px;color:#fff;font:20px system-ui;padding:12px;box-shadow:0 6px 24px #000c}#vc:empty{display:none}
 #vc b{display:block;font-size:24px;color:#ffe066}#vc small{display:block;color:#cfe3f5;font-size:15px;font-weight:400}
 #vc .vr{display:flex;gap:8px;margin-top:10px}#vc button{flex:1;min-height:58px;font-size:20px;text-align:left}#vc button.ok{background:var(--g);color:#04121c;border-color:var(--g);font-weight:700}#vc button.ok small{color:#04121c}
+body.drv .loc{min-height:52px;font-size:18px;padding:8px 14px}
 </style>
 </head><body>
 <div id="tbar"><button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button></div>
@@ -328,14 +329,17 @@ map.on('contextmenu',e=>{const s=fmt(e.latlng);try{navigator.clipboard.writeText
 /* ---------- Mi ubicación (GPS del celular o red de la PC), en tiempo real ---------- */
 map.createPane('gps').style.zIndex=450;map.createPane('ad').style.zIndex=445;
 let me,meAcc,follow=false;
+function followPan(ll,z){let zz=z||map.getZoom(),off=0;const el=document.getElementById('ins');
+ if(typeof ins!=='undefined'&&ins&&ins.drv){if(zz<16)zz=17;if(el&&el.offsetHeight)off=el.offsetHeight/2}
+ const pt=map.project(ll,zz);map.setView(map.unproject(pt.add([0,off]),zz),zz,{animate:true,duration:.6})}
 const lc=L.control({position:'topleft'});lc.onAdd=()=>{const b=L.DomUtil.create('button','loc');b.id='lb';b.textContent='◎ Mi ubicación';L.DomEvent.disableClickPropagation(b);return b};lc.addTo(map);
-$('#lb').onclick=()=>{if(!me)return log('⚠ Aún no hay posición disponible; permita el acceso a la ubicación');follow=true;$('#lb').classList.add('on');map.setView(me.getLatLng(),Math.max(map.getZoom(),17))};
+$('#lb').onclick=()=>{if(!me)return log('⚠ Aún no hay posición disponible; permita el acceso a la ubicación');follow=true;$('#lb').classList.add('on');followPan(me.getLatLng(),Math.max(map.getZoom(),17))};
 map.on('dragstart',()=>{follow=false;$('#lb').classList.remove('on')});
 if(navigator.geolocation)navigator.geolocation.watchPosition(pos=>{const ll=[pos.coords.latitude,pos.coords.longitude],a=pos.coords.accuracy;
- if(!me){me=L.circleMarker(ll,{pane:'gps',radius:8,color:'#fff',weight:3,fillColor:'#2f80ff',fillOpacity:1}).addTo(map).bindTooltip(()=>'Mi posición: '+fmt(me.getLatLng()));
+ if(!me){me=L.circleMarker(ll,{pane:'gps',radius:document.body.classList.contains('drv')?14:8,color:'#fff',weight:3,fillColor:'#2f80ff',fillOpacity:1}).addTo(map).bindTooltip(()=>'Mi posición: '+fmt(me.getLatLng()));
   meAcc=L.circle(ll,{pane:'gps',radius:a,color:'#2f80ff',weight:1,fillOpacity:.12,interactive:false}).addTo(map);log('Ubicación obtenida (±'+Math.round(a)+' m)');if(!circ.length)map.setView(ll,16)}
  else{me.setLatLng(ll);meAcc.setLatLng(ll).setRadius(a)}
- if(follow)map.panTo(ll)},
+ if(follow)followPan(ll)},
  e=>{log('⚠ Ubicación no disponible: '+e.message);warnGps()},{enableHighAccuracy:true,maximumAge:2000,timeout:30000});
 else log('⚠ Este navegador no admite geolocalización');
 /* ---------- KMZ ---------- */
@@ -1254,7 +1258,10 @@ function insStart(id,dir,cnn,rs){const ip=byId(id);if(!ip)return;const c=cnn||ip
 /* ---------- avance automático, pantalla encendida, modo conducción y reanudación ---------- */
 function insWake(){if(!ins||!navigator.wakeLock||document.visibilityState!=='visible')return;if(ins.wl&&!ins.wl.released)return;try{navigator.wakeLock.request('screen').then(w=>{if(ins)ins.wl=w;else w.release()}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(ins)insWake()});
-function insDrvApply(){document.body.classList.toggle('drv',!!(ins&&ins.drv))}
+function insDrvApply(){const on=!!(ins&&ins.drv);document.body.classList.toggle('drv',on);if(me)me.setRadius(on?14:8);
+ if(on&&me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');setTimeout(()=>{if(ins&&ins.drv)followPan(me.getLatLng(),Math.max(map.getZoom(),17))},150)}}
+/* si el mapa se movió con el dedo, vuelve solo a la posición a los 8 s */
+map.on('dragend',()=>{if(!ins||!ins.drv)return;clearTimeout(ins.rc);ins.rc=setTimeout(()=>{if(ins&&ins.drv&&me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');followPan(me.getLatLng())}},8000)});
 function insDrv(){ins.drv=!ins.drv;try{localStorage.setItem('gc_drv',ins.drv?'1':'0')}catch(e){}insDrvApply();insUi()}
 /* llegó (o ya pasó junto) al equipo: se marca como revisado y se pasa al siguiente sin tocar la pantalla. Solo con GPS preciso (±60 m) */
 function insAuto(p,d,s){const acc=meAcc?meAcc.getRadius():999;s.min=Math.min(s.min==null?1e9:s.min,d);
@@ -1410,7 +1417,7 @@ function insDraw(fit){if(!ins)return;if(!ins.lg)ins.lg=L.layerGroup().addTo(map)
  L.circleMarker(to,{radius:p.wp?10:22,color:'#ffc233',weight:3,fillColor:'#ffc233',fillOpacity:.15,interactive:false}).addTo(g);if(ins.list.length>1)L.polyline(ins.list.slice(ins.i).map(y=>[y.p.lat,y.p.lng]),{color:'#ffc233',weight:2.5,opacity:.85,dashArray:'2 7',interactive:false}).addTo(g);
  if(r){L.polyline(r.rp,{color:'#fff',weight:10,opacity:.9,interactive:false,lineCap:'round'}).addTo(g);L.polyline(r.rp,{color:'#2f80ff',weight:6,opacity:1,interactive:false,lineCap:'round'}).addTo(g);
   if(r.end&&r.snap>6)L.polyline([r.end,to],{color:'#2f80ff',weight:3,dashArray:'3 7',interactive:false}).addTo(g);
-  if(fit){if(me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');map.setView(me.getLatLng(),Math.max(map.getZoom(),16))}else map.fitBounds(L.latLngBounds(r.rp).extend(to),{padding:[50,50],maxZoom:17})}}
+  if(fit){if(me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');followPan(me.getLatLng(),Math.max(map.getZoom(),16))}else map.fitBounds(L.latLngBounds(r.rp).extend(to),{padding:[50,50],maxZoom:17})}}
  else if(ins.fb){L.polyline(ins.fb,{color:'#9aa7b3',weight:3,dashArray:'6 8',interactive:false}).addTo(g);if(fit)map.fitBounds(L.latLngBounds(ins.fb),{padding:[50,50],maxZoom:17})}}
 /* ---------- barra inferior ---------- */
 function insBanner(){const x=ins.list[ins.i],r=ins.rt,eq=dn(x.p);
@@ -1434,11 +1441,11 @@ function insToggleList(){ins.open=!ins.open;insUi()}
 function insProf(){ins.prof=ins.prof=='foot'?'car':'foot';try{localStorage.setItem('gc_prof',ins.prof)}catch(e){}ins.rt=null;ins.pr=null;ins.err='';ins.ld=0;ins.tok++;ins.rr=0;insFetch();insUi()}
 function insNext(sk){const x=ins.list[ins.i];(sk?ins.sk:ins.ok).add(x.p);ins.prev=[x.p.lat,x.p.lng];insGo(ins.i+1)}
 function insMute(){ins.mute=!ins.mute;if(ins.mute&&window.speechSynthesis)speechSynthesis.cancel();insUi()}
-function insEnd(){if(ins&&ins.nav)return insNavEnd();insRestore();document.body.classList.remove('drv');try{localStorage.removeItem('gc_insr')}catch(e){}clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;const eqs=ins.list.filter(x=>!x.p.wp),n=eqs.length,okn=eqs.filter(x=>ins.ok.has(x.p)).length,skn=eqs.filter(x=>ins.sk.has(x.p)).length;insSay('Inspección terminada. Se recorrió todo el circuito; '+okn+' de '+n+' equipos revisados.');
+function insEnd(){if(ins&&ins.nav)return insNavEnd();insRestore();document.body.classList.remove('drv');me&&me.setRadius(8);try{localStorage.removeItem('gc_insr')}catch(e){}clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;const eqs=ins.list.filter(x=>!x.p.wp),n=eqs.length,okn=eqs.filter(x=>ins.ok.has(x.p)).length,skn=eqs.filter(x=>ins.sk.has(x.p)).length;insSay('Inspección terminada. Se recorrió todo el circuito; '+okn+' de '+n+' equipos revisados.');
  ins.rep='Inspección '+ins.cn+' · '+new Date().toLocaleString()+'\n'+eqs.map(x=>(ins.ok.has(x.p)?'✔ ':'✖ ')+x.p.name+' ('+T[x.p.t].n+')').join('\n');log('🧭 Inspección de '+ins.cn+': '+okn+'/'+n+' equipos revisados');
  insb.innerHTML=`<div class="ih"><b>🧭 Inspección terminada</b><span>${okn}/${n}</span><button onclick="insStop()">✕</button></div><div class="ib"><div class="in">Recorrido completo · revisados: <b>${okn}</b> · omitidos: <b>${skn}</b></div><div class="ia"><button class="ok" onclick="insShare()">Compartir reporte</button></div></div>`}
 function insShare(){const t=ins.rep;navigator.share?navigator.share({title:'Inspección '+ins.cn,text:t}).catch(()=>{}):navigator.clipboard.writeText(t).then(()=>toast('Reporte copiado'))}
-function insStop(keep){insRestore();document.body.classList.remove('drv');if(keep!==1)try{localStorage.removeItem('gc_insr')}catch(e){}if(!ins)return;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
+function insStop(keep){insRestore();document.body.classList.remove('drv');me&&me.setRadius(8);if(keep!==1)try{localStorage.removeItem('gc_insr')}catch(e){}if(!ins)return;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.wl&&ins.wl.release&&ins.wl.release();window.speechSynthesis&&speechSynthesis.cancel();insb.innerHTML='';ins=null}
 </script>
 <script>
 /* ===== Guardado: copia interna en IndexedDB, almacenamiento protegido y estado visible ===== */
