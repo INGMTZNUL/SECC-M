@@ -1287,7 +1287,7 @@ setTimeout(insOffer,2500);
 /* ---------- navegar hasta un equipo (dentro de la app, con ruta por calles y voz) ---------- */
 function navTo(id,circ){const p=byId(id);if(!p)return;const vc=$('#vc');vc&&(vc.innerHTML='');
  if(ins){if(!ins.nav)insSave();insStop(1)}
- ins={cn:p.cn||'',list:[{p,n:-1,d:0}],i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,nav:1,navCirc:circ||'',prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0,
+ ins={cn:p.cn||'',list:[{p,n:-1,d:0}],i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,nav:1,navCirc:circ||((p.t=='INT'&&p.cn)?p.cn:''),prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0,
   drv:(()=>{try{return localStorage.getItem('gc_drv')!=='0'}catch(e){return true}})()};
  map.closePopup();insDrvApply();insWake();insGo(0);ins.tm=setInterval(insTick,2000)}
 function insNavEnd(){const p=ins.list[0].p;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;ins.wl&&ins.wl.release&&ins.wl.release();
@@ -1335,7 +1335,7 @@ function vPh(x){return x.replace(/qu/g,'k').replace(/c(?=[ei])/g,'s').replace(/c
 function vLev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=[...Array(n+1).keys()];for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]==b[j-1]?0:1));p=c}return p[n]}
 /* busca el equipo: el NÚMERO manda (el reconocedor oye «null» por «NUL»), las letras solo se comparan con tolerancia; nombre dicho completo > nombre contenido en lo dicho > palabras en común */
 function vMatch(alts){const best=new Map();
- const items=[...pts.filter(p=>p.vis!==0&&p.t!='DR'&&p.name).map(p=>({p,nm:p.name})),...circ.filter(c=>c.name).map(c=>({c,nm:c.name}))];
+ const items=[...pts.filter(p=>p.t!='DR'&&p.name).map(p=>({p,nm:p.name})),...circ.filter(c=>c.name).map(c=>({c,nm:c.name}))];
  for(const t of alts){const q=vN(t).replace(/([a-z])(\d)/g,'$1 $2').replace(/(\d)([a-z])/g,'$1 $2'),tk=q.split(' ').filter(w=>w&&!VF.has(w)),c1=q.replace(/ /g,''),c2=tk.map(w=>V_D[w]??V_L[w]??w).join(''),at=tk.filter(w=>/^[a-z]+$/.test(w)&&!(w in V_D)),lt=at.join(''),P1=vPh(c1),P2=vPh(c2);
   /* números dichos: grupos de dígitos seguidos, sin ceros a la izquierda; deben coincidir COMPLETOS (5320 no es 320) */
   const runs=[];let cur='';for(const w of tk){const m=V_D[w]??w;if(/^\d+$/.test(m))cur+=m;else{if(cur)runs.push(cur);cur=''}}if(cur)runs.push(cur);const R=runs.map(r=>r.replace(/^0+/,''));
@@ -1351,9 +1351,10 @@ function vMatch(alts){const best=new Map();
   if(it.p){a.push({p:it.p,sc});continue}
   /* un circuito: se va a su interruptor (inicio); si no tiene, al equipo del circuito más cercano */
   const eq=pts.filter(p=>p.cn==it.c.name&&p.t!='DR'&&!(T[p.t]&&T[p.t].sv));if(!eq.length)continue;
-  const tg=eq.find(p=>p.t=='INT')||eq.map(p=>[p,me?map.distance(me.getLatLng(),[p.lat,p.lng]):0]).sort((x,y)=>x[1]-y[1])[0][0];
+  const nn=vN(it.c.name).replace(/ /g,''),tg=eq.find(p=>p.t=='INT'&&vN(p.name).replace(/ /g,'')==nn)||eq.find(p=>p.t=='INT')||eq.map(p=>[p,me?map.distance(me.getLatLng(),[p.lat,p.lng]):0]).sort((x,y)=>x[1]-y[1])[0][0];
   a.push({p:tg,sc,circ:it.c.name})}
  if(!a.length)return[];
+ if(a.some(x=>!x.circ&&x.sc>=3))a=a.filter(x=>!x.circ);
  const mx=Math.max(...a.map(x=>x.sc)),tier=Math.floor(mx);a=a.filter(x=>Math.floor(x.sc)==tier&&x.sc>=mx-(tier==3?.0001:tier==2?.05:.2));
  const dd=x=>me?map.distance(me.getLatLng(),[x.p.lat,x.p.lng]):0;a.sort((x,y)=>y.sc-x.sc||dd(x)-dd(y));
  const seen=new Set();a=a.filter(x=>{if(seen.has(x.p.id))return false;seen.add(x.p.id);return true});return a.slice(0,3)}
