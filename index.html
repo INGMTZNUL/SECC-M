@@ -181,16 +181,18 @@ body.sheet #fab,body.sheet #tbar{display:none}
 </style><style>
 /* ===== Pantalla de conducción: solo lo indispensable, letra grande y alto contraste ===== */
 body.drv #tbar,body.drv #shb,body.drv #fab,body.drv #side,body.drv .leaflet-top .leaflet-control:not(.vmic):not(.loc),body.drv #co{display:none!important}
-body.drv #ins{left:0;right:0;bottom:0;border-radius:16px 16px 0 0;border-width:3px;background:#000;padding-bottom:env(safe-area-inset-bottom)}
-body.drv #ins .ih{background:#000;padding:6px 10px}body.drv #ins .ih b{font-size:18px}
-body.drv #ins .nx{background:#000;padding:12px 14px;font-size:26px;line-height:1.2;color:#fff;border-color:#2f80ff}
-body.drv #ins .nx i{font-size:48px;width:60px;color:#5ab0ff}
-body.drv #ins .nx b{display:block;font-size:38px;color:#ffe066}
-body.drv #ins .ib{padding:10px 14px}
-body.drv #ins .in b{font-size:24px;color:#fff}body.drv #ins .in small{font-size:16px;color:#cfe3f5}
-body.drv #ins button{min-height:58px;font-size:20px;padding:10px 20px}
-body.drv #ins .ih button{min-height:46px;font-size:20px;padding:6px 12px}
-body.drv #ins .ia{flex:1;justify-content:flex-end}
+body.drv #ins{left:0;right:0;bottom:0;border-radius:14px 14px 0 0;border-width:2px;background:rgba(0,0,0,.82);padding-bottom:env(safe-area-inset-bottom);max-height:30dvh}
+body.drv #ins .ih{background:transparent;padding:4px 8px;justify-content:flex-end}body.drv #ins .ih b{display:none}body.drv #ins .ih span{margin-right:auto;color:#cfe3f5;font-size:15px}
+body.drv #ins .ih button{min-height:40px;font-size:18px;padding:2px 12px}
+body.drv #ins .nx{background:transparent;padding:2px 12px 6px;gap:10px;font-size:20px;line-height:1.15;color:#fff;border:0}
+body.drv #ins .nx i{font-size:40px;width:48px;color:#5ab0ff}
+body.drv #ins .nx b{font-size:30px;color:#ffe066;margin-right:8px}
+body.drv #ins .ib{padding:4px 12px 8px;gap:8px;flex-wrap:nowrap}
+body.drv #ins .in{flex:1;min-width:0}body.drv #ins .in b{font-size:18px;color:#fff;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}body.drv #ins .in small{display:none}
+body.drv #ins .ia{flex:none}body.drv #ins .ia button{min-height:48px;font-size:17px;padding:6px 14px}
+body.drv #ins .bar{display:none}
+body.drv #ins.min .ib{display:none}
+body.drv .loc{min-height:52px;font-size:18px;padding:8px 14px}
 </style>
 <style>
 /* ===== Búsqueda por voz ===== */
@@ -200,7 +202,6 @@ body.drv #ins .ia{flex:1;justify-content:flex-end}
 #vc{position:fixed;left:8px;right:8px;top:calc(10px + env(safe-area-inset-top));z-index:1500;background:#000;border:3px solid var(--a);border-radius:14px;color:#fff;font:20px system-ui;padding:12px;box-shadow:0 6px 24px #000c}#vc:empty{display:none}
 #vc b{display:block;font-size:24px;color:#ffe066}#vc small{display:block;color:#cfe3f5;font-size:15px;font-weight:400}
 #vc .vr{display:flex;gap:8px;margin-top:10px}#vc button{flex:1;min-height:58px;font-size:20px;text-align:left}#vc button.ok{background:var(--g);color:#04121c;border-color:var(--g);font-weight:700}#vc button.ok small{color:#04121c}
-body.drv .loc{min-height:52px;font-size:18px;padding:8px 14px}
 </style>
 </head><body>
 <div id="tbar"><button id="shb" onclick="this.textContent=document.body.classList.toggle('sheet')?'✕ Cerrar':'☰ Panel'">☰ Panel</button></div>
@@ -1258,7 +1259,8 @@ function insStart(id,dir,cnn,rs){const ip=byId(id);if(!ip)return;const c=cnn||ip
 /* ---------- avance automático, pantalla encendida, modo conducción y reanudación ---------- */
 function insWake(){if(!ins||!navigator.wakeLock||document.visibilityState!=='visible')return;if(ins.wl&&!ins.wl.released)return;try{navigator.wakeLock.request('screen').then(w=>{if(ins)ins.wl=w;else w.release()}).catch(()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(ins)insWake()});
-function insDrvApply(){const on=!!(ins&&ins.drv);document.body.classList.toggle('drv',on);if(me)me.setRadius(on?14:8);
+function insMin(){ins.min=!ins.min;try{localStorage.setItem('gc_min',ins.min?'1':'0')}catch(e){}insUi();setTimeout(()=>{if(me&&follow)followPan(me.getLatLng())},120)}
+function insDrvApply(){const on=!!(ins&&ins.drv);if(ins&&ins.min===undefined){try{ins.min=localStorage.getItem('gc_min')==='1'}catch(e){ins.min=false}}document.body.classList.toggle('drv',on);if(me)me.setRadius(on?14:8);
  if(on&&me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');setTimeout(()=>{if(ins&&ins.drv)followPan(me.getLatLng(),Math.max(map.getZoom(),17))},150)}}
 /* si el mapa se movió con el dedo, vuelve solo a la posición a los 8 s */
 map.on('dragend',()=>{if(!ins||!ins.drv)return;clearTimeout(ins.rc);ins.rc=setTimeout(()=>{if(ins&&ins.drv&&me){follow=true;const lb=$('#lb');lb&&lb.classList.add('on');followPan(me.getLatLng())}},8000)});
@@ -1431,10 +1433,10 @@ const insInfo=x=>tn(x.p)+(ins.rt?' · '+insFk(ins.rt.dist)+' · '+insFt(ins.rt.d
 function insListHtml(){const r=ins.rt;if(!r||!ins.open||ins.drv)return'';const cur=ins.pr?ins.pr.si+1:-1;
  return'<div class="sl">'+r.steps.map((s,i)=>`<div class="${i==cur?'cur':''}"><span style="flex:none;width:18px">${insIco(s)}</span><span style="flex:1">${esc(insCap(insStepTxt(s,'')))}</span><small style="flex:none;color:var(--m)">${insFk(s.d)}</small></div>`).join('')+'</div>'}
 function insUi(){if(!ins)return;const x=ins.list[ins.i];if(!x)return;const p=x.p,n=ins.list.length,k=ins.ok.size+ins.sk.size,b=insBanner(),old=insb.querySelector('.sl'),sc=old?old.scrollTop:0;
- insb.innerHTML=`<div class="ih"><b>🧭 ${ins.nav?'Navegando':esc(ins.cn)}</b><span>${ins.nav?'':k+'/'+n}</span><button onclick="insDrv()" title="Pantalla de conducción">${ins.drv?'🗺':'🚘'}</button>${ins.drv?'':`<button onclick="insProf()" title="Tipo de ruta">${ins.prof=='foot'?'🚶':'🚗'}</button><button onclick="insToggleList()" title="Indicaciones">📋</button>`}<button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div>
+ insb.innerHTML=`<div class="ih"><b>🧭 ${ins.nav?'Navegando':esc(ins.cn)}</b><span>${ins.nav?'':k+'/'+n}</span><button onclick="insDrv()" title="Pantalla de conducción">${ins.drv?'🗺':'🚘'}</button>${ins.drv?`<button onclick="insMin()" title="Reducir panel">${ins.min?'▴':'▾'}</button>`:`<button onclick="insProf()" title="Tipo de ruta">${ins.prof=='foot'?'🚶':'🚗'}</button><button onclick="insToggleList()" title="Indicaciones">📋</button>`}<button onclick="insMute()">${ins.mute?'🔇':'🔊'}</button><button onclick="insStop()">✕</button></div>
 <div class="nx" onclick="insRetry()"><i id="ins-i">${b.i}</i><span id="ins-b">${b.t}</span></div>${insListHtml()}
 <div class="ib"><div class="in"><b>${p.wp?'Recorrido de la línea':esc(p.name)}</b><small id="ins-s">${esc(insInfo(x))}</small></div><div class="ia">${ins.nav?'<button onclick="insGmaps()">Google Maps</button>':'<button onclick="insNext(1)">Omitir</button>'}<button id="ins-ok" class="ok ${ins.near!=null&&ins.near<=30?'pulse':''}" onclick="insNext()">${p.wp?'Siguiente':ins.nav?'🏁 Llegué':'✔ Revisado'}</button></div></div><div class="bar"><i style="width:${k/n*100}%"></i></div>`;
- const nw=insb.querySelector('.sl');if(nw)nw.scrollTop=sc}
+ insb.classList.toggle('min',!!(ins.drv&&ins.min));const nw=insb.querySelector('.sl');if(nw)nw.scrollTop=sc}
 /* actualiza solo los textos (sin reconstruir los botones, para no perder toques en el celular) */
 function insUpd(){if(!ins)return;const x=ins.list[ins.i],t=insb.querySelector('#ins-b');if(!x||!t)return;const b=insBanner();insb.querySelector('#ins-i').textContent=b.i;t.innerHTML=b.t;insb.querySelector('#ins-s').textContent=insInfo(x);insb.querySelector('#ins-ok').classList.toggle('pulse',ins.near!=null&&ins.near<=30)}
 function insToggleList(){ins.open=!ins.open;insUi()}
