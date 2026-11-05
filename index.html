@@ -1312,11 +1312,16 @@ function vListen(){return new Promise(res=>{const SR=window.SpeechRecognition||w
  r.onresult=e=>{const o=[],R=e.results[e.results.length-1];for(let i=0;i<R.length;i++)o.push(R[i].transcript);fin(o)};
  r.onerror=e=>fin(e.error=='not-allowed'||e.error=='service-not-allowed'?null:[]);r.onend=()=>fin([]);
  try{vRec=r;r.start();vBtn(1)}catch(e){fin([])}})}
-/* busca el equipo: nombre dicho completo > nombre contenido en lo dicho > palabras en común */
+/* pronunciación aproximada: «zac»=«sac», «lado»≈«lao», «null»=«nul» */
+function vPh(x){return x.replace(/qu/g,'k').replace(/c(?=[ei])/g,'s').replace(/c/g,'k').replace(/z/g,'s').replace(/v/g,'b').replace(/w/g,'u').replace(/h/g,'').replace(/ll/g,'y').replace(/(.)\1+/g,'$1')}
+function vLev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=[...Array(n+1).keys()];for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]==b[j-1]?0:1));p=c}return p[n]}
+/* busca el equipo: el NÚMERO manda (el reconocedor oye «null» por «NUL»), las letras solo se comparan con tolerancia; nombre dicho completo > nombre contenido en lo dicho > palabras en común */
 function vMatch(alts){const best=new Map();
- for(const t of alts){const q=vN(t),tk=q.split(' ').filter(w=>w&&!VF.has(w)),c1=q.replace(/ /g,''),c2=tk.map(w=>V_D[w]??V_L[w]??w).join('');
+ for(const t of alts){const q=vN(t).replace(/([a-z])(\d)/g,'$1 $2').replace(/(\d)([a-z])/g,'$1 $2'),tk=q.split(' ').filter(w=>w&&!VF.has(w)),c1=q.replace(/ /g,''),c2=tk.map(w=>V_D[w]??V_L[w]??w).join(''),QD=c2.replace(/\D/g,''),at=tk.filter(w=>/^[a-z]+$/.test(w)&&!(w in V_D)),lt=at.join(''),P1=vPh(c1),P2=vPh(c2);
   for(const p of pts){if(p.vis===0||p.t=='DR'||!p.name)continue;const nt=vN(p.name),nm=nt.replace(/ /g,'');if(nm.length<2)continue;let sc=0;
-   if(c1.includes(nm)||c2.includes(nm))sc=3+nm.length/100;
+   const D=nm.replace(/\D/g,'').replace(/^0+/,''),L=nm.replace(/\d/g,'');
+   if(D.length>=3&&QD.includes(D)){const PL=vPh(L),lok=!L||at.some(w=>{const f=vPh(w);return vLev(f,PL)<=(PL.length>=5?2:1)||f.includes(PL)||(f.length>1&&PL.includes(f))})||vPh(lt).includes(PL)||vLev(vPh(lt),PL)<=1;sc=lok?3+nm.length/100:2.5}
+   else if(c1.includes(nm)||c2.includes(nm)||P1.includes(vPh(nm))||P2.includes(vPh(nm)))sc=3+nm.length/100;
    else if(c2.length>=3&&nm.includes(c2))sc=2+c2.length/nm.length/10;
    else if(tk.length){const nw=nt.split(' '),h=tk.filter(w=>w.length>1&&nw.includes(w)).length;if(h&&h/tk.length>=.5)sc=h/tk.length*.99}
    if(sc>(best.get(p)||0))best.set(p,sc)}}
