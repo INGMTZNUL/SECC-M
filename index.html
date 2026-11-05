@@ -200,7 +200,7 @@ body.drv .loc{min-height:52px;font-size:18px;padding:8px 14px}
 #vbtn{display:block;width:60px;height:60px;min-height:60px;padding:0;border-radius:50%;background:var(--a);color:#04121c;border:3px solid #fff;font-size:28px;line-height:1;box-shadow:0 4px 16px #000a}
 #vbtn.on{background:#ff3b3b;color:#fff;animation:pl 1s infinite}
 #vc{position:fixed;left:8px;right:8px;top:calc(10px + env(safe-area-inset-top));z-index:1500;background:#000;border:3px solid var(--a);border-radius:14px;color:#fff;font:20px system-ui;padding:12px;box-shadow:0 6px 24px #000c}#vc:empty{display:none}
-#vc b{display:block;font-size:24px;color:#ffe066}#vc small{display:block;color:#cfe3f5;font-size:15px;font-weight:400}
+#vc .vv{font-size:11px;opacity:.55;margin-top:6px}#vc b{display:block;font-size:24px;color:#ffe066}#vc small{display:block;color:#cfe3f5;font-size:15px;font-weight:400}
 #vc .vr{display:flex;gap:8px;margin-top:10px}#vc button{flex:1;min-height:58px;font-size:20px;text-align:left}#vc button.ok{background:var(--g);color:#04121c;border-color:var(--g);font-weight:700}#vc button.ok small{color:#04121c}
 </style>
 </head><body>
@@ -1319,7 +1319,7 @@ const V_D={cero:'0',uno:'1',una:'1',dos:'2',tres:'3',cuatro:'4',cinco:'5',seis:'
  VF=new Set('busca buscame buscar encuentra encuentrame localiza llevame lleva llevar ir ve vamos navega navegar navegame ruta hacia hasta a al el la los las de del en equipo por favor quiero necesito'.split(' ')),
  vN=t=>String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
 let vRec=null,vBusy=0,vTok=0;
-const vBtn=on=>{const b=$('#vbtn');b&&b.classList.toggle('on',!!on)},vCard=h=>{const c=$('#vc');if(c)c.innerHTML=h||''};
+const vBtn=on=>{const b=$('#vbtn');b&&b.classList.toggle('on',!!on)},vCard=h=>{const c=$('#vc');if(c)c.innerHTML=h?h+'<small class="vv">búsqueda por voz v5</small>':''};
 function vCancel(){vTok++;try{vRec&&vRec.abort()}catch(e){}vRec=null;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}vBusy=0;vBtn(0);vCard('')}
 function vGo(id,circ){vTok++;try{vRec&&vRec.abort()}catch(e){}vRec=null;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}vBusy=0;vBtn(0);vCard('');navTo(id,circ)}
 function vSay(t){return new Promise(res=>{if(!window.speechSynthesis){res();return}try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='es-MX';let d=0;const f=()=>{if(!d){d=1;res()}};u.onend=f;u.onerror=f;setTimeout(f,12000);speechSynthesis.speak(u)}catch(e){res()}})}
@@ -1334,7 +1334,7 @@ function vListen(){return new Promise(res=>{const SR=window.SpeechRecognition||w
 function vPh(x){return x.replace(/qu/g,'k').replace(/c(?=[ei])/g,'s').replace(/c/g,'k').replace(/z/g,'s').replace(/v/g,'b').replace(/w/g,'u').replace(/h/g,'').replace(/ll/g,'y').replace(/(.)\1+/g,'$1')}
 function vLev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=[...Array(n+1).keys()];for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]==b[j-1]?0:1));p=c}return p[n]}
 /* busca el equipo: el NÚMERO manda (el reconocedor oye «null» por «NUL»), las letras solo se comparan con tolerancia; nombre dicho completo > nombre contenido en lo dicho > palabras en común */
-function vMatch(alts){const best=new Map();
+function vMatch(alts){vMatch.noInt='';const best=new Map();
  const items=[...pts.filter(p=>p.t!='DR'&&p.name).map(p=>({p,nm:p.name})),...circ.filter(c=>c.name).map(c=>({c,nm:c.name}))];
  for(const t of alts){const q=vN(t).replace(/([a-z])(\d)/g,'$1 $2').replace(/(\d)([a-z])/g,'$1 $2'),tk=q.split(' ').filter(w=>w&&!VF.has(w)),c1=q.replace(/ /g,''),c2=tk.map(w=>V_D[w]??V_L[w]??w).join(''),at=tk.filter(w=>/^[a-z]+$/.test(w)&&!(w in V_D)),lt=at.join(''),P1=vPh(c1),P2=vPh(c2);
   /* números dichos: grupos de dígitos seguidos, sin ceros a la izquierda; deben coincidir COMPLETOS (5320 no es 320) */
@@ -1350,8 +1350,8 @@ function vMatch(alts){const best=new Map();
  for(const [it,sc] of best){
   if(it.p){a.push({p:it.p,sc});continue}
   /* un circuito: se va a su interruptor (inicio); si no tiene, al equipo del circuito más cercano */
-  const eq=pts.filter(p=>p.cn==it.c.name&&p.t!='DR'&&!(T[p.t]&&T[p.t].sv));if(!eq.length)continue;
-  const nn=vN(it.c.name).replace(/ /g,''),tg=eq.find(p=>p.t=='INT'&&vN(p.name).replace(/ /g,'')==nn)||eq.find(p=>p.t=='INT')||eq.map(p=>[p,me?map.distance(me.getLatLng(),[p.lat,p.lng]):0]).sort((x,y)=>x[1]-y[1])[0][0];
+  const ints=pts.filter(p=>p.cn==it.c.name&&p.t=='INT');if(!ints.length){if(sc>=3)vMatch.noInt=it.c.name;continue}
+  const nn=vN(it.c.name).replace(/ /g,''),tg=ints.find(p=>vN(p.name).replace(/ /g,'')==nn)||ints.map(p=>[p,me?map.distance(me.getLatLng(),[p.lat,p.lng]):0]).sort((x,y)=>x[1]-y[1])[0][0];
   a.push({p:tg,sc,circ:it.c.name})}
  if(!a.length)return[];
  if(a.some(x=>!x.circ&&x.sc>=3))a=a.filter(x=>!x.circ);
@@ -1368,7 +1368,7 @@ async function vFind(){
   if(a===null){vCard('');toast('Permita el micrófono para esta página (candado junto a la dirección)');return}
   if(!a.length){vCard('<b>No lo escuché</b><small>Toque el micrófono e intente de nuevo</small><div class="vr"><button onclick="vCancel()">Cerrar</button></div>');await vSay('No lo escuché. Intente de nuevo.');return}
   const c=vMatch(a);
-  if(!c.length){vCard('<b>No encontré ese equipo</b><small>Escuché: «'+esc(a[0])+'»</small><div class="vr"><button onclick="vCancel()">Cerrar</button></div>');await vSay('No encontré ese equipo');return}
+  if(!c.length){const ni=vMatch.noInt;vCard('<b>'+(ni?'No encontré el interruptor de '+esc(ni):'No encontré ese equipo')+'</b><small>Escuché: «'+esc(a[0])+'»</small><div class="vr"><button onclick="vCancel()">Cerrar</button></div>');await vSay(ni?'No encontré el interruptor del circuito '+ni:'No encontré ese equipo');return}
   if(c.length==1){const x0=c[0],p=x0.p;
    vCard('<b>¿Ir a '+esc(ttl(x0))+'?</b><small>'+esc(sub(x0))+'</small><div class="vr"><button class="ok" onclick="vGo('+p.id+','+vq(x0.circ)+')">Sí, ir</button><button onclick="vCancel()">No</button></div>');
    await vSay('¿Ir a '+lab(x0)+'? Diga sí o no.');if(!live())return;await wait(250);
