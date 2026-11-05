@@ -1285,14 +1285,32 @@ function insOffer(){if(ins||insb.innerHTML)return;let s=null;try{s=JSON.parse(lo
  insb.innerHTML=`<div class="ih"><b>🧭 Inspección pendiente</b><button onclick="insDiscard()">✕</button></div><div class="ib"><div class="in"><b>Circuito ${esc(s.c)}</b><small>Iba en el equipo ${Math.min(s.i+1,s.n)} de ${s.n}</small></div><div class="ia"><button class="ok" style="min-height:56px;font-size:20px" onclick="insResume()">▶ Continuar</button></div></div>`}
 setTimeout(insOffer,2500);
 /* ---------- navegar hasta un equipo (dentro de la app, con ruta por calles y voz) ---------- */
-function navTo(id){const p=byId(id);if(!p)return;const vc=$('#vc');vc&&(vc.innerHTML='');
+function navTo(id,circ){const p=byId(id);if(!p)return;const vc=$('#vc');vc&&(vc.innerHTML='');
  if(ins){if(!ins.nav)insSave();insStop(1)}
- ins={cn:p.cn||'',list:[{p,n:-1,d:0}],i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,nav:1,prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0,
+ ins={cn:p.cn||'',list:[{p,n:-1,d:0}],i:0,ok:new Set,sk:new Set,say:{},ann:{},mute:false,nav:1,navCirc:circ||'',prof:(()=>{try{return localStorage.getItem('gc_prof')||'car'}catch(e){return'car'}})(),tok:0,ld:0,
   drv:(()=>{try{return localStorage.getItem('gc_drv')!=='0'}catch(e){return true}})()};
  map.closePopup();insDrvApply();insWake();insGo(0);ins.tm=setInterval(insTick,2000)}
 function insNavEnd(){const p=ins.list[0].p;clearInterval(ins.tm);ins.lg&&ins.lg.remove();ins.lg=null;ins.wl&&ins.wl.release&&ins.wl.release();
+ if(ins.navCirc){insNavCirc(p);return}
  insSay('Llegó a '+T[p.t].n+' '+p.name);
  insb.innerHTML=`<div class="ih"><b>🏁 Llegó a su destino</b><button onclick="insNavClose()">✕</button></div><div class="ib"><div class="in"><b>${esc(p.name)}</b><small>${esc(T[p.t].n)}${p.cn?' · '+esc(p.cn):''}</small></div><div class="ia"><button class="ok" onclick="insNavClose()">Cerrar</button></div></div>`}
+function insNavCirc(p){const cn=ins.navCirc;
+ insb.innerHTML=`<div class="ih"><b>🏁 Llegó al interruptor</b><button onclick="insNavClose()">✕</button></div><div class="nx"><i>🏁</i><span>Llegó al interruptor de <b>${esc(cn)}</b><br>¿Iniciar la inspección desde aquí hasta el final del circuito?</span></div><div class="ib"><div class="in"></div><div class="ia"><button onclick="insNavClose()">No</button><button class="ok" onclick="insNavGo()">▶ Sí, iniciar</button></div></div>`;
+ insNavAsk(cn)}
+/* pregunta por voz y escucha «sí» / «no» */
+async function insNavAsk(cn){const tk=++vTok;vBusy=1;
+ try{await vSay('Llegó al interruptor del circuito '+cn+'. ¿Desea iniciar la inspección desde este punto hasta el final del circuito? Diga sí o no.');
+  if(tk!==vTok||!ins||!ins.nav)return;await new Promise(r=>setTimeout(r,250));
+  const r=await vListen();if(tk!==vTok||!ins||!ins.nav)return;const y=r?r.map(vN).join(' | '):'';
+  if(/\b(si|claro|correcto|ok|okey|dale|va|afirmativo|adelante|vamos|inicia|iniciar|empieza|empezar|comienza|comenzar)\b/.test(y)&&!/\bno\b/.test(y)){insNavGo();return}
+  if(/\b(no|negativo|cancela|cancelar)\b/.test(y))insNavClose()
+ }finally{if(tk===vTok){vBusy=0;vBtn(0)}}}
+/* inicia la inspección desde el interruptor hasta el final del circuito */
+async function insNavGo(){if(!ins||!ins.nav)return;const p=ins.list[0].p,cn=ins.navCirc;
+ vTok++;try{vRec&&vRec.abort()}catch(e){}vRec=null;vBusy=0;vBtn(0);insStop(1);
+ const ci=circ.findIndex(c=>c.name==cn);
+ if(ci>=0){insb.innerHTML='<div class="nx"><span>⏳ Cargando el circuito…</span></div>';try{const c=circ[ci];if(!c.on)await vis('c',ci,true);else if(!c.segs)await ensureC(c)}catch(e){}}
+ insStart(p.id,'down',cn)}
 function insNavClose(){insStop(1);insOffer()}
 function insGmaps(){const p=ins&&ins.list[ins.i]&&ins.list[ins.i].p;if(p)window.open('https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lng+'&travelmode=driving','_blank')}
 /* ---------- búsqueda por voz: «busca restaurador R0201» ---------- */
@@ -1303,7 +1321,7 @@ const V_D={cero:'0',uno:'1',una:'1',dos:'2',tres:'3',cuatro:'4',cinco:'5',seis:'
 let vRec=null,vBusy=0,vTok=0;
 const vBtn=on=>{const b=$('#vbtn');b&&b.classList.toggle('on',!!on)},vCard=h=>{const c=$('#vc');if(c)c.innerHTML=h||''};
 function vCancel(){vTok++;try{vRec&&vRec.abort()}catch(e){}vRec=null;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}vBusy=0;vBtn(0);vCard('')}
-function vGo(id){vTok++;try{vRec&&vRec.abort()}catch(e){}vRec=null;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}vBusy=0;vBtn(0);vCard('');navTo(id)}
+function vGo(id,circ){vTok++;try{vRec&&vRec.abort()}catch(e){}vRec=null;try{window.speechSynthesis&&speechSynthesis.cancel()}catch(e){}vBusy=0;vBtn(0);vCard('');navTo(id,circ)}
 function vSay(t){return new Promise(res=>{if(!window.speechSynthesis){res();return}try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='es-MX';let d=0;const f=()=>{if(!d){d=1;res()}};u.onend=f;u.onerror=f;setTimeout(f,12000);speechSynthesis.speak(u)}catch(e){res()}})}
 /* escucha una frase: devuelve las alternativas, [] si no se oyó nada, o null si no hay micrófono o permiso */
 function vListen(){return new Promise(res=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){res(null);return}
@@ -1317,21 +1335,32 @@ function vPh(x){return x.replace(/qu/g,'k').replace(/c(?=[ei])/g,'s').replace(/c
 function vLev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=[...Array(n+1).keys()];for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]==b[j-1]?0:1));p=c}return p[n]}
 /* busca el equipo: el NÚMERO manda (el reconocedor oye «null» por «NUL»), las letras solo se comparan con tolerancia; nombre dicho completo > nombre contenido en lo dicho > palabras en común */
 function vMatch(alts){const best=new Map();
- for(const t of alts){const q=vN(t).replace(/([a-z])(\d)/g,'$1 $2').replace(/(\d)([a-z])/g,'$1 $2'),tk=q.split(' ').filter(w=>w&&!VF.has(w)),c1=q.replace(/ /g,''),c2=tk.map(w=>V_D[w]??V_L[w]??w).join(''),QD=c2.replace(/\D/g,''),at=tk.filter(w=>/^[a-z]+$/.test(w)&&!(w in V_D)),lt=at.join(''),P1=vPh(c1),P2=vPh(c2);
-  for(const p of pts){if(p.vis===0||p.t=='DR'||!p.name)continue;const nt=vN(p.name),nm=nt.replace(/ /g,'');if(nm.length<2)continue;let sc=0;
+ const items=[...pts.filter(p=>p.vis!==0&&p.t!='DR'&&p.name).map(p=>({p,nm:p.name})),...circ.filter(c=>c.name).map(c=>({c,nm:c.name}))];
+ for(const t of alts){const q=vN(t).replace(/([a-z])(\d)/g,'$1 $2').replace(/(\d)([a-z])/g,'$1 $2'),tk=q.split(' ').filter(w=>w&&!VF.has(w)),c1=q.replace(/ /g,''),c2=tk.map(w=>V_D[w]??V_L[w]??w).join(''),at=tk.filter(w=>/^[a-z]+$/.test(w)&&!(w in V_D)),lt=at.join(''),P1=vPh(c1),P2=vPh(c2);
+  /* números dichos: grupos de dígitos seguidos, sin ceros a la izquierda; deben coincidir COMPLETOS (5320 no es 320) */
+  const runs=[];let cur='';for(const w of tk){const m=V_D[w]??w;if(/^\d+$/.test(m))cur+=m;else{if(cur)runs.push(cur);cur=''}}if(cur)runs.push(cur);const R=runs.map(r=>r.replace(/^0+/,''));
+  for(const it of items){const nt=vN(it.nm),nm=nt.replace(/ /g,'');if(nm.length<2)continue;let sc=0;
    const D=nm.replace(/\D/g,'').replace(/^0+/,''),L=nm.replace(/\d/g,'');
-   if(D.length>=3&&QD.includes(D)){const PL=vPh(L),lok=!L||at.some(w=>{const f=vPh(w);return vLev(f,PL)<=(PL.length>=5?2:1)||f.includes(PL)||(f.length>1&&PL.includes(f))})||vPh(lt).includes(PL)||vLev(vPh(lt),PL)<=1;sc=lok?3+nm.length/100:2.5}
+   if(D.length>=2&&R.includes(D)){const PL=vPh(L),lok=!L||at.some(w=>{const f=vPh(w);return vLev(f,PL)<=(PL.length>=5?2:1)||f.includes(PL)||(f.length>1&&PL.includes(f))})||vPh(lt).includes(PL)||vLev(vPh(lt),PL)<=1;sc=lok?3+nm.length/100:2.5}
    else if(c1.includes(nm)||c2.includes(nm)||P1.includes(vPh(nm))||P2.includes(vPh(nm)))sc=3+nm.length/100;
    else if(c2.length>=3&&nm.includes(c2))sc=2+c2.length/nm.length/10;
    else if(tk.length){const nw=nt.split(' '),h=tk.filter(w=>w.length>1&&nw.includes(w)).length;if(h&&h/tk.length>=.5)sc=h/tk.length*.99}
-   if(sc>(best.get(p)||0))best.set(p,sc)}}
- let a=[...best].map(([p,sc])=>({p,sc}));if(!a.length)return[];
+   if(sc>(best.get(it)||0))best.set(it,sc)}}
+ let a=[];
+ for(const [it,sc] of best){
+  if(it.p){a.push({p:it.p,sc});continue}
+  /* un circuito: se va a su interruptor (inicio); si no tiene, al equipo del circuito más cercano */
+  const eq=pts.filter(p=>p.cn==it.c.name&&p.t!='DR'&&!(T[p.t]&&T[p.t].sv));if(!eq.length)continue;
+  const tg=eq.find(p=>p.t=='INT')||eq.map(p=>[p,me?map.distance(me.getLatLng(),[p.lat,p.lng]):0]).sort((x,y)=>x[1]-y[1])[0][0];
+  a.push({p:tg,sc,circ:it.c.name})}
+ if(!a.length)return[];
  const mx=Math.max(...a.map(x=>x.sc)),tier=Math.floor(mx);a=a.filter(x=>Math.floor(x.sc)==tier&&x.sc>=mx-(tier==3?.0001:tier==2?.05:.2));
- const dd=x=>me?map.distance(me.getLatLng(),[x.p.lat,x.p.lng]):0;a.sort((x,y)=>y.sc-x.sc||dd(x)-dd(y));return a.slice(0,3)}
+ const dd=x=>me?map.distance(me.getLatLng(),[x.p.lat,x.p.lng]):0;a.sort((x,y)=>y.sc-x.sc||dd(x)-dd(y));
+ const seen=new Set();a=a.filter(x=>{if(seen.has(x.p.id))return false;seen.add(x.p.id);return true});return a.slice(0,3)}
 async function vFind(){
  if(vBusy){vCancel();return}
  if(!(window.SpeechRecognition||window.webkitSpeechRecognition)){toast('Este navegador no permite la búsqueda por voz: use el buscador de arriba');const i=$('#sqi');i&&i.focus();return}
- vBusy=1;const tk=++vTok,live=()=>vBusy&&tk===vTok,desc=p=>T[p.t].n+' '+p.name+(p.cn?', circuito '+p.cn:''),wait=ms=>new Promise(r=>setTimeout(r,ms));
+ vBusy=1;const tk=++vTok,live=()=>vBusy&&tk===vTok,desc=p=>T[p.t].n+' '+p.name+(p.cn?', circuito '+p.cn:''),vq=c=>c?JSON.stringify(c).replace(/"/g,'&quot;'):'null',lab=x=>x.circ?'circuito '+x.circ+', interruptor '+x.p.name:desc(x.p),ttl=x=>x.circ?'Circuito '+x.circ:x.p.name,sub=x=>x.circ?'Interruptor '+x.p.name+' · inicio del circuito':T[x.p.t].n+(x.p.cn?' · '+x.p.cn:''),wait=ms=>new Promise(r=>setTimeout(r,ms));
  try{try{navigator.vibrate&&navigator.vibrate(40)}catch(e){}try{speechSynthesis.cancel()}catch(e){}
   vCard('<b>🎤 Escuchando…</b><small>Diga, por ejemplo: «busca restaurador R0201»</small><div class="vr"><button onclick="vCancel()">Cancelar</button></div>');
   const a=await vListen();if(!live())return;
@@ -1339,18 +1368,18 @@ async function vFind(){
   if(!a.length){vCard('<b>No lo escuché</b><small>Toque el micrófono e intente de nuevo</small><div class="vr"><button onclick="vCancel()">Cerrar</button></div>');await vSay('No lo escuché. Intente de nuevo.');return}
   const c=vMatch(a);
   if(!c.length){vCard('<b>No encontré ese equipo</b><small>Escuché: «'+esc(a[0])+'»</small><div class="vr"><button onclick="vCancel()">Cerrar</button></div>');await vSay('No encontré ese equipo');return}
-  if(c.length==1){const p=c[0].p;
-   vCard('<b>¿Ir a '+esc(p.name)+'?</b><small>'+esc(T[p.t].n)+(p.cn?' · '+esc(p.cn):'')+'</small><div class="vr"><button class="ok" onclick="vGo('+p.id+')">Sí, ir</button><button onclick="vCancel()">No</button></div>');
-   await vSay('¿Ir a '+desc(p)+'? Diga sí o no.');if(!live())return;await wait(250);
+  if(c.length==1){const x0=c[0],p=x0.p;
+   vCard('<b>¿Ir a '+esc(ttl(x0))+'?</b><small>'+esc(sub(x0))+'</small><div class="vr"><button class="ok" onclick="vGo('+p.id+','+vq(x0.circ)+')">Sí, ir</button><button onclick="vCancel()">No</button></div>');
+   await vSay('¿Ir a '+lab(x0)+'? Diga sí o no.');if(!live())return;await wait(250);
    const r=await vListen();if(!live())return;const y=r?r.map(vN).join(' | '):'';
-   if(/\b(si|claro|correcto|ok|okey|dale|va|afirmativo|adelante|vamos)\b/.test(y)&&!/\bno\b/.test(y)){vGo(p.id);return}
+   if(/\b(si|claro|correcto|ok|okey|dale|va|afirmativo|adelante|vamos)\b/.test(y)&&!/\bno\b/.test(y)){vGo(p.id,x0.circ);return}
    if(/\b(no|negativo|cancela|cancelar)\b/.test(y)){vCancel();return}
    return}
-  vCard('<b>Encontré varios</b>'+c.map((x,k)=>'<div class="vr"><button class="ok" onclick="vGo('+x.p.id+')">'+(k+1)+' · '+esc(x.p.name)+'<small>'+esc(T[x.p.t].n)+(x.p.cn?' · '+esc(x.p.cn):'')+'</small></button></div>').join('')+'<div class="vr"><button onclick="vCancel()">Ninguno</button></div>');
-  await vSay('Encontré '+c.length+' equipos. '+c.map((x,k)=>['Uno','Dos','Tres'][k]+', '+desc(x.p)).join('. ')+'. Diga el número.');if(!live())return;await wait(250);
+  vCard('<b>Encontré varios</b>'+c.map((x,k)=>'<div class="vr"><button class="ok" onclick="vGo('+x.p.id+','+vq(x.circ)+')">'+(k+1)+' · '+esc(ttl(x))+'<small>'+esc(sub(x))+'</small></button></div>').join('')+'<div class="vr"><button onclick="vCancel()">Ninguno</button></div>');
+  await vSay('Encontré '+c.length+' equipos. '+c.map((x,k)=>['Uno','Dos','Tres'][k]+', '+lab(x)).join('. ')+'. Diga el número.');if(!live())return;await wait(250);
   const r=await vListen();if(!live())return;const y=r?r.map(vN).join(' | '):'';
   const k=/\b(uno|1|primero|primera)\b/.test(y)?0:/\b(dos|2|segundo|segunda)\b/.test(y)?1:/\b(tres|3|tercero|tercera)\b/.test(y)?2:-1;
-  if(k>=0&&c[k]){vGo(c[k].p.id);return}
+  if(k>=0&&c[k]){vGo(c[k].p.id,c[k].circ);return}
   if(/\b(ninguno|ninguna|no|cancela|cancelar)\b/.test(y))vCancel()
  }finally{if(tk===vTok){vBusy=0;vBtn(0)}}}
 (function(){const d=document.createElement('div');d.id='vc';document.body.appendChild(d);
